@@ -1,0 +1,9 @@
+Package: medplot
+Type: Package
+Title: What the package does (short line)
+Version: 0.9.1
+Date: 2012-12-28
+Author: Who wrote it
+Maintainer: Who to complain to <crt.ahlin@gmail.com>
+Description: More about what it does (maybe more than one line)
+License: All rights reserved until license agreed upon. What license is it under?
