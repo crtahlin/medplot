@@ -164,6 +164,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # debugging
   podatki <<- data
   browser()
+
   
   # generate plot with number of days of tests on the x axis
   # and appropriate y axis
