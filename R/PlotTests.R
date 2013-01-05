@@ -161,6 +161,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # calculate buffer for y axis size (account for drawing lines between groups)
   
+  # debugging
+  podatki <<- data
   
   # generate plot with number of days of tests on the x axis
   # and appropriate y axis
