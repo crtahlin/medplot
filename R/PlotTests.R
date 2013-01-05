@@ -20,6 +20,12 @@
 
 plotTests <- function (data, figureParameters, graphsDir = getwd(),
                        generateTooltips = TRUE) {
+  
+  # replace missing values with NA (must do because RExcel sends them as 
+  # empty string and it does that by purpose - at a different setting 
+  # the date labels would also be transformed, which we do not want
+  data[data==""] <- NA
+  
   # start profiling
   Rprof(filename="Rprof.out", append=TRUE)
   
@@ -227,7 +233,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       # loop through all points - for case when there are two in one cell
       for (k in 1:length(tests)) {
         # if (k>1) browser()
-        symbolTooltip[pointCounter+k] <-  
+        symbolTooltip[pointCounter+k] <-
           paste("ID:", data[data$Order==i, "ID"], # "ID" of patient     
                 ", positive:", # list tests which are positive
                 as.character(unlist(data[data$Order==i,
