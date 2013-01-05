@@ -580,7 +580,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   }
   
   # for debuging
-  pointsPlottedWithTooltips <- symbolTooltip
-  pointPlottedSVG <- getPlotPoints(doc)[[1]]
+  pointsPlottedWithTooltips <<- symbolTooltip
+  pointPlottedSVG <<- getPlotPoints(doc)[[1]]
   
 }
