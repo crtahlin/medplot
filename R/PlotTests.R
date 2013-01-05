@@ -51,6 +51,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   DOT.COLORS <- as.character(unlist(figureParameters["Color"]))
   DOT.SIZES <- as.integer(unlist(figureParameters["Size"]))
   
+  # TODO: add checking if all levels in Data are valid levels also listed in Parameters
+  
   # make dot colors transparent with transparency APLHA (0-255) ####
   ALPHA <- 150
   DOT.COLORS <- apply(col2rgb(DOT.COLORS), 2, function(x)
@@ -91,6 +93,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # the unit should be drawn in
   order <- vector(mode="integer", length=nUNITS)
   data <- cbind(data, Order=order) 
+  rm(order)
   
   # start with line number 1; number will be incremented for every unit and every
   # separating line
@@ -148,7 +151,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # load plotting library ####
   library(Cairo)
   
-  Cairo(paste(graphsDir, "/", "example.svg", sep=""), type="svg",width=max(daysofTests)/4,height=29,units="cm",dpi=300)
+  Cairo(paste(graphsDir, "/", "example.svg", sep=""), type="svg",width=max(max(daysofTests)/4,10 ),height=29,units="cm",dpi=300)
   # Cairo("example.pdf", type="pdf",width=19,height=24,units="cm",dpi=300)
   # svg("example1.svg")
   
