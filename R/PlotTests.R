@@ -19,7 +19,7 @@
 
 
 plotTests <- function (data, figureParameters, graphsDir = getwd(),
-                         generateTooltips = TRUE) {
+                       generateTooltips = TRUE) {
   # start profiling
   Rprof(filename="Rprof.out", append=TRUE)
   
@@ -32,13 +32,13 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     errorMessages[length(errorMessages)+1] <<-
       "Error: Data was not passed to R."
   }
-    
+  
   if(!exists(x="figureParameters")) {
     errorMessages[length(errorMessages)+1] <<-
       "Error: Plot parameters were not passed to R."
   }
   
-    
+  
   # identify and store first and last columns that contain dates of tests ####
   datesColumnsIndices <- grep("^[0-9]{1,2}[.][0-9]{1,2}[.][0-9]{4}$",
                               colnames(data))
@@ -92,7 +92,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   order <- vector(mode="integer", length=nUNITS)
   data <- cbind(data, Order=order) 
   
-  # start with line number 1, which will be incremented for every unit and every
+  # start with line number 1; number will be incremented for every unit and every
   # separating line
   lineNo <- 1
   
@@ -148,12 +148,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # load plotting library ####
   library(Cairo)
   
-  # initialize plotting graphics device
-  # CairoWin()
-  # CairoSVG(height=10, units="cm", bg = "transparent", pointsize = 12)
-  # CairoPDF(dpi=300 )
-  # Cairo("example.pdf", type="pdf",width=20,height=20,units="cm",dpi=300)
-  
   Cairo(paste(graphsDir, "/", "example.svg", sep=""), type="svg",width=max(daysofTests)/4,height=29,units="cm",dpi=300)
   # Cairo("example.pdf", type="pdf",width=19,height=24,units="cm",dpi=300)
   # svg("example1.svg")
@@ -198,7 +192,9 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     
     for (ii in index) {
       # get a character vector of all the tests in the cell
-      tests <- isolateTests(string=as.character(unlist(data[data$Order==i, DATES.COLUMN.FIRST : DATES.COLUMN.LAST][ii])), separator=",")
+      tests <- isolateTests(string=as.character(unlist(
+        data[data$Order==i, DATES.COLUMN.FIRST : DATES.COLUMN.LAST][ii]))
+                            , separator=",")
       
       # draws point one on top of the other if multiple tests 
       # are positive in the same cell
@@ -583,5 +579,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     errorMessages[length(errorMessages)+1] <<- "No errors found."
   }
   
-
+  # for debuging
+  pointsPlottedWithTooltips <- symbolTooltip
+  pointPlottedSVG <- getPlotPoints(doc)[[1]]
+  
 }
