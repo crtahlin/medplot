@@ -151,7 +151,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # load plotting library ####
   library(Cairo)
   
-  Cairo(paste(graphsDir, "/", "example.svg", sep=""), type="svg",width=max(max(daysofTests)/4,10 ),height=29,units="cm",dpi=300)
+  Cairo(paste(graphsDir, "/", "example.svg", sep=""), type="svg",width=(max(daysofTests)/4)+10 ,height=29,units="cm",dpi=300)
   # Cairo("example.pdf", type="pdf",width=19,height=24,units="cm",dpi=300)
   # svg("example1.svg")
   
