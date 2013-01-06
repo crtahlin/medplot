@@ -423,11 +423,12 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     mtext(line=2, text=TEST.RESULT.LEVELS[i], side=3,
           las=1,  cex=.75, padj=1, font=2,
           at=max(daysofTests)/4+i*5-5, col=DOT.COLORS[i])
+    
     points(x=max(daysofTests)/4+i*5-5,
            y=2,
            col=DOT.COLORS[i],
            cex=DOT.SIZES[i],
-           pch=16
+           pch=16)
   }
   
   # add label of graph
