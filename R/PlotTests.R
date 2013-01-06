@@ -415,24 +415,21 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
-  
-  
-  # add legend - what test is meant by each color ####
-  # TODO: add dots (symbols) to the legend, above the labels
-  for(i in 1:length(TEST.RESULT.LEVELS)) {
-    mtext(line=2, text=TEST.RESULT.LEVELS[i], side=3,
-          las=1,  cex=.75, padj=1, font=2,
-          at=max(daysofTests)/4+i*5-5, col=DOT.COLORS[i])
-    
-    points(x=max(daysofTests)/4+i*5-5,
-           y=2,
-           col=DOT.COLORS[i],
-           cex=DOT.SIZES[i],
-           pch=16)
-  }
-  
-  # add label of graph
+
+  # add label of graph A
   mtext("A", side=3, adj=0, line=1, cex=1.5)
+  
+  # add a legend to the A plot
+  legend(x=2,
+         y=-1.5,
+         xpd=TRUE,
+         legend=TEST.RESULT.LEVELS,
+         pch=16,
+         horiz=TRUE,
+         col=DOT.COLORS,
+         pt.cex=DOT.SIZES
+         )
+ 
   
   
   
@@ -512,8 +509,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
-  browser()
-  
+    
   # TODO: should colors for groups be parameters for the user to set?
   # TODO: at least set them for a general case of N 1st levels
   # load libray for "barplot2" function
