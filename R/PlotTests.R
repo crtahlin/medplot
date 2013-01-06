@@ -237,8 +237,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                  )
       # if at least one is invalid, set that a critical error has occured as TRUE     
          criticalError <- TRUE
-      # and exit function
-      #   stop()
+      
        }
         
       }
@@ -458,7 +457,10 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
          pt.cex=DOT.SIZES
          )
  
-  
+  # if critical error occured, print a warning on graph
+  if (criticalError) {
+    text(x=1, y=0, labels="Critical error", cex=20, col="red", srt=45)
+  }
   
   
   #### draw the second figure #####
@@ -588,6 +590,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # draw the "title" of the graph
   mtext("B", side=3, adj=0, line=1, cex=1.5)
+  
   
   
   # writes image to file
