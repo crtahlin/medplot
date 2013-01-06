@@ -15,9 +15,16 @@
 # TODO: če je več skupini in je ena NA, naj zanjo izpiše "Unknown" sicer naj ne izpiše nič, če je NA edina skupina
 # TODO: naredi presledke med skupinami na spodnjem grafu večje - npr. 1/3 ali pa 1/2 vsega prostora
 # TODO: probaj sortirati absolutno in po vsaki skupini posebej; recimo za paciente je datum mogoče čisto v redu, za osebje pa verjetno kaj drugega
-# TODO: premisli, kako bi naredil, da bi SVGAnnotation deloval: kaj če bi "points" zagnal v for loopu za vsak level posebej  - bi potem lažje uporabil SVGAnnotation ?
 
 
+# function to get all the test results from a cell
+isolateTests <- function (string, separator) {
+  a <- unlist(strsplit(string, split=separator)) # isolate all tests in cell
+  b <- sub(pattern="^ ", replacement="", x=a) # remove leading spaces
+  return(b)  # return character vector to calling function
+}
+
+# function to plot test results
 plotTests <- function (data, figureParameters, graphsDir = getwd(),
                        generateTooltips = TRUE) {
   
@@ -31,6 +38,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # initialize placeholder for error messages 
   errorMessages <<- list()
+  criticalError <- FALSE
   
   # check if function arguments were received; a bit superflous since
   # function will not work without arguments passed
@@ -147,12 +155,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
-  # function to get all the test results from a cell
-  isolateTests <- function (string, separator) {
-    a <- unlist(strsplit(string, split=separator)) # isolate all tests in cell
-    b <- sub(pattern="^ ", replacement="", x=a) # remove leading spaces
-    return(b)  # return character vector to calling function
-  }
+ 
   
   # load plotting library ####
   library(Cairo)
@@ -216,6 +219,21 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       tests <- isolateTests(string=as.character(unlist(
         data[data$Order==i, DATES.COLUMN.FIRST : DATES.COLUMN.LAST][ii]))
                             , separator=",")
+            
+      # test if all test results entered are valid
+      for (iii in 1:length(tests)) {
+       if (!any(tests[iii]==TEST.RESULT.LEVELS)){
+         errorMessages[length(errorMessages)+1] <<-
+           cat("Error: Data does not match allowed values. Check ID:",
+               data[data$Order==i,]["ID"],
+               " and date column:",
+               names(data[ii])
+                 )
+      # if at least one is invalid, set that a critical error has occured as TRUE     
+         criticalError <- TRUE
+       }
+        
+      }
       
       # draws point one on top of the other if multiple tests 
       # are positive in the same cell
@@ -261,7 +279,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
-  
+  browser()
   
   # TODO: should dying as an outcome be plotted? 
   # ANSW: make it a parameter - which is the special event that is marked with X, add a column with date of event
