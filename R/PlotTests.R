@@ -420,7 +420,9 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # add legend - what test is meant by each color ####
   # TODO: add dots (symbols) to the legend, above the labels
   for(i in 1:length(TEST.RESULT.LEVELS)) {
-    mtext(line=2, text=TEST.RESULT.LEVELS[i], side=3, las=1,  cex=.75, padj=1, font=2, at=32+i*5-5, col=DOT.COLORS[i])
+    mtext(line=2, text=TEST.RESULT.LEVELS[i], side=3,
+          las=1,  cex=.75, padj=1, font=2,
+          at=max(daysofTests)/2+i*5-5, col=DOT.COLORS[i])
   }
   
   # add label of graph
