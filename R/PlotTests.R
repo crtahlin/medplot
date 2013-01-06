@@ -234,7 +234,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
         # if (k>1) browser()
         symbolTooltip[pointCounter+k] <-
           paste("ID:", data[data$Order==i, "ID"], # "ID" of patient     
-                ", positive:", # list tests which are positive
+                ", result:", # lists test results
                 as.character(unlist(data[data$Order==i,
                                          DATES.COLUMN.FIRST : 
                                            DATES.COLUMN.LAST][ii])),
@@ -471,10 +471,10 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     column <- column +1 
   }
   
-  # calculate minumum difference between tests in days
+  # calculate minumum difference between consecutive tests in days
   minimumInterval <- min(as.numeric(diff(daysofTests)))
-  # calculate space available to draw bar, 
-  #leaving a buffer the size of one width
+  # calculate space available to draw a bar, 
+  # leaving a buffer the size of one width
   barWidth <- minimumInterval / (length(TYPE.LEVELS)+1)
   # calculate distance to middle of bars drawn
   middleofBars <- (barWidth*(length(TYPE.LEVELS))/2)
@@ -500,6 +500,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       }
     }
   }
+  
+  browser()
   
   # TODO: should colors for groups be parameters for the user to set?
   # TODO: at least set them for a general case of N 1st levels
