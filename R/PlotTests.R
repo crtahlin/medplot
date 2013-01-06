@@ -10,10 +10,8 @@
 # TODO: study the seriation package (if there is a lot of heterogeneity with the date of 
 ## first arrival, let it be sorted by the date of first arrival, otherwise try to use
 ## seriation package)
-# TODO: add checking if all received results values are valid. otherwise return an error to Exceland abort.
 # TODO: add a static picture to be generated
 # TODO: če je več skupini in je ena NA, naj zanjo izpiše "Unknown" sicer naj ne izpiše nič, če je NA edina skupina
-# TODO: naredi presledke med skupinami na spodnjem grafu večje - npr. 1/3 ali pa 1/2 vsega prostora
 # TODO: probaj sortirati absolutno in po vsaki skupini posebej; recimo za paciente je datum mogoče čisto v redu, za osebje pa verjetno kaj drugega
 
 
@@ -128,26 +126,30 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       if (is.na(typeName)) {
         # a special case when both 1st and 2nd level are NA
         if (is.na(diagnosisName)) {
-          data[which(is.na(data$Type) & is.na(data$Diagnosis)),]["Order"] <- (lineNo):(lineNo-1 + cellSize)
+          data[which(is.na(data$Type) & is.na(data$Diagnosis)),]["Order"] <- 
+            (lineNo):(lineNo-1 + cellSize)
           # increase line number by cellsize and buffer for the separating line
           lineNo <- lineNo + cellSize + LINE.SIZE
           
           # case when only 1st level is NA
         } else {
           # assign an abolute order number to units in this cell
-          data[which(is.na(data$Type) & data$Diagnosis==diagnosisName),]["Order"] <- (lineNo):(lineNo-1 + cellSize)
+          data[which(is.na(data$Type) & data$Diagnosis==diagnosisName),]["Order"] <-
+            (lineNo):(lineNo-1 + cellSize)
           # increase line number by cellsize and buffer for the separating line
           lineNo <- lineNo + cellSize + LINE.SIZE
         }
       } else {
         # catch a special case when only 2nd level is NA
         if (is.na(diagnosisName)) {
-          data[which(data$Type==typeName & is.na(data$Diagnosis)),]["Order"] <- (lineNo):(lineNo-1 + cellSize)
+          data[which(data$Type==typeName & is.na(data$Diagnosis)),]["Order"] <- 
+            (lineNo):(lineNo-1 + cellSize)
           # increase line number by cellsize and buffer for the separating line
           lineNo <- lineNo + cellSize + LINE.SIZE
         } else {
           # assign an abolute order number to units in this cell
-          data[which(data$Type==typeName & data$Diagnosis==diagnosisName),]["Order"] <- (lineNo):(lineNo-1 + cellSize)
+          data[which(data$Type==typeName & data$Diagnosis==diagnosisName),]["Order"] <- 
+            (lineNo):(lineNo-1 + cellSize)
           # increase line number by cellsize and buffer for the separating line
           lineNo <- lineNo + cellSize + LINE.SIZE
         }
@@ -182,7 +184,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # calculate buffer for y axis size (account for drawing lines between groups)
   
-  # debugging
+  # TODO:  debugging
   podatki <<- data
   
   
@@ -212,7 +214,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     # but only the columns that are not NA
     # calculate the indices of nonNA test values
     index <- which(!is.na(data[data$Order==i, DATES.COLUMN.FIRST : DATES.COLUMN.LAST]))
-    
     
     for (ii in index) {
       # get a character vector of all the tests in the cell
@@ -279,10 +280,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       
       # increment counter of symbols drawn
       pointCounter <- pointCounter + length(tests)
-      
-      
-      
-      
     }
   }
   
@@ -304,140 +301,14 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   abline(h=unlist(data["Order"]), lty=2, col=LINE.UNIT.COLOR)
   
   
-  # add labels for first level groups ####
-  # function to draw 1st level labels  
-  drawLevelLabels <- function (firstLevel, secondLevel) {
-    # 1st level draw label for nonNA case
-    if (!is.na(firstLevel)) {
-      # get the rownumber for the first unit in this first level group
-      firstRowforType <- 
-        min(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)
-      
-      # and write the name of the type on the margin
-      mtext(line=2, text=firstLevel, side=2, las=2,  cex=1, padj=0, font=2, 
-            at=firstRowforType)
-      
-      # get row number for last unit in this first level group
-      lastRowforType <- 
-        max(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)
-      
-      # add line after last unit, for any but the last group - case with NA values
-      if (firstLevel != tail(TYPE.LEVELS[!is.na(TYPE.LEVELS)], n=1)) {
-        abline(h=lastRowforType+(LINE.SIZE/2), lty=2, col="black", lwd=2) 
-      }
-      
-      # 2nd level draw label
-      # only look at existing 1st and 2nd level combinations
-      # TODO: take this line out and call this function only for existing combinations???
-      if (!dim(na.omit(data[data$Type==firstLevel &
-                              data$Diagnosis==secondLevel,]["Order"]))[[1]]==0) {
-        
-        # 2nd level nonNA scenario ####
-        if (!is.na(secondLevel)) {
-          # get the rownumber for the first and last unit in this 2nd level group
-          firstRowforDiagnosis <- 
-            min(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
-                na.rm=TRUE)
-          lastRowforDiagnosis <- 
-            max(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
-                na.rm=TRUE)
-          
-          # and write the name of the type on the margin in the middle of group
-          mtext(line=1, text=secondLevel, side=2, las=2,  cex=.75, padj=0, font=1,
-                at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)
-          
-          # add line after last unit, for any but the last group
-          existingLevels <- as.character(unlist((
-            na.omit(unique(data[data$Type==firstLevel,]["Diagnosis"])))))
-          existingLevelsSorted <- DIAGNOSIS.LEVELS[sort(match(DIAGNOSIS.LEVELS,existingLevels), na.last=NA)]
-          
-          if (secondLevel != tail( existingLevelsSorted, n=1 )) {
-            abline(h=lastRowforDiagnosis+(LINE.SIZE/2), lty=2, col="gray", lwd=2)
-          }
-        }
-      }
-    }
-    
-    # 1st level draw label for NA case
-    if (is.na(firstLevel)) {
-      # get the rownumber for the first unit in this first level group
-      firstRowforType <- 
-        min(data[is.na(data$Type),]["Order"], na.rm=TRUE)
-      
-      # and write the name of the type on the margin
-      mtext(line=2, text="Unknown", side=2, las=2,  cex=1, padj=0, font=2, 
-            at=firstRowforType)
-      
-      # get row number for last unit in this first level group
-      lastRowforType <- 
-        max(data[is.na(data$Type),]["Order"], na.rm=TRUE)
-      
-      # add line above category
-      abline(h=firstRowforType-(LINE.SIZE/2), lty=2, col="black", lwd=2)    
-      
-      # 2nd level draw label for nonNA case
-      # TODO: take this line out and call this function only for existing combinations???
-      if (!dim(na.omit(data[is.na(data$Type) &
-                              data$Diagnosis==secondLevel,]["Order"]))[[1]]==0) {
-        
-        # 2nd level nonNA scenario ####
-        if (!is.na(secondLevel)) {
-          # get the rownumber for the first and last unit in this 2nd level group
-          firstRowforDiagnosis <- 
-            min(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
-                na.rm=TRUE)
-          lastRowforDiagnosis <- 
-            max(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
-                na.rm=TRUE)
-          
-          # and write the name of the type on the margin in the middle of group
-          mtext(line=1, text=secondLevel, side=2, las=2,  cex=.75, padj=0, font=1,
-                at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)
-          
-          # add line after last unit, for any but the last group
-          # TODO: check if lines are correctly dawn, when there are no NA values!    
-          existingLevels <- as.character(unlist((
-            na.omit(unique(data[is.na(data$Type),]["Diagnosis"])))))
-          existingLevelsSorted <- DIAGNOSIS.LEVELS[sort(match(existingLevels,DIAGNOSIS.LEVELS), na.last=NA)]
-          if (secondLevel != tail(existingLevelsSorted, n=1)) {
-            abline(h=lastRowforDiagnosis+(LINE.SIZE/2), lty=2, col="gray", lwd=2)
-          }
-        }
-      }
-      
-      # 2nd level draw label for NA case
-      
-      if (!dim(na.omit(data[is.na(data$Type) &
-                              is.na(data$Diagnosis),]["Order"]))[[1]]==0) {
-        
-        # 2nd level nonNA scenario ####
-        if (!is.na(secondLevel)) {
-          # get the rownumber for the first and last unit in this 2nd level group
-          firstRowforDiagnosis <- 
-            min(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
-                na.rm=TRUE)
-          lastRowforDiagnosis <- 
-            max(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
-                na.rm=TRUE)
-          
-          # and write the name of the type on the margin in the middle of group
-          mtext(line=1, text="", side=2, las=2,  cex=.75, padj=0, font=1,
-                at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)
-          
-          # add line above category
-          abline(h=firstRowforDiagnosis-(LINE.SIZE/2), lty=2, col="gray", lwd=2)
-          
-        }
-      }
-      
-    }
-  }
+ 
   
   
   # call function to draw labels for each 1st+2nd level combination ####
   for (i in TYPE.LEVELS) {
     for (ii in DIAGNOSIS.LEVELS) {
-      drawLevelLabels(firstLevel=i, secondLevel=ii)
+      drawLevelLabels(data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
+                      firstLevel=i, secondLevel=ii)
     }
   }
   
@@ -617,14 +488,144 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # TODO: take out functions for profiling
   # summaryRprof(filename="Rprof.out")
-  # parse_rprof("./scripts/Rprof.out")
-  # ggplot.profr("./scripts/Rprof.out")
-  # plot.profr("./scripts/Rprof.out")
-  # plot(parse_rprof("./scripts/Rprof.out"))
+  # library(profr)
+  # parse_rprof("Rprof.out")
+  # ggplot.profr("Rprof.out")
+  # plot.profr("Rprof.out")
+  # plot(parse_rprof("Rprof.out"))
   
   
   # set default error message, if no errors were generated
   if (length(errorMessages) == 0) {
     errorMessages[length(errorMessages)+1] <<- "No errors found."
+  }
+}
+
+
+
+# add labels for first level groups ####
+# function to draw 1st level labels  
+drawLevelLabels <- function (data, TYPE.LEVELS,LINE.SIZE, DIAGNOSIS.LEVELS, firstLevel, secondLevel) {
+  # 1st level draw label for nonNA case
+  if (!is.na(firstLevel)) {
+    # get the rownumber for the first unit in this first level group
+    firstRowforType <- 
+      min(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)
+    
+    # and write the name of the type on the margin
+    mtext(line=2, text=firstLevel, side=2, las=2,  cex=1, padj=0, font=2, 
+          at=firstRowforType)
+    
+    # get row number for last unit in this first level group
+    lastRowforType <- 
+      max(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)
+    
+    # add line after last unit, for any but the last group - case with NA values
+    if (firstLevel != tail(TYPE.LEVELS[!is.na(TYPE.LEVELS)], n=1)) {
+      abline(h=lastRowforType+(LINE.SIZE/2), lty=2, col="black", lwd=2) 
+    }
+    
+    # 2nd level draw label
+    # only look at existing 1st and 2nd level combinations
+    # TODO: take this line out and call this function only for existing combinations???
+    if (!dim(na.omit(data[data$Type==firstLevel &
+                            data$Diagnosis==secondLevel,]["Order"]))[[1]]==0) {
+      
+      # 2nd level nonNA scenario ####
+      if (!is.na(secondLevel)) {
+        # get the rownumber for the first and last unit in this 2nd level group
+        firstRowforDiagnosis <- 
+          min(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
+              na.rm=TRUE)
+        lastRowforDiagnosis <- 
+          max(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
+              na.rm=TRUE)
+        
+        # and write the name of the type on the margin in the middle of group
+        mtext(line=1, text=secondLevel, side=2, las=2,  cex=.75, padj=0, font=1,
+              at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)
+        
+        # add line after last unit, for any but the last group
+        existingLevels <- as.character(unlist((
+          na.omit(unique(data[data$Type==firstLevel,]["Diagnosis"])))))
+        existingLevelsSorted <- DIAGNOSIS.LEVELS[sort(match(DIAGNOSIS.LEVELS,existingLevels), na.last=NA)]
+        
+        if (secondLevel != tail( existingLevelsSorted, n=1 )) {
+          abline(h=lastRowforDiagnosis+(LINE.SIZE/2), lty=2, col="gray", lwd=2)
+        }
+      }
+    }
+  }
+  
+  # 1st level draw label for NA case
+  if (is.na(firstLevel)) {
+    # get the rownumber for the first unit in this first level group
+    firstRowforType <- 
+      min(data[is.na(data$Type),]["Order"], na.rm=TRUE)
+    
+    # and write the name of the type on the margin
+    mtext(line=2, text="Unknown", side=2, las=2,  cex=1, padj=0, font=2, 
+          at=firstRowforType)
+    
+    # get row number for last unit in this first level group
+    lastRowforType <- 
+      max(data[is.na(data$Type),]["Order"], na.rm=TRUE)
+    
+    # add line above category
+    abline(h=firstRowforType-(LINE.SIZE/2), lty=2, col="black", lwd=2)    
+    
+    # 2nd level draw label for nonNA case
+    # TODO: take this line out and call this function only for existing combinations???
+    if (!dim(na.omit(data[is.na(data$Type) &
+                            data$Diagnosis==secondLevel,]["Order"]))[[1]]==0) {
+      
+      # 2nd level nonNA scenario ####
+      if (!is.na(secondLevel)) {
+        # get the rownumber for the first and last unit in this 2nd level group
+        firstRowforDiagnosis <- 
+          min(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
+              na.rm=TRUE)
+        lastRowforDiagnosis <- 
+          max(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
+              na.rm=TRUE)
+        
+        # and write the name of the type on the margin in the middle of group
+        mtext(line=1, text=secondLevel, side=2, las=2,  cex=.75, padj=0, font=1,
+              at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)
+        
+        # add line after last unit, for any but the last group
+        # TODO: check if lines are correctly dawn, when there are no NA values!    
+        existingLevels <- as.character(unlist((
+          na.omit(unique(data[is.na(data$Type),]["Diagnosis"])))))
+        existingLevelsSorted <- DIAGNOSIS.LEVELS[sort(match(existingLevels,DIAGNOSIS.LEVELS), na.last=NA)]
+        if (secondLevel != tail(existingLevelsSorted, n=1)) {
+          abline(h=lastRowforDiagnosis+(LINE.SIZE/2), lty=2, col="gray", lwd=2)
+        }
+      }
+    }
+    
+    # 2nd level draw label for NA case
+    
+    if (!dim(na.omit(data[is.na(data$Type) &
+                            is.na(data$Diagnosis),]["Order"]))[[1]]==0) {
+      
+      # 2nd level nonNA scenario ####
+      if (!is.na(secondLevel)) {
+        # get the rownumber for the first and last unit in this 2nd level group
+        firstRowforDiagnosis <- 
+          min(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
+              na.rm=TRUE)
+        lastRowforDiagnosis <- 
+          max(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
+              na.rm=TRUE)
+        
+        # and write the name of the type on the margin in the middle of group
+        mtext(line=1, text="Unknown", side=2, las=2,  cex=.75, padj=0, font=1,
+              at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)
+        
+        # add line above category
+        abline(h=firstRowforDiagnosis-(LINE.SIZE/2), lty=2, col="gray", lwd=2)
+      }
+    }
   }
 }
