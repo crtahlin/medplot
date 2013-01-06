@@ -157,7 +157,16 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # load plotting library ####
   library(Cairo)
   
-  Cairo(paste(graphsDir, "/", "example.svg", sep=""), type="svg",width=(max(daysofTests)/4)+10 ,height=29,units="cm",dpi=300)
+  # set width of plotting region (in centimeters)
+  PLOT.WIDTH <- max(c(max(daysofTests), (5+3*length(TEST.RESULT.LEVELS)) ))
+  
+  Cairo(paste(graphsDir, "/", "example.svg", sep=""),
+        type="svg",
+        width=PLOT.WIDTH ,
+        height=29,
+        units="cm",
+        dpi=300)
+  
   # Cairo("example.pdf", type="pdf",width=19,height=24,units="cm",dpi=300)
   # svg("example1.svg")
   
@@ -399,13 +408,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       
     }
   }
-  
-  # call function to draw 1st level labels
-  #  for (i in TYPE.LEVELS) {
-  #  draw1stLevelLabel(firstLevel=i)
-  #  }
-  
-  
   
   
   # call function to draw labels for each 1st+2nd level combination ####
