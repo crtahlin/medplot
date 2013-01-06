@@ -268,11 +268,11 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
         # if (k>1) browser()
         symbolTooltip[pointCounter+k] <-
           paste("ID:", data[data$Order==i, "ID"], # "ID" of patient     
-                ", result:", # lists test results
+                "; result:", # lists test results
                 as.character(unlist(data[data$Order==i,
                                          DATES.COLUMN.FIRST : 
                                            DATES.COLUMN.LAST][ii])),
-                ", date:", format(datesofTests[ii],format="%d.%m.%y" )# Date of test
+                "; date:", format(datesofTests[ii],format="%d.%m.%y" )# Date of test
                 
           )
       }
@@ -286,7 +286,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
-  browser()
   
   # TODO: should dying as an outcome be plotted? 
   # ANSW: make it a parameter - which is the special event that is marked with X, add a column with date of event
@@ -460,23 +459,16 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # if critical error occured, print a warning on graph
   if (criticalError) {
     text(x=1, y=0, labels="Critical error",
-         cex=max(c(10, PLOT.WIDTH/15)), col="red",
+         cex=max(c(8, PLOT.WIDTH/15)), col="red",
          srt=-45, adj=0)
   }
   
   
   #### draw the second figure #####
-  # TODO: the second figure draws thepercentage of infected in each 1st level group
-  # but how should this be implemented ?
-  # should the negative results be hardcoded as "neg" (or meybe better "negative"?)
-  # ANSW: harcode/ keep the first line in Excel as "negative"
   # ANSW: think about possiblity of drawing confidence interval inste OR in addition to 
   # column; should the user have a choice of drawing only means and also confindence intervals
-  # should the percentage of positive be (positive)/(positive + negative)* 100%
-  # or maybe (positive)/(all) (I guess not, it makes little sense to do this)
-  # ANSW : we look only at the nonmissing values
-  
-  
+
+    
   # set margins for 2nd figure
   par(mar=c(4, 7, .5, 2) + 0.1 )
   
@@ -504,15 +496,18 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       }
       row <- row + 1
     }
-    
-    column <- column +1 
+      column <- column +1 
   }
+  
+  # set buffer between bars plotted in relative units of one bar width
+  # e.g. if 1, that means buffer is the same width as one bar
+  BAR.BUFFER <- 3
   
   # calculate minumum difference between consecutive tests in days
   minimumInterval <- min(as.numeric(diff(daysofTests)))
   # calculate space available to draw a bar, 
   # leaving a buffer the size of one width
-  barWidth <- minimumInterval / (length(TYPE.LEVELS)+1)
+  barWidth <- minimumInterval / (length(TYPE.LEVELS)+BAR.BUFFER)
   # calculate distance to middle of bars drawn
   middleofBars <- (barWidth*(length(TYPE.LEVELS))/2)
   
@@ -542,8 +537,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   }
   
     
-  # TODO: should colors for groups be parameters for the user to set?
-  # TODO: at least set them for a general case of N 1st levels
+ 
   # load libray for "barplot2" function
   library(gplots)
   # load library for "ColorBrewer" function
@@ -593,7 +587,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # draw the "title" of the graph
   mtext("B", side=3, adj=0, line=1, cex=1.5)
   
-  
+  # write the date and time of plotting
+  mtext(paste("Generated on:", format(Sys.time(), "%d %b %Y, %H:%M")), side=1, line=2, cex=1)
   
   # writes image to file
   dev.off()
@@ -632,9 +627,4 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   if (length(errorMessages) == 0) {
     errorMessages[length(errorMessages)+1] <<- "No errors found."
   }
-  
-  # for debuging
-  pointsPlottedWithTooltips <<- symbolTooltip
-  pointPlottedSVG <<- getPlotPoints(doc)[[1]]
-  
 }
