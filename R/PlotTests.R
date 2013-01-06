@@ -231,6 +231,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                  )
       # if at least one is invalid, set that a critical error has occured as TRUE     
          criticalError <- TRUE
+      # and exit function
+         stop()
        }
         
       }
