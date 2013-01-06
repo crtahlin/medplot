@@ -229,8 +229,11 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
          errorMessages[length(errorMessages)+1] <<-
            paste("Error: Data does not match allowed values. Check ID:",
                data[data$Order==i,]["ID"],
-               " and date column:",
-               names(data[DATES.COLUMN.FIRST + ii - 1])
+               "and date column:",
+               names(data[DATES.COLUMN.FIRST + ii - 1]),
+                 "for value:'",
+                 tests[iii],
+                 "'"
                  )
       # if at least one is invalid, set that a critical error has occured as TRUE     
          criticalError <- TRUE
