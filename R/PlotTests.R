@@ -496,7 +496,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                                daysofTests[(i %/% length(TYPE.LEVELS))]
                              - 2*middleofBars) /(barWidth)
       } else if (length(TYPE.LEVELS)==1) { # if only one column (level) in group
-        spacingVector[i] <- (diff(daysofTests)[i] - 2*middleofBars)/(barWidth)
+        spacingVector[i] <- (diff(daysofTests)[i-1] - 2*middleofBars)/(barWidth)
       }
       else { # all columns inside a group have zero space between
         spacingVector[i] <- 0
