@@ -217,8 +217,11 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     for (ii in index) {
       # get a character vector of all the tests in the cell
       tests <- isolateTests(string=as.character(unlist(
-        data[data$Order==i, DATES.COLUMN.FIRST : DATES.COLUMN.LAST][ii]))
-                            , separator=",")
+        data[data$Order==i, DATES.COLUMN.FIRST : DATES.COLUMN.LAST][ii]
+        )), separator=",")
+      # TODO: would the code run faster, if I would use as reference:
+      # data[DATES.COLUMN.FIRST + ii - 1])
+      # as bellow ?
             
       # test if all test results entered are valid
       for (iii in 1:length(tests)) {
@@ -227,12 +230,12 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
            paste("Error: Data does not match allowed values. Check ID:",
                data[data$Order==i,]["ID"],
                " and date column:",
-               names(data[ii])
+               names(data[DATES.COLUMN.FIRST + ii - 1])
                  )
       # if at least one is invalid, set that a critical error has occured as TRUE     
          criticalError <- TRUE
       # and exit function
-         stop()
+      #   stop()
        }
         
       }
