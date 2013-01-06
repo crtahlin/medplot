@@ -224,7 +224,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       for (iii in 1:length(tests)) {
        if (!any(tests[iii]==TEST.RESULT.LEVELS)){
          errorMessages[length(errorMessages)+1] <<-
-           cat("Error: Data does not match allowed values. Check ID:",
+           paste("Error: Data does not match allowed values. Check ID:",
                data[data$Order==i,]["ID"],
                " and date column:",
                names(data[ii])
