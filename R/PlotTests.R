@@ -459,7 +459,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
  
   # if critical error occured, print a warning on graph
   if (criticalError) {
-    text(x=1, y=0, labels="Critical error", cex=20, col="red", srt=45)
+    text(x=1, y=0, labels="Critical error",
+         cex=max(c(10, PLOT.WIDTH/15)), col="red", srt=-45)
   }
   
   
