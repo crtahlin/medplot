@@ -309,15 +309,17 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   mtext("A", side=3, adj=0, line=1, cex=1.5)
   
   # add a legend to the A plot
-  legend(x=2,
-         y=-1.5,
-         xpd=TRUE,
-         legend=TEST.RESULT.LEVELS,
-         pch=16,
-         horiz=TRUE,
-         col=DOT.COLORS,
-         pt.cex=DOT.SIZES
-         )
+  legend("topright",
+    # x=2,
+    # y=-3,
+    bty="n",
+    xpd=TRUE,
+    legend=TEST.RESULT.LEVELS,
+    pch=16,
+    horiz=TRUE,
+    col=DOT.COLORS,
+    pt.cex=DOT.SIZES
+    )
  
   # if critical error occured, print a warning on graph
   if (criticalError) {
@@ -441,9 +443,11 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # draw title of y axis
   mtext("Percentage of positive swabs", line=2, side=2, cex=.7 )
   
-  # draw legend
-  # TODO: generalise to write used labels and used colors
-  legend("topright",  legend=TYPE.LEVELS, fill=legendColors, cex=.7)
+  # draw legend for graph B
+  TEMP.TYPE.LEVELS <- TYPE.LEVELS
+  TEMP.TYPE.LEVELS[(is.na(TYPE.LEVELS))]<-"Unknown"
+  legend("topright",  legend=TEMP.TYPE.LEVELS, fill=legendColors, cex=.7)
+  rm(TEMP.TYPE.LEVELS)
   
   # draw the "title" of the graph
   mtext("B", side=3, adj=0, line=1, cex=1.5)
