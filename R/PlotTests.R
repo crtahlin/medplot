@@ -15,12 +15,7 @@
 # TODO: probaj sortirati absolutno in po vsaki skupini posebej; recimo za paciente je datum mogoče čisto v redu, za osebje pa verjetno kaj drugega
 
 
-# function to get all the test results from a cell
-isolateTests <- function (string, separator) {
-  a <- unlist(strsplit(string, split=separator)) # isolate all tests in cell
-  b <- sub(pattern="^ ", replacement="", x=a) # remove leading spaces
-  return(b)  # return character vector to calling function
-}
+
 
 # function to plot test results
 plotTests <- function (data, figureParameters, graphsDir = getwd(),
@@ -30,6 +25,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # empty string and it does that by purpose - at a different setting 
   # the date labels would also be transformed, which we do not want
   data[data==""] <- NA
+  # drop unused levels in data frame factors
+  data <- droplevels(data)
   
   # start profiling
   Rprof(filename="Rprof.out", append=TRUE)
@@ -97,9 +94,14 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   nDIAGNOSIS <- dim(tableofGroups)[2]
   TYPE.LEVELS <- dimnames(tableofGroups)[[1]]
   DIAGNOSIS.LEVELS <- dimnames(tableofGroups)[[2]]
-  
   # set size of space for separating lines on graph
   LINE.SIZE <- 4
+  
+  # Graph B settings 
+  # set buffer between bars plotted in relative units of one bar width
+  # e.g. if 1, that means buffer is the same width as one bar
+  BAR.BUFFER <- 3
+  
   
   # add an ordering column to the data dataframe; the number means which row
   # the unit should be drawn in
@@ -178,14 +180,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   #set layout
   layout(c(1,2), heights=c(4,1))
   
-  # set margins for first figure
+  # set margins for graph A
   par(mar=c(5, 7, 4, 2) + 0.1 )
-  
-  
-  # calculate buffer for y axis size (account for drawing lines between groups)
-  
-  # TODO:  debugging
-  podatki <<- data
   
   
   # generate plot with number of days of tests on the x axis
@@ -266,7 +262,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       # to be shown as a tooltip
       # loop through all points - for case when there are two in one cell
       for (k in 1:length(tests)) {
-        # if (k>1) browser()
         symbolTooltip[pointCounter+k] <-
           paste("ID:", data[data$Order==i, "ID"], # "ID" of patient     
                 "; result:", # lists test results
@@ -300,19 +295,16 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # draw horizontal lines for each unit ####
   abline(h=unlist(data["Order"]), lty=2, col=LINE.UNIT.COLOR)
   
-  
- 
-  
-  
-  # call function to draw labels for each 1st+2nd level combination ####
+  # call function to draw labels for each existing 1st+2nd level combination 
   for (i in TYPE.LEVELS) {
     for (ii in DIAGNOSIS.LEVELS) {
+      if (checkifCombinationExists(data, i, ii)) { 
       drawLevelLabels(data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
                       firstLevel=i, secondLevel=ii)
+      }
     }
   }
-  
-
+ 
   # add label of graph A
   mtext("A", side=3, adj=0, line=1, cex=1.5)
   
@@ -335,7 +327,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   }
   
   
-  #### draw the second figure #####
+  #### draw graph B #####
   # ANSW: think about possiblity of drawing confidence interval inste OR in addition to 
   # column; should the user have a choice of drawing only means and also confindence intervals
 
@@ -370,9 +362,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       column <- column +1 
   }
   
-  # set buffer between bars plotted in relative units of one bar width
-  # e.g. if 1, that means buffer is the same width as one bar
-  BAR.BUFFER <- 3
+
   
   # calculate minumum difference between consecutive tests in days
   minimumInterval <- min(as.numeric(diff(daysofTests)))
@@ -506,97 +496,44 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
 # add labels to graph ####
 drawLevelLabels <- function (data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
                              firstLevel, secondLevel) {
-  
   # get the rownumber for the first and last units in this 1st level group
   firstRowforType <- findFirstRowof1stLevel(data, firstLevel)
   lastRowforType <- findLastRowof1stLevel(data, firstLevel)
-  
-  # 1st level, nonNA case
-  if (!is.na(firstLevel)) {
-    # draw labels on margins and add line after last unit, 
-    # for any but the last group - case with NA values
-    draw1stLevelLabels(label=firstLevel, firstRowforType)
-    drawLineBelow1stLevel(firstLevel,TYPE.LEVELS, lastRowforType, LINE.SIZE)
-    
-
-    # 2nd level draw label
-    # only look at existing 1st and 2nd level combinations
-    # TODO: take this line out and call this function only for existing combinations???
-    # only look at existing combinations of 1st and 2nd levels
-    if (!dim(na.omit(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"]))[[1]]==0) {
-      # 2nd level, nonNA case
-      if (!is.na(secondLevel)) {
-        # get the rownumber for the first and last unit in this 2nd level group
-        firstRowforDiagnosis <- findFirstRowof2ndLevel(data, firstLevel, secondLevel)
-        lastRowforDiagnosis <- findLastRowof2ndLevel(data, firstLevel, secondLevel)
-        # draw label for 2nd level group on margin
-        draw2ndLevelLabels(label=secondLevel, 
-                           firstRowforDiagnosis,
-                           lastRowforDiagnosis )
-        drawLineBelow2ndLevel(data, firstLevel, secondLevel, lastRowforDiagnosis, DIAGNOSIS.LEVELS, LINE.SIZE)
-        
-      }
-    }
-  }
-  
-  # 1st level, NA case
-  if (is.na(firstLevel)) {
-    # draw labels on margins and line ABOVE category
-    draw1stLevelLabels(label="Unknown", firstRowforType)
-    drawLineAbove1stLevel(firstRowforType, LINE.SIZE)
-    
-        
-    # 2nd level, nonNA case
-    # TODO: take this line out and call this function only for existing combinations???
-    if (!dim(na.omit(data[is.na(data$Type) &
-                            data$Diagnosis==secondLevel,]["Order"]))[[1]]==0) {
-      # 2nd level nonNA scenario ####
-      if (!is.na(secondLevel)) {
-        # get the rownumber for the first and last unit in this 2nd level group
-        firstRowforDiagnosis <- findFirstRowof2ndLevel(data, firstLevel, secondLevel)
-        lastRowforDiagnosis <- findLastRowof2ndLevel(data, firstLevel, secondLevel) 
-        # draw labels and lines separating groups
-        draw2ndLevelLabels(label=secondLevel, firstRowforDiagnosis, lastRowforDiagnosis )
-        drawLineBelow2ndLevel(data, firstLevel, secondLevel, lastRowforDiagnosis, DIAGNOSIS.LEVELS, LINE.SIZE)
-      }
-    }
-    # 2nd level draw label for NA case
-    if (!dim(na.omit(data[is.na(data$Type) &
-                            is.na(data$Diagnosis),]["Order"]))[[1]]==0) {
-      # 2nd level nonNA scenario ####
-      if (!is.na(secondLevel)) {
-        # get the rownumber for the first and last unit in this 2nd level group
-        firstRowforDiagnosis <- 
-          min(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
-              na.rm=TRUE)
-        lastRowforDiagnosis <- 
-          max(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
-              na.rm=TRUE)
-        # and write the name of the type on the margin in the middle of group
-        draw2ndLevelLabels(label="Unknown", 
-                           firstRowforDiagnosis,
-                           lastRowforDiagnosis )
-        
-        # add line above category
-        abline(h=firstRowforDiagnosis-(LINE.SIZE/2), lty=2, col="gray", lwd=2)
-      }
-    }
-  }
+  # get rownumber for first and last unist in 2nd level group
+  firstRowforDiagnosis <- findFirstRowof2ndLevel(data, firstLevel, secondLevel)
+  lastRowforDiagnosis <- findLastRowof2ndLevel(data, firstLevel, secondLevel)
+  # draw labels and lines for 2nd level
+  draw2ndLevelLabels(label=secondLevel, firstRowforDiagnosis, lastRowforDiagnosis )
+  drawLineBelow2ndLevel(data, firstLevel, secondLevel, lastRowforDiagnosis, DIAGNOSIS.LEVELS, LINE.SIZE)
+  # draw labels and lines for 1st level
+  draw1stLevelLabels(label=firstLevel, firstRowforType)
+  drawLineBelow1stLevel(data, firstLevel, TYPE.LEVELS, lastRowforType, LINE.SIZE)
 }
 
 
-#####################################################################
+############ HELPER FUNCTIONS ##################################################
 
 draw2ndLevelLabels <- function (label,
                                 firstRowforDiagnosis,
                                 lastRowforDiagnosis) {
-  mtext(line=1, text=label, side=2, las=2,  cex=.75, padj=0, font=1,
-        at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)
+  if (!is.na(label)){ mtext(line=1, text=label, side=2, las=2,  cex=.75,
+                            padj=0, font=1,
+                            at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)}
+ 
+ if (is.na(label)) {mtext(line=1, text="Unknown", side=2, las=2,  cex=.75,
+                          padj=0, font=1,
+                          at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)}
 }
 
 draw1stLevelLabels <- function (label, firstRowforType ) {
+  if (!is.na(label)){
   mtext(line=2, text=label, side=2, las=2,  cex=1, padj=0, font=2, 
-        at=firstRowforType)
+        at=firstRowforType)}
+  
+  if (is.na(label)){
+    mtext(line=2, text="Unknown", side=2, las=2,  cex=1, padj=0, font=2, 
+          at=firstRowforType)}
+  
 }
 
 findFirstRowof1stLevel <- function(data, firstLevel) {
@@ -612,20 +549,43 @@ findLastRowof1stLevel <- function (data, firstLevel) {
 }
 
 findFirstRowof2ndLevel <- function (data, firstLevel, secondLevel) {
-  if (is.na(firstLevel)) # if 1st level is NA
-    {min(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
-         na.rm=TRUE)} else { # if it is nonNA
-           min(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
-               na.rm=TRUE)}
+  if ( is.na(firstLevel) & !is.na(secondLevel) ) # 1st level NA, 2nd level nonNA
+  {x <- min(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
+       na.rm=TRUE) } 
+  
+  if (is.na(firstLevel) & is.na(secondLevel)) # 1st level NA, 2nd level NA
+  {x <- min(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
+       na.rm=TRUE)} 
+  
+  if (!is.na(firstLevel) & !is.na(secondLevel)) # 1st level nonNA, 2nd level nonNA
+  {x <- min(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
+       na.rm=TRUE)}
+  
+  if (!is.na(firstLevel) & is.na(secondLevel)) # 1st level nonNA, 2nd level NA
+  {x <- min(data[data$Type==firstLevel & is.na(data$Diagnosis),]["Order"],
+       na.rm=TRUE)}
+
+  return(x)
 }
 
 
 findLastRowof2ndLevel <- function (data, firstLevel, secondLevel) {
-  if (is.na(firstLevel)) # if 1st level is NA
-    {max(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
-         na.rm=TRUE) } else { # if it is nonNA
-  max(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
+  if (is.na(firstLevel) & !is.na(secondLevel)) # 1st level NA, 2nd level nonNA
+    {x <- max(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
+         na.rm=TRUE) } 
+  
+  if (is.na(firstLevel) & is.na(secondLevel)) # 1st level NA, 2nd level NA
+    {x <- max(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
+         na.rm=TRUE)} 
+      
+  if (!is.na(firstLevel) & !is.na(secondLevel)) # 1st level nonNA, 2nd level nonNA
+    {x <- max(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
       na.rm=TRUE)}
+  
+  if (!is.na(firstLevel) & is.na(secondLevel)) # 1st level nonNA, 2nd level NA
+    {x <- max(data[data$Type==firstLevel & is.na(data$Diagnosis),]["Order"],
+         na.rm=TRUE)}
+  return(x)
 }
 
 
@@ -633,12 +593,14 @@ drawLineAbove1stLevel <- function (firstRowforType, LINE.SIZE) {
   abline(h=firstRowforType-(LINE.SIZE/2), lty=2, col="black", lwd=2)    
 }
 
-drawLineBelow1stLevel <- function (firstLevel,
+drawLineBelow1stLevel <- function (data,
+                                   firstLevel,
                                    TYPE.LEVELS,
                                    lastRowforType,
                                    LINE.SIZE) {
-  if (firstLevel != tail(TYPE.LEVELS[!is.na(TYPE.LEVELS)], n=1)) {
-    abline(h=lastRowforType+(LINE.SIZE/2), lty=2, col="black", lwd=2) 
+ # if (firstLevel != tail(TYPE.LEVELS[!is.na(TYPE.LEVELS)], n=1)) {
+  if (lastRowforType!=max(data$Order)){  
+  abline(h=lastRowforType+(LINE.SIZE/2), lty=2, col="black", lwd=2) 
   }
 }
 
@@ -650,19 +612,38 @@ drawLineBelow2ndLevel <- function (data,
                                    LINE.SIZE) {
   # add line after last unit, for any but the last group
   # TODO: check if lines are correctly drawn, when there are no NA values! 
-  if (is.na(firstLevel)) {
-  existingLevels <- as.character(unlist((
-    na.omit(unique(data[is.na(data$Type),]["Diagnosis"])))))
-  existingLevelsSorted <- 
-    DIAGNOSIS.LEVELS[sort(match(existingLevels,DIAGNOSIS.LEVELS), na.last=NA)]
-  } else {
-    existingLevels <- as.character(unlist((
-      na.omit(unique(data[data$Type==firstLevel,]["Diagnosis"])))))
-    existingLevelsSorted <- 
-      DIAGNOSIS.LEVELS[sort(match(DIAGNOSIS.LEVELS,existingLevels), na.last=NA)]
-    }
-  if (secondLevel != tail(existingLevelsSorted, n=1)) {
-    abline(h=lastRowforDiagnosis+(LINE.SIZE/2), lty=2, col="gray", lwd=2)
-  }
+ 
+if (lastRowforDiagnosis!=max(data$Order)) {
+  abline(h=lastRowforDiagnosis+(LINE.SIZE/2), lty=2, col="gray", lwd=2)
+}
+  
+
 }
 
+# function to get all the test results from a cell
+isolateTests <- function (string, separator) {
+  a <- unlist(strsplit(string, split=separator)) # isolate all tests in cell
+  b <- sub(pattern="^ ", replacement="", x=a) # remove leading spaces
+  return(b)  # return character vector to calling function
+}
+
+# add error message to error message list
+addErrorMessage <- function(text) {
+  errorMessages[length(errorMessages)+1] <<- text
+}
+
+checkifCombinationExists <- function (data, firstLevel, secondLevel) {
+  if (!is.na(firstLevel) & !is.na(secondLevel)) {
+    x <- (!dim(na.omit(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"]))[[1]]==0)
+  }
+  if (!is.na(firstLevel) &  is.na(secondLevel)) {
+    x <- (!dim(na.omit(data[data$Type==firstLevel & is.na(data$Diagnosis),]["Order"]))[[1]]==0)
+  }
+  if ( is.na(firstLevel) & !is.na(secondLevel)) {
+    x <- (!dim(na.omit(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"]))[[1]]==0)
+  }
+  if ( is.na(firstLevel) &  is.na(secondLevel)) {
+    x <- (!dim(na.omit(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"]))[[1]]==0)
+  }
+  return(x)
+}
