@@ -7,7 +7,7 @@ Author: Who wrote it
 Maintainer: Who to complain to <crt.ahlin@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: All rights reserved until license agreed upon. What license is it under?
-Imports:
+Suggests:
   Cairo,
 	gplots,
 	RColorBrewer,
