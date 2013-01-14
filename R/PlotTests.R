@@ -16,8 +16,22 @@
 
 
 
-
-# function to plot test results
+#' @title Plot test results
+#' @description Function that plots which test results were positive for 
+#' a subject on a certain day.
+#' @details
+#' The function is primarily meant to be called from MS Excel through the 
+#' RExcel plugin and not used directly from R.
+#' Data is sent from Excel and drawn on a graph by 
+#' this R function. The output contains two graphs: A and B. 
+#' 
+#' The A graph shows the test results for subjects (y-axis) on certain days
+#' (x-axis). The results are represented by colored dots and can be divided in 
+#' groups and subgroups (two levels), depending on the nature of data.
+#' 
+#' The B graph shows, via a barchart, how many results were positive on
+#' a certain day for a certain group.
+#' 
 plotTests <- function (data, figureParameters, graphsDir = getwd(),
                        generateTooltips = TRUE) {
   
@@ -29,7 +43,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   data <- droplevels(data)
   
   # start profiling
-  Rprof(filename="Rprof.out", append=TRUE)
+  # Rprof(filename="Rprof.out", append=TRUE)
   
   # initialize placeholder for error messages 
   errorMessages <<- list()
@@ -497,7 +511,10 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
 
 
 
-# add labels to graph ####
+
+
+############ HELPER FUNCTIONS ##################################################
+
 drawLevelLabels <- function (data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
                              firstLevel, secondLevel) {
   # get the rownumber for the first and last units in this 1st level group
@@ -513,9 +530,6 @@ drawLevelLabels <- function (data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
   draw1stLevelLabels(label=firstLevel, firstRowforType)
   drawLineBelow1stLevel(data, firstLevel, TYPE.LEVELS, lastRowforType, LINE.SIZE)
 }
-
-
-############ HELPER FUNCTIONS ##################################################
 
 draw2ndLevelLabels <- function (label,
                                 firstRowforDiagnosis,
@@ -631,7 +645,14 @@ isolateTests <- function (string, separator) {
   return(b)  # return character vector to calling function
 }
 
-# add error message to error message list
+
+#' @title Adds an error message to error message list
+#' @description Called from the plotTests function and not meant to be 
+#' used from the R console.
+#' @details 
+#' This function adds an error message to the list of error messages
+#' which is passed to RExcel. The messages are shown to the user 
+#' in the Excel spreadsheet.
 addErrorMessage <- function(text) {
   errorMessages[length(errorMessages)+1] <<- text
 }
