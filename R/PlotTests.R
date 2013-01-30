@@ -500,6 +500,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     {errorMessages[length(errorMessages)+1] <<-
        paste("Critical Error: Number of points drawn does not match the number",
              "of tooltips generated. Graph with tooltips will not be generated.")
+     browser()
     } else {
       # add tool tips - must reference to the first list in 
       # a list of points - because they were drawn first? 
