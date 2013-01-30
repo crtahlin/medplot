@@ -499,13 +499,13 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     if (pointCounter!=length(getPlotPoints(doc)[[1]]))
     {errorMessages[length(errorMessages)+1] <<-
        paste("Critical Error: Number of points drawn (",
-             pointCounter,
+             length(getPlotPoints(doc)[[1]]),
              ") does not match the number",
              "of tooltips generated (",
-             length(getPlotPoints(doc)[[1]]),
+             pointCounter,
              "). Graph with tooltips will not be generated.")
      browser()
-    } else {
+    } # else {
       # add tool tips - must reference to the first list in 
       # a list of points - because they were drawn first? 
       # if the order of drawing changes, this will break
@@ -517,7 +517,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     # without having to share referenced CSS files
     addCSS(doc, insert=TRUE)
     saveXML(doc, paste(graphsDir, "/", "example_tooltips.svg", sep=""))
-    }
+    #}
   }
   
   # TODO: take out functions for profiling
