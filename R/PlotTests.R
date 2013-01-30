@@ -267,14 +267,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                                     function(x) which(x==TEST.RESULT.LEVELS) ) )],
         pch=16
       )
-      
-      # draw deaths of patients if they died, at the date of release
-      if (data[data$Order==i,]$Outcome=="died") {
-        dayofDeath <- as.Date((data[data$Order==i,]$DateOut)) - datesofTests[1]
-        plotDeaths(lineNumber=i, dayofDeath=dayofDeath+1 )
-      }
-      
-      
+                  
       # save some additional information for each point 
       # to be shown as a tooltip
       # loop through all points - for case when there are two in one cell
@@ -291,8 +284,37 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       
       # increment counter of symbols drawn
       pointCounter <- pointCounter + length(tests)
+      
+      
+      
+      
+    }
+    
+    # draw death of patient if they died, at the date of release
+    if (data[data$Order==i,]$Outcome=="died") {
+      dateofDeath <- as.Date((data[data$Order==i,]$DateOut))
+      dayofDeath <- dateofDeath - datesofTests[1]
+      if (dayofDeath < 0) {
+        errorMessages[length(errorMessages)+1] <<-
+          paste("Error: Day of death falls before the date of first test.")
+        criticalError <- TRUE
+      }
+      if (dayofDeath > max(daysofTests)) {
+        errorMessages[length(errorMessages)+1] <<-
+          paste("Warning: Day of death falls after the last date of observation.")
+      }
+      if ( dayofDeath >= 0 && dayofDeath <= max(daysofTests))
+        {
+        plotDeaths(lineNumber=i, dayofDeath= dayofDeath + 1)
+        symbolTooltip[pointCounter+1] <-
+        paste("ID:", data[data$Order==i, "ID"], # "ID" of patient 
+              "; died:", format(dateofDeath,format="%d.%m.%y")  
+        )
+      pointCounter <- pointCounter + 1 
+      }
     }
   }
+  
   
   
   # TODO: should dying as an outcome be plotted? 
@@ -470,7 +492,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # writes image to file
   dev.off()
-    
+  browser()
   ### add interactivity to the figure ####
   # execute only if parameter to show tooltips is TRUE
   if (generateTooltips) {
@@ -484,6 +506,10 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     addToolTips(getPlotPoints(doc)[[1]], 
                 symbolTooltip,
                 addArea=TRUE)
+    if (pointCounter!=length(getPlotPoints(doc)[[1]]))
+    {errorMessages[length(errorMessages)+1] <<-
+       paste("Error: Number of points drawn does not the number
+             of tooltips generated.") }
     # add CSS styles inside the file 
     # internal style enable easier sharing of SVG files
     # without having to share referenced CSS files
