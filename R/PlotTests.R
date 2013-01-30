@@ -13,7 +13,8 @@
 # TODO: add a static picture to be generated
 # TODO: če je več skupini in je ena NA, naj zanjo izpiše "Unknown" sicer naj ne izpiše nič, če je NA edina skupina
 # TODO: probaj sortirati absolutno in po vsaki skupini posebej; recimo za paciente je datum mogoče čisto v redu, za osebje pa verjetno kaj drugega
-
+# TODO: preveri zakaj so datumi v Excelu za DateIn in DateOut zapisani v obliki 
+# 02/02/2011 in jih daj v obliko 2.2.2011 (zna zakomplicirati prenos podatkov)
 
 
 #' @title Plot test results
@@ -504,8 +505,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
              "of tooltips generated (",
              pointCounter,
              "). Graph with tooltips will not be generated.")
-     browser()
-    } # else {
+    } else {
       # add tool tips - must reference to the first list in 
       # a list of points - because they were drawn first? 
       # if the order of drawing changes, this will break
@@ -517,7 +517,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     # without having to share referenced CSS files
     addCSS(doc, insert=TRUE)
     saveXML(doc, paste(graphsDir, "/", "example_tooltips.svg", sep=""))
-    #}
+    }
   }
   
   # TODO: take out functions for profiling
@@ -733,5 +733,9 @@ checkifCombinationExists <- function (data, firstLevel, secondLevel) {
 #' @description Not meant to be called by the user.
 plotDeaths <- function (lineNumber, dayofDeath) {
   points(x=dayofDeath, y=lineNumber, pch=15, col="black", cex=2)
-  browser()
+  # WARNING: for some pch values, the SVG file saves the plotted symbol
+  # to a different XML node, which destroys the tooltip generation feature
+  # safe pch are those wirth simple forms: circle, square, ...?
+  # but not a cross or a star. Just so you know, in case that you change 
+  # the pch value and everything breaks :)
 }
