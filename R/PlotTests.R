@@ -284,10 +284,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       
       # increment counter of symbols drawn
       pointCounter <- pointCounter + length(tests)
-      
-      
-      
-      
     }
     
     # draw death of patient if they died, at the date of release
@@ -303,14 +299,12 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
         errorMessages[length(errorMessages)+1] <<-
           paste("Warning: Day of death falls after the last date of observation.")
       }
-      if ( dayofDeath >= 0 && dayofDeath <= max(daysofTests))
-        {
+      if (dayofDeath >= 0 && dayofDeath <= max(daysofTests)) {
         plotDeaths(lineNumber=i, dayofDeath= dayofDeath + 1)
         symbolTooltip[pointCounter+1] <-
         paste("ID:", data[data$Order==i, "ID"], # "ID" of patient 
-              "; died:", format(dateofDeath,format="%d.%m.%y")  
-        )
-      pointCounter <- pointCounter + 1 
+              "; died:", format(dateofDeath,format="%d.%m.%y"))
+        pointCounter <- pointCounter + 1 
       }
     }
   }
