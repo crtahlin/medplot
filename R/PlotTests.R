@@ -303,7 +303,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
         plotDeaths(lineNumber=i, dayofDeath= dayofDeath + 1)
         symbolTooltip[pointCounter+1] <-
         paste("ID:", data[data$Order==i, "ID"], # "ID" of patient 
-              "; died:", format(dateofDeath,format="%d.%m.%y"))
+              "; died:", format(dateofDeath, format="%d.%m.%y"))
         pointCounter <- pointCounter + 1 
       }
     }
@@ -729,4 +729,5 @@ checkifCombinationExists <- function (data, firstLevel, secondLevel) {
 #' @description Not meant to be called by the user.
 plotDeaths <- function (lineNumber, dayofDeath) {
   points(x=dayofDeath, y=lineNumber, pch=4)
+  browser()
 }
