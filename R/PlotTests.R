@@ -510,17 +510,22 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
 }
 
 
-
-
-
 ############ HELPER FUNCTIONS ##################################################
+# functions below are called by the plotTests function and are not meant to
+# be called by the user
 
+#' @title Draw labels and lines for groups
+#' @description Function that plots labels for both possible groups describing
+#' subjects.
+#' @details
+#' The function is meant to be called by the general function for plotting,
+#' when it needs to draw the labels for the groups.
 drawLevelLabels <- function (data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
                              firstLevel, secondLevel) {
   # get the rownumber for the first and last units in this 1st level group
   firstRowforType <- findFirstRowof1stLevel(data, firstLevel)
   lastRowforType <- findLastRowof1stLevel(data, firstLevel)
-  # get rownumber for first and last unist in 2nd level group
+  # get rownumber for first and last unit in 2nd level group
   firstRowforDiagnosis <- findFirstRowof2ndLevel(data, firstLevel, secondLevel)
   lastRowforDiagnosis <- findLastRowof2ndLevel(data, firstLevel, secondLevel)
   # draw labels and lines for 2nd level
@@ -531,6 +536,8 @@ drawLevelLabels <- function (data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
   drawLineBelow1stLevel(data, firstLevel, TYPE.LEVELS, lastRowforType, LINE.SIZE)
 }
 
+#' @title Draws labels for the 2nd level groups
+#' @description Not meant to be called by the user.
 draw2ndLevelLabels <- function (label,
                                 firstRowforDiagnosis,
                                 lastRowforDiagnosis) {
@@ -543,6 +550,8 @@ draw2ndLevelLabels <- function (label,
                           at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)}
 }
 
+#' @title Draws labels for the 1st level groups
+#' @description Not meant to be called by the user.
 draw1stLevelLabels <- function (label, firstRowforType ) {
   if (!is.na(label)){
   mtext(line=2, text=label, side=2, las=2,  cex=1, padj=0, font=2, 
@@ -554,18 +563,24 @@ draw1stLevelLabels <- function (label, firstRowforType ) {
   
 }
 
+#' @title Finds first row of 1st level group
+#' @description Not meant to be called by the user.
 findFirstRowof1stLevel <- function(data, firstLevel) {
   if (is.na(firstLevel))  # if 1st level is NA
     {min(data[is.na(data$Type),]["Order"], na.rm=TRUE)} else { 
       min(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)} # if it is nonNA
 }
 
+#' @title Finds last row of 1st level group
+#' @description Not meant to be called by the user.
 findLastRowof1stLevel <- function (data, firstLevel) {
   if (is.na(firstLevel)) # if 1st level is NA
     {max(data[is.na(data$Type),]["Order"], na.rm=TRUE)} else { # if it is nonNA
       max(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)}
 }
 
+#' @title Finds first row of 2nd level group
+#' @description Not meant to be called by the user.
 findFirstRowof2ndLevel <- function (data, firstLevel, secondLevel) {
   if ( is.na(firstLevel) & !is.na(secondLevel) ) # 1st level NA, 2nd level nonNA
   {x <- min(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
@@ -586,7 +601,8 @@ findFirstRowof2ndLevel <- function (data, firstLevel, secondLevel) {
   return(x)
 }
 
-
+#' @title Finds last row of 2nd level group
+#' @description Not meant to be called by the user.
 findLastRowof2ndLevel <- function (data, firstLevel, secondLevel) {
   if (is.na(firstLevel) & !is.na(secondLevel)) # 1st level NA, 2nd level nonNA
     {x <- max(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
@@ -606,11 +622,14 @@ findLastRowof2ndLevel <- function (data, firstLevel, secondLevel) {
   return(x)
 }
 
-
+#' @title Draws lines above 1st level groups
+#' @description Not meant to be called by the user.
 drawLineAbove1stLevel <- function (firstRowforType, LINE.SIZE) {
   abline(h=firstRowforType-(LINE.SIZE/2), lty=2, col="black", lwd=2)    
 }
 
+#' @title Draws lines below 1st level groups
+#' @description Not meant to be called by the user.
 drawLineBelow1stLevel <- function (data,
                                    firstLevel,
                                    TYPE.LEVELS,
@@ -622,6 +641,8 @@ drawLineBelow1stLevel <- function (data,
   }
 }
 
+#' @title Draws lines below 2nd level groups
+#' @description Not meant to be called by the user.
 drawLineBelow2ndLevel <- function (data,
                                    firstLevel,
                                    secondLevel,
@@ -638,7 +659,11 @@ if (lastRowforDiagnosis!=max(data$Order)) {
 
 }
 
-# function to get all the test results from a cell
+#' @title Gets all test results written in a cell
+#' @description Not meant to be called by the user.
+#' @details
+#' Parses test result strings from a string (a cell of data containing results).
+#' Different separators can be defined. Leading spaces are removed.
 isolateTests <- function (string, separator) {
   a <- unlist(strsplit(string, split=separator)) # isolate all tests in cell
   b <- sub(pattern="^ ", replacement="", x=a) # remove leading spaces
@@ -648,7 +673,7 @@ isolateTests <- function (string, separator) {
 
 #' @title Adds an error message to error message list
 #' @description Called from the plotTests function and not meant to be 
-#' used from the R console.
+#' called by user.
 #' @details 
 #' This function adds an error message to the list of error messages
 #' which is passed to RExcel. The messages are shown to the user 
@@ -657,6 +682,12 @@ addErrorMessage <- function(text) {
   errorMessages[length(errorMessages)+1] <<- text
 }
 
+#' @title Checks if combination of groups exists
+#' @description Checks if combination of groups exists and is not meant 
+#' to be called from by user.
+#' @details
+#' Checks for existance of combination of first and second level groups
+#' in the data.
 checkifCombinationExists <- function (data, firstLevel, secondLevel) {
   if (!is.na(firstLevel) & !is.na(secondLevel)) {
     x <- (!dim(na.omit(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"]))[[1]]==0)
