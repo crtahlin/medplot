@@ -492,7 +492,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # writes image to file
   dev.off()
-  browser()
   ### add interactivity to the figure ####
   # execute only if parameter to show tooltips is TRUE
   if (generateTooltips) {
@@ -508,8 +507,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                 addArea=TRUE)
     if (pointCounter!=length(getPlotPoints(doc)[[1]]))
     {errorMessages[length(errorMessages)+1] <<-
-       paste("Error: Number of points drawn does not the number
-             of tooltips generated.") }
+       paste("Error: Number of points drawn does not match the number",
+             "of tooltips generated.") }
     # add CSS styles inside the file 
     # internal style enable easier sharing of SVG files
     # without having to share referenced CSS files
