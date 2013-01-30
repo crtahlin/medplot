@@ -728,6 +728,6 @@ checkifCombinationExists <- function (data, firstLevel, secondLevel) {
 #' @title Plots a death of a patient with a special character
 #' @description Not meant to be called by the user.
 plotDeaths <- function (lineNumber, dayofDeath) {
-  points(x=dayofDeath, y=lineNumber, pch=4)
+  points(x=dayofDeath, y=lineNumber, pch="*")
   browser()
 }
