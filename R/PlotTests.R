@@ -492,28 +492,33 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # writes image to file
   dev.off()
+  
   ### add interactivity to the figure ####
   # execute only if parameter to show tooltips is TRUE
   if (generateTooltips) {
     library(SVGAnnotation)
     # open the generated SVG file
     doc <- xmlParse(paste(graphsDir, "/", "example.svg", sep=""))
-    # TODO: make a constant to reference the file (instead of using paste everywhere as above)
-    # add tool tips - must reference to the first list in 
-    # a list of points - because they were drawn first? 
-    # if the order of drawing changes, this will break
-    addToolTips(getPlotPoints(doc)[[1]], 
-                symbolTooltip,
-                addArea=TRUE)
+    
+    # only generate graph with tooltips if the number of points is the same
+    # as the number of tooltip annotations
     if (pointCounter!=length(getPlotPoints(doc)[[1]]))
     {errorMessages[length(errorMessages)+1] <<-
-       paste("Error: Number of points drawn does not match the number",
-             "of tooltips generated.") }
+       paste("Critical Error: Number of points drawn does not match the number",
+             "of tooltips generated. Graph with tooltips will not be generated.")
+    } else {
+      # add tool tips - must reference to the first list in 
+      # a list of points - because they were drawn first? 
+      # if the order of drawing changes, this will break
+      addToolTips(getPlotPoints(doc)[[1]], 
+                  symbolTooltip,
+                  addArea=TRUE)
     # add CSS styles inside the file 
     # internal style enable easier sharing of SVG files
     # without having to share referenced CSS files
     addCSS(doc, insert=TRUE)
     saveXML(doc, paste(graphsDir, "/", "example_tooltips.svg", sep=""))
+    }
   }
   
   # TODO: take out functions for profiling
