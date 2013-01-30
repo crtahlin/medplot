@@ -502,7 +502,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
              pointCounter,
              ") does not match the number",
              "of tooltips generated (",
-             length(getPlotPoints(doc)[[1]],
+             length(getPlotPoints(doc)[[1]]),
              "). Graph with tooltips will not be generated.")
      browser()
     } else {
