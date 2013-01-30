@@ -271,10 +271,9 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       # draw deaths of patients if they died, at the date of release
       if (data[data$Order==i,]$Outcome=="died") {
         dayofDeath <- as.Date((data[data$Order==i,]$DateOut)) - datesofTests[1]
-        plotDeaths(lineNumber=i, dayofDeath=dayofDeath )
+        plotDeaths(lineNumber=i, dayofDeath=dayofDeath+1 )
       }
       
-      # plotDeaths <- function (lineNumber, dateofDeath)
       
       # save some additional information for each point 
       # to be shown as a tooltip
@@ -704,5 +703,5 @@ checkifCombinationExists <- function (data, firstLevel, secondLevel) {
 #' @title Plots a death of a patient with a special character
 #' @description Not meant to be called by the user.
 plotDeaths <- function (lineNumber, dayofDeath) {
-  points(x=dayofDeath, y=lineNumber, pch=5)
+  points(x=dayofDeath, y=lineNumber, pch=4)
 }
