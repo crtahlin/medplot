@@ -173,8 +173,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
- 
-  
   # load plotting library ####
   library(Cairo)
   
@@ -248,9 +246,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                  )
       # if at least one is invalid, set that a critical error has occured as TRUE     
          criticalError <- TRUE
-      
        }
-        
       }
       
       # draws point one on top of the other if multiple tests 
@@ -283,8 +279,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                                          DATES.COLUMN.FIRST : 
                                            DATES.COLUMN.LAST][ii])),
                 "; date:", format(datesofTests[ii],format="%d.%m.%y" )# Date of test
-                
-          )
+                )
       }
       
       # increment counter of symbols drawn
@@ -323,7 +318,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   mtext("A", side=3, adj=0, line=1, cex=1.5)
   
   # add a legend to the A plot
-  legend("topright",
+  legend("topleft",
     # x=2,
     # y=-3,
     bty="n",
@@ -413,8 +408,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
-    
- 
   # load libray for "barplot2" function
   library(gplots)
   # load library for "ColorBrewer" function
@@ -433,7 +426,6 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   if (length(TYPE.LEVELS)>10) {
     legendColors <- sample(colors(),length(TYPE.LEVELS), replace=FALSE)
   }
-  
   
   barplot2(positiveUnits, beside=T, col=legendColors, axes=F,
            xlim=c(0, max(daysofTests)), width=barWidth,
@@ -471,9 +463,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   # writes image to file
   dev.off()
-  
-  
-  
+    
   ### add interactivity to the figure ####
   # execute only if parameter to show tooltips is TRUE
   if (generateTooltips) {
@@ -501,8 +491,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # ggplot.profr("Rprof.out")
   # plot.profr("Rprof.out")
   # plot(parse_rprof("Rprof.out"))
-  
-  
+    
   # set default error message, if no errors were generated
   if (length(errorMessages) == 0) {
     errorMessages[length(errorMessages)+1] <<- "No errors found."
