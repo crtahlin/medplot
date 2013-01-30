@@ -498,8 +498,12 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     # as the number of tooltip annotations
     if (pointCounter!=length(getPlotPoints(doc)[[1]]))
     {errorMessages[length(errorMessages)+1] <<-
-       paste("Critical Error: Number of points drawn does not match the number",
-             "of tooltips generated. Graph with tooltips will not be generated.")
+       paste("Critical Error: Number of points drawn (",
+             pointCounter,
+             ") does not match the number",
+             "of tooltips generated (",
+             length(getPlotPoints(doc)[[1]],
+             "). Graph with tooltips will not be generated.")
      browser()
     } else {
       # add tool tips - must reference to the first list in 
