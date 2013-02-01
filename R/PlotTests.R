@@ -112,7 +112,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   BAR.BUFFER <- 3
   
   ### reorder data (using seriation package)
-  data <- sortData(data, sortMethod="BEA", 
+  data <- sortData(data, sortMethod="DateIn", 
                         nUNITS, 
                         DATES.COLUMN.FIRST,DATES.COLUMN.LAST,
                         TEST.RESULT.LEVELS )
@@ -743,12 +743,18 @@ sortData <- function (data, sortMethod="BEA",
                       DATES.COLUMN.FIRST,DATES.COLUMN.LAST,
                       TEST.RESULT.LEVELS ) {
   
+  # if sorting method is by date of admission
+  if (sortMethod=="DateIn") {
+    # return data reordered by date of admission
+    return(data[order(data$DateIn), ])
+    
+  } else { # else return data sorted by the seriation package
   nTESTS <- length(TEST.RESULT.LEVELS)
   nDATES <- (DATES.COLUMN.LAST - DATES.COLUMN.FIRST + 1)
   # initialize matrix to hold info about positive test results
   # the matrix has a row for every patient and
   # the columns for every day*result
-  # and will contain 1 where the day/result is realized
+  # and will contain 1 where the day+result is realized
   results <- matrix(0, nrow=nUNITS, ncol=nDATES*nTESTS)
   colnames(results) <- rep(TEST.RESULT.LEVELS, nDATES)
   for (i in 1:nUNITS) {
@@ -764,10 +770,11 @@ sortData <- function (data, sortMethod="BEA",
   }
   # load library for sorting via similarity
   library(seriation)
-  # sort via similarity, get order by patients
+  # sort, get order by patients dimension
   series <- seriate(results, method=sortMethod)
   seriesOrder <- get_order(series,dim=1)
   
   # return data resorted
   return(data[seriesOrder, ])
+  }
 }
