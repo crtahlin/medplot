@@ -738,7 +738,7 @@ plotDeaths <- function (lineNumber, dayofDeath) {
 }
 
 
-sortData <- function (data, sortMethod=BEA, 
+sortData <- function (data, sortMethod="BEA", 
                       nUNITS, 
                       DATES.COLUMN.FIRST,DATES.COLUMN.LAST,
                       TEST.RESULT.LEVELS ) {
