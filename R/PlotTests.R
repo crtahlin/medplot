@@ -1,11 +1,3 @@
-# file containing function to draw data
-# work in progress - content being created from figuresFinalNov11.r
-# as this seems to be the latest version of code
-
-# Will use coding conventions as described in :
-# https://docs.google.com/document/edit?id=1esDVxyWvH8AsX-VJa-8oqWaHLs4stGlIbk8kLc5VlII
-
-### DRAW FIGURES FUNCTION ####
 
 # TODO: study the seriation package (if there is a lot of heterogeneity with the date of 
 ## first arrival, let it be sorted by the date of first arrival, otherwise try to use
@@ -68,6 +60,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                               colnames(data))
   DATES.COLUMN.FIRST <- min(datesColumnsIndices)
   DATES.COLUMN.LAST <- max(datesColumnsIndices)
+  # number of date columns
+  nDATES <- DATES.COLUMN.LAST - DATES.COLUMN.FIRST + 1
   
   # identify and store parameters for drawing (levels of test results, color, ####
   # size of symbols) 
@@ -116,6 +110,12 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # set buffer between bars plotted in relative units of one bar width
   # e.g. if 1, that means buffer is the same width as one bar
   BAR.BUFFER <- 3
+  
+  ### reorder data (using seriation package)
+  data <- sortData(data, sortMethod="BEA", 
+                        nUNITS, 
+                        DATES.COLUMN.FIRST,DATES.COLUMN.LAST,
+                        TEST.RESULT.LEVELS )
   
   
   # add an ordering column to the data dataframe; the number means which row
@@ -310,11 +310,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
-  
-  
-  # TODO: should dying as an outcome be plotted? 
-  # ANSW: make it a parameter - which is the special event that is marked with X, add a column with date of event
-  
+
   # draw labels on the x axis ####
   axis(1, at=daysofTests, labels=rep("", length(daysofTests)), cex.axis=.35)
   DATE.LABELS <- format(datesofTests, format="%d %b")
@@ -735,7 +731,43 @@ plotDeaths <- function (lineNumber, dayofDeath) {
   points(x=dayofDeath, y=lineNumber, pch=15, col="black", cex=2)
   # WARNING: for some pch values, the SVG file saves the plotted symbol
   # to a different XML node, which destroys the tooltip generation feature
-  # safe pch are those wirth simple forms: circle, square, ...?
-  # but not a cross or a star. Just so you know, in case that you change 
-  # the pch value and everything breaks :)
+  # safe pch are those with simple forms: circle, square, ...?
+  # but not a cross or a star (since those are apparently drawn in more than one
+  # move). Just so you know, in case that you change the pch value
+  # and everything breaks :)
+}
+
+
+sortData <- function (data, sortMethod=BEA, 
+                      nUNITS, 
+                      DATES.COLUMN.FIRST,DATES.COLUMN.LAST,
+                      TEST.RESULT.LEVELS ) {
+  
+  nTESTS <- length(TEST.RESULT.LEVELS)
+  nDATES <- (DATES.COLUMN.LAST - DATES.COLUMN.FIRST + 1)
+  # initialize matrix to hold info about positive test results
+  # the matrix has a row for every patient and
+  # the columns for every day*result
+  # and will contain 1 where the day/result is realized
+  results <- matrix(0, nrow=nUNITS, ncol=nDATES*nTESTS)
+  colnames(results) <- rep(TEST.RESULT.LEVELS, nDATES)
+  for (i in 1:nUNITS) {
+    for (ii in 1:nDATES) {
+      for (iii in 1:nTESTS) {
+        if(grepl(TEST.RESULT.LEVELS[iii],
+                  data[i, DATES.COLUMN.FIRST + ii - 1])
+           ) {
+          results[i, (ii-1)*nTESTS + iii] <- 1         
+        }
+      }      
+    }
+  }
+  # load library for sorting via similarity
+  library(seriation)
+  # sort via similarity, get order by patients
+  series <- seriate(results, method=sortMethod)
+  seriesOrder <- get_order(series,dim=1)
+  
+  # return data resorted
+  return(data[seriesOrder, ])
 }
