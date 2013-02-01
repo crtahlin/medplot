@@ -56,7 +56,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   
   # identify and store first and last columns that contain dates of tests ####
-  datesColumnsIndices <- grep("^[0-9]{1,2}[.][0-9]{1,2}[.][0-9]{4}$",
+  datesColumnsIndices <- grep("^X[0-9]{1,2}[.][0-9]{1,2}[.][0-9]{4}$",
                               colnames(data))
   DATES.COLUMN.FIRST <- min(datesColumnsIndices)
   DATES.COLUMN.LAST <- max(datesColumnsIndices)
@@ -87,7 +87,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   nUNITS <- dim(data)[1]
   
   # store the dates in R date format
-  datesofTests <- as.Date(colnames(data)[datesColumnsIndices], "%d.%m.%Y")
+  datesofTests <- as.Date(colnames(data)[datesColumnsIndices], "X%d.%m.%Y")
   
   # vector of relative difference in days from test on day x to test on day 1
   daysofTests <- datesofTests-datesofTests[1]
