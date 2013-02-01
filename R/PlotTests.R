@@ -1,13 +1,7 @@
 
-# TODO: study the seriation package (if there is a lot of heterogeneity with the date of 
-## first arrival, let it be sorted by the date of first arrival, otherwise try to use
-## seriation package)
 # TODO: add a static picture to be generated
 # TODO: če je več skupini in je ena NA, naj zanjo izpiše "Unknown" sicer naj ne izpiše nič, če je NA edina skupina
 # TODO: probaj sortirati absolutno in po vsaki skupini posebej; recimo za paciente je datum mogoče čisto v redu, za osebje pa verjetno kaj drugega
-# TODO: preveri zakaj so datumi v Excelu za DateIn in DateOut zapisani v obliki 
-# 02/02/2011 in jih daj v obliko 2.2.2011 (zna zakomplicirati prenos podatkov)
-
 
 #' @title Plot test results
 #' @description Function that plots which test results were positive for 
@@ -26,7 +20,7 @@
 #' a certain day for a certain group.
 #' 
 plotTests <- function (data, figureParameters, graphsDir = getwd(),
-                       generateTooltips = TRUE) {
+                       generateTooltips = TRUE, sortMethod="DateIn") {
   
   # replace missing values with NA (must do because RExcel sends them as 
   # empty string and it does that by purpose - at a different setting 
@@ -111,12 +105,13 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # e.g. if 1, that means buffer is the same width as one bar
   BAR.BUFFER <- 3
   
-  ### reorder data (using seriation package)
-  data <- sortData(data, sortMethod="DateIn", 
+  ### reorder data (using seriation package) unless no sorting requested
+  if (sortMethod!="none") {
+  data <- sortData(data, sortMethod, 
                         nUNITS, 
                         DATES.COLUMN.FIRST,DATES.COLUMN.LAST,
                         TEST.RESULT.LEVELS )
-  
+  }
   
   # add an ordering column to the data dataframe; the number means which row
   # the unit should be drawn in
