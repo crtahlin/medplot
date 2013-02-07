@@ -15,4 +15,5 @@ Suggests:
 	shiny,
 	scales,
 	reshape2,
-	ggplot2
+	ggplot2,
+  seriation
