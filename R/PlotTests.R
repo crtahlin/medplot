@@ -1,8 +1,3 @@
-
-# TODO: add a static picture to be generated
-# TODO: če je več skupini in je ena NA, naj zanjo izpiše "Unknown" sicer naj ne izpiše nič, če je NA edina skupina
-# TODO: probaj sortirati absolutno in po vsaki skupini posebej; recimo za paciente je datum mogoče čisto v redu, za osebje pa verjetno kaj drugega
-
 #' @title Plot test results
 #' @description Function that plots which test results were positive for 
 #' a subject on a certain day.
@@ -49,7 +44,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   }
   
   
-  # identify and store first and last columns that contain dates of tests ####
+  # identify and store first and last columns that contain dates of tests
   datesColumnsIndices <- grep("^X[0-9]{1,2}[.][0-9]{1,2}[.][0-9]{4}$",
                               colnames(data))
   DATES.COLUMN.FIRST <- min(datesColumnsIndices)
@@ -57,20 +52,18 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # number of date columns
   nDATES <- DATES.COLUMN.LAST - DATES.COLUMN.FIRST + 1
   
-  # identify and store parameters for drawing (levels of test results, color, ####
+  # identify and store parameters for drawing (levels of test results, color,
   # size of symbols) 
   TEST.RESULT.LEVELS <- as.character(unlist(figureParameters["Result"]))
   DOT.COLORS <- as.character(unlist(figureParameters["Color"]))
   DOT.SIZES <- as.integer(unlist(figureParameters["Size"]))
   
-  # TODO: add checking if all levels in Data are valid levels also listed in Parameters
-  
-  # make dot colors transparent with transparency APLHA (0-255) ####
+  # make dot colors transparent with transparency APLHA (0-255)
   ALPHA <- 150
   DOT.COLORS <- apply(col2rgb(DOT.COLORS), 2, function(x)
   {rgb(red=x[1], green=x[2], blue=x[3], alpha=ALPHA, maxColorValue=255)} )
   
-  # set the color for the lines at unit level ####
+  # set the color for the lines at unit level
   LINE.UNIT.COLOR <- rgb(red=col2rgb("gray")[1], 
                          green=col2rgb("gray")[2],
                          blue=col2rgb("gray")[3],
@@ -86,10 +79,8 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # vector of relative difference in days from test on day x to test on day 1
   daysofTests <- datesofTests-datesofTests[1]
   
-  # create table of frequencies for all USED combinations of types & diagnosistabl
+  # create table of frequencies for all USED combinations of types & diagnosis
   tableofGroups <- table(data$Type, data$Diagnosis, useNA="ifany")
-  
-  # TODO: kako imenovati 1st levele in 2nd level? -> uporabniki
   
   # walk through all the units in the sample and assign them 
   # an absolute line number (keeping spaces for separating lines between groups)
@@ -105,12 +96,12 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # e.g. if 1, that means buffer is the same width as one bar
   BAR.BUFFER <- 3
   
-  ### reorder data (using seriation package) unless no sorting requested
+  # reorder data (using seriation package) unless no sorting requested
   if (sortMethod!="none") {
-  data <- sortData(data, sortMethod, 
-                        nUNITS, 
-                        DATES.COLUMN.FIRST,DATES.COLUMN.LAST,
-                        TEST.RESULT.LEVELS )
+    data <- sortData(data, sortMethod, 
+                     nUNITS, 
+                     DATES.COLUMN.FIRST,DATES.COLUMN.LAST,
+                     TEST.RESULT.LEVELS )
   }
   
   # add an ordering column to the data dataframe; the number means which row
@@ -169,7 +160,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
   }
   
-  # load plotting library ####
+  # load plotting library
   library(Cairo)
   
   # set width of plotting region (in centimeters)
@@ -223,26 +214,27 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       # get a character vector of all the tests in the cell
       tests <- isolateTests(string=as.character(unlist(
         data[data$Order==i, DATES.COLUMN.FIRST : DATES.COLUMN.LAST][ii]
-        )), separator=",")
+      )), separator=",")
       # TODO: would the code run faster, if I would use as reference:
       # data[DATES.COLUMN.FIRST + ii - 1])
       # as bellow ?
-            
+      
       # test if all test results entered are valid
       for (iii in 1:length(tests)) {
-       if (!any(tests[iii]==TEST.RESULT.LEVELS)){
-         errorMessages[length(errorMessages)+1] <<-
-           paste("Error: Data does not match allowed values. Check ID:",
-               data[data$Order==i,]["ID"],
-               "and date column:",
-               names(data[DATES.COLUMN.FIRST + ii - 1]),
-                 "for value:'",
-                 tests[iii],
-                 "'"
-                 )
-      # if at least one is invalid, set that a critical error has occured as TRUE     
-         criticalError <- TRUE
-       }
+        if (!any(tests[iii]==TEST.RESULT.LEVELS)){
+          errorMessages[length(errorMessages)+1] <<-
+            paste("Error: Data does not match allowed values. Check ID:",
+                  data[data$Order==i,]["ID"],
+                  "and date column:",
+                  names(data[DATES.COLUMN.FIRST + ii - 1]),
+                  "for value:'",
+                  tests[iii],
+                  "'"
+            )
+          # if at least one is invalid, set that a critical error has occured
+          # as TRUE     
+          criticalError <- TRUE
+        }
       }
       
       # draws point one on top of the other if multiple tests 
@@ -263,7 +255,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                                     function(x) which(x==TEST.RESULT.LEVELS) ) )],
         pch=16
       )
-                  
+      
       # save some additional information for each point 
       # to be shown as a tooltip
       # loop through all points - for case when there are two in one cell
@@ -275,7 +267,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
                                          DATES.COLUMN.FIRST : 
                                            DATES.COLUMN.LAST][ii])),
                 "; date:", format(datesofTests[ii],format="%d.%m.%y" )# Date of test
-                )
+          )
       }
       
       # increment counter of symbols drawn
@@ -298,15 +290,15 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       if (dayofDeath >= 0 && dayofDeath <= max(daysofTests)) {
         plotDeaths(lineNumber=i, dayofDeath= dayofDeath + 1)
         symbolTooltip[pointCounter+1] <-
-        paste("ID:", data[data$Order==i, "ID"], # "ID" of patient 
-              "; died:", format(dateofDeath, format="%d.%m.%y"))
+          paste("ID:", data[data$Order==i, "ID"], # "ID" of patient 
+                "; died:", format(dateofDeath, format="%d.%m.%y"))
         pointCounter <- pointCounter + 1 
       }
     }
   }
   
-
-  # draw labels on the x axis ####
+  
+  # draw labels on the x axis
   axis(1, at=daysofTests, labels=rep("", length(daysofTests)), cex.axis=.35)
   DATE.LABELS <- format(datesofTests, format="%d %b")
   axis(1, at=daysofTests[seq(1, length(daysofTests), 2)], 
@@ -316,35 +308,35 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
        labels=DATE.LABELS[seq(2, length(daysofTests), 2)],
        cex.axis=.75, line=-1, lwd=0)
   
-  # draw horizontal lines for each unit ####
+  # draw horizontal lines for each unit
   abline(h=unlist(data["Order"]), lty=2, col=LINE.UNIT.COLOR)
   
   # call function to draw labels for each existing 1st+2nd level combination 
   for (i in TYPE.LEVELS) {
     for (ii in DIAGNOSIS.LEVELS) {
       if (checkifCombinationExists(data, i, ii)) { 
-      drawLevelLabels(data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
-                      firstLevel=i, secondLevel=ii)
+        drawLevelLabels(data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
+                        firstLevel=i, secondLevel=ii)
       }
     }
   }
- 
+  
   # add label of graph A
   mtext("A", side=3, adj=0, line=1, cex=1.5)
   
   # add a legend to the A plot
   legend("topleft",
-    # x=2,
-    # y=-3,
-    bty="n",
-    xpd=TRUE,
-    legend=TEST.RESULT.LEVELS,
-    pch=16,
-    horiz=TRUE,
-    col=DOT.COLORS,
-    pt.cex=DOT.SIZES
-    )
- 
+         # x=2,
+         # y=-3,
+         bty="n",
+         xpd=TRUE,
+         legend=TEST.RESULT.LEVELS,
+         pch=16,
+         horiz=TRUE,
+         col=DOT.COLORS,
+         pt.cex=DOT.SIZES
+  )
+  
   # if critical error occured, print a warning on graph
   if (criticalError) {
     text(x=1, y=0, labels="Critical error",
@@ -354,10 +346,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   
   
   #### draw graph B #####
-  # ANSW: think about possiblity of drawing confidence interval inste OR in addition to 
-  # column; should the user have a choice of drawing only means and also confindence intervals
 
-    
   # set margins for 2nd figure
   par(mar=c(4, 7, .5, 2) + 0.1 )
   
@@ -374,21 +363,23 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       # for case when 1st level in nonNA
       if (!is.na(ii)) { 
         sumNonNA <- sum(!is.na(data[data$Type==ii, i]))
-        sumPositive <- sum(!is.na(data[data$Type==ii, i]) & data[data$Type==ii, i]!="neg" ) 
+        sumPositive <- sum(!is.na(data[data$Type==ii, i]) &
+                             data[data$Type==ii, i]!="neg" ) 
         positiveUnits[row, column] <- sumPositive/sumNonNA*100
       }
       # for case when 1st level is NA
       if (is.na(ii)) {
         sumNonNA <- sum(!is.na(data[is.na(data$Type), i]))
-        sumPositive <- sum(!is.na(data[is.na(data$Type), i]) & data[is.na(data$Type), i]!="neg" ) 
+        sumPositive <- sum(!is.na(data[is.na(data$Type), i]) &
+                             data[is.na(data$Type), i]!="neg" ) 
         positiveUnits[row, column] <- sumPositive/sumNonNA*100
       }
       row <- row + 1
     }
-      column <- column +1 
+    column <- column +1 
   }
   
-
+  
   
   # calculate minumum difference between consecutive tests in days
   minimumInterval <- min(as.numeric(diff(daysofTests)))
@@ -446,7 +437,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
            xlim=c(0, max(daysofTests)), width=barWidth,
            space=spacingVector)
   abline(h=seq(0, 100, by=5), col="gray", lty=2)
-  # draw labels on the x axis ####
+  # draw labels on the x axis
   axis(1, at=daysofTests, labels=rep("", length(daysofTests)), cex.axis=.35)
   
   # draw x axis labels
@@ -474,12 +465,13 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   mtext("B", side=3, adj=0, line=1, cex=1.5)
   
   # write the date and time of plotting
-  mtext(paste("Generated on:", format(Sys.time(), "%d %b %Y, %H:%M")), side=1, line=2, cex=1)
+  mtext(paste("Generated on:", format(Sys.time(), "%d %b %Y, %H:%M")),
+        side=1, line=2, cex=1)
   
   # writes image to file
   dev.off()
   
-  ### add interactivity to the figure ####
+  # add interactivity to the figure
   # execute only if parameter to show tooltips is TRUE
   if (generateTooltips) {
     library(SVGAnnotation)
@@ -503,22 +495,14 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       addToolTips(getPlotPoints(doc)[[1]], 
                   symbolTooltip,
                   addArea=TRUE)
-    # add CSS styles inside the file 
-    # internal style enable easier sharing of SVG files
-    # without having to share referenced CSS files
-    addCSS(doc, insert=TRUE)
-    saveXML(doc, paste(graphsDir, "/", "example_tooltips.svg", sep=""))
+      # add CSS styles inside the file 
+      # internal style enable easier sharing of SVG files
+      # without having to share referenced CSS files
+      addCSS(doc, insert=TRUE)
+      saveXML(doc, paste(graphsDir, "/", "example_tooltips.svg", sep=""))
     }
   }
   
-  # TODO: take out functions for profiling
-  # summaryRprof(filename="Rprof.out")
-  # library(profr)
-  # parse_rprof("Rprof.out")
-  # ggplot.profr("Rprof.out")
-  # plot.profr("Rprof.out")
-  # plot(parse_rprof("Rprof.out"))
-    
   # set default error message, if no errors were generated
   if (length(errorMessages) == 0) {
     errorMessages[length(errorMessages)+1] <<- "No errors found."
@@ -545,11 +529,14 @@ drawLevelLabels <- function (data, TYPE.LEVELS, LINE.SIZE, DIAGNOSIS.LEVELS,
   firstRowforDiagnosis <- findFirstRowof2ndLevel(data, firstLevel, secondLevel)
   lastRowforDiagnosis <- findLastRowof2ndLevel(data, firstLevel, secondLevel)
   # draw labels and lines for 2nd level
-  draw2ndLevelLabels(label=secondLevel, firstRowforDiagnosis, lastRowforDiagnosis )
-  drawLineBelow2ndLevel(data, firstLevel, secondLevel, lastRowforDiagnosis, DIAGNOSIS.LEVELS, LINE.SIZE)
+  draw2ndLevelLabels(label=secondLevel, firstRowforDiagnosis,
+                     lastRowforDiagnosis )
+  drawLineBelow2ndLevel(data, firstLevel, secondLevel,
+                        lastRowforDiagnosis, DIAGNOSIS.LEVELS, LINE.SIZE)
   # draw labels and lines for 1st level
   draw1stLevelLabels(label=firstLevel, firstRowforType)
-  drawLineBelow1stLevel(data, firstLevel, TYPE.LEVELS, lastRowforType, LINE.SIZE)
+  drawLineBelow1stLevel(data, firstLevel, TYPE.LEVELS,
+                        lastRowforType, LINE.SIZE)
 }
 
 #' @title Draws labels for the 2nd level groups
@@ -560,18 +547,18 @@ draw2ndLevelLabels <- function (label,
   if (!is.na(label)){ mtext(line=1, text=label, side=2, las=2,  cex=.75,
                             padj=0, font=1,
                             at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)}
- 
- if (is.na(label)) {mtext(line=1, text="Unknown", side=2, las=2,  cex=.75,
-                          padj=0, font=1,
-                          at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)}
+  
+  if (is.na(label)) {mtext(line=1, text="Unknown", side=2, las=2,  cex=.75,
+                           padj=0, font=1,
+                           at=(firstRowforDiagnosis+lastRowforDiagnosis)/2)}
 }
 
 #' @title Draws labels for the 1st level groups
 #' @description Not meant to be called by the user.
 draw1stLevelLabels <- function (label, firstRowforType ) {
   if (!is.na(label)){
-  mtext(line=2, text=label, side=2, las=2,  cex=1, padj=0, font=2, 
-        at=firstRowforType)}
+    mtext(line=2, text=label, side=2, las=2,  cex=1, padj=0, font=2, 
+          at=firstRowforType)}
   
   if (is.na(label)){
     mtext(line=2, text="Unknown", side=2, las=2,  cex=1, padj=0, font=2, 
@@ -583,16 +570,16 @@ draw1stLevelLabels <- function (label, firstRowforType ) {
 #' @description Not meant to be called by the user.
 findFirstRowof1stLevel <- function(data, firstLevel) {
   if (is.na(firstLevel))  # if 1st level is NA
-    {min(data[is.na(data$Type),]["Order"], na.rm=TRUE)} else { 
-      min(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)} # if it is nonNA
+  {min(data[is.na(data$Type),]["Order"], na.rm=TRUE)} else { 
+    min(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)} # if it is nonNA
 }
 
 #' @title Finds last row of 1st level group
 #' @description Not meant to be called by the user.
 findLastRowof1stLevel <- function (data, firstLevel) {
   if (is.na(firstLevel)) # if 1st level is NA
-    {max(data[is.na(data$Type),]["Order"], na.rm=TRUE)} else { # if it is nonNA
-      max(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)}
+  {max(data[is.na(data$Type),]["Order"], na.rm=TRUE)} else { # if it is nonNA
+    max(data[data$Type==firstLevel,]["Order"], na.rm=TRUE)}
 }
 
 #' @title Finds first row of 2nd level group
@@ -600,20 +587,20 @@ findLastRowof1stLevel <- function (data, firstLevel) {
 findFirstRowof2ndLevel <- function (data, firstLevel, secondLevel) {
   if ( is.na(firstLevel) & !is.na(secondLevel) ) # 1st level NA, 2nd level nonNA
   {x <- min(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
-       na.rm=TRUE) } 
+            na.rm=TRUE) } 
   
   if (is.na(firstLevel) & is.na(secondLevel)) # 1st level NA, 2nd level NA
   {x <- min(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
-       na.rm=TRUE)} 
+            na.rm=TRUE)} 
   
   if (!is.na(firstLevel) & !is.na(secondLevel)) # 1st level nonNA, 2nd level nonNA
   {x <- min(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
-       na.rm=TRUE)}
+            na.rm=TRUE)}
   
   if (!is.na(firstLevel) & is.na(secondLevel)) # 1st level nonNA, 2nd level NA
   {x <- min(data[data$Type==firstLevel & is.na(data$Diagnosis),]["Order"],
-       na.rm=TRUE)}
-
+            na.rm=TRUE)}
+  
   return(x)
 }
 
@@ -621,20 +608,20 @@ findFirstRowof2ndLevel <- function (data, firstLevel, secondLevel) {
 #' @description Not meant to be called by the user.
 findLastRowof2ndLevel <- function (data, firstLevel, secondLevel) {
   if (is.na(firstLevel) & !is.na(secondLevel)) # 1st level NA, 2nd level nonNA
-    {x <- max(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
-         na.rm=TRUE) } 
+  {x <- max(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"],
+            na.rm=TRUE) } 
   
   if (is.na(firstLevel) & is.na(secondLevel)) # 1st level NA, 2nd level NA
-    {x <- max(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
-         na.rm=TRUE)} 
-      
+  {x <- max(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"],
+            na.rm=TRUE)} 
+  
   if (!is.na(firstLevel) & !is.na(secondLevel)) # 1st level nonNA, 2nd level nonNA
-    {x <- max(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
-      na.rm=TRUE)}
+  {x <- max(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"],
+            na.rm=TRUE)}
   
   if (!is.na(firstLevel) & is.na(secondLevel)) # 1st level nonNA, 2nd level NA
-    {x <- max(data[data$Type==firstLevel & is.na(data$Diagnosis),]["Order"],
-         na.rm=TRUE)}
+  {x <- max(data[data$Type==firstLevel & is.na(data$Diagnosis),]["Order"],
+            na.rm=TRUE)}
   return(x)
 }
 
@@ -651,9 +638,9 @@ drawLineBelow1stLevel <- function (data,
                                    TYPE.LEVELS,
                                    lastRowforType,
                                    LINE.SIZE) {
- # if (firstLevel != tail(TYPE.LEVELS[!is.na(TYPE.LEVELS)], n=1)) {
+  # if (firstLevel != tail(TYPE.LEVELS[!is.na(TYPE.LEVELS)], n=1)) {
   if (lastRowforType!=max(data$Order)){  
-  abline(h=lastRowforType+(LINE.SIZE/2), lty=2, col="black", lwd=2) 
+    abline(h=lastRowforType+(LINE.SIZE/2), lty=2, col="black", lwd=2) 
   }
 }
 
@@ -666,13 +653,11 @@ drawLineBelow2ndLevel <- function (data,
                                    DIAGNOSIS.LEVELS,
                                    LINE.SIZE) {
   # add line after last unit, for any but the last group
-  # TODO: check if lines are correctly drawn, when there are no NA values! 
- 
-if (lastRowforDiagnosis!=max(data$Order)) {
-  abline(h=lastRowforDiagnosis+(LINE.SIZE/2), lty=2, col="gray", lwd=2)
-}
+  if (lastRowforDiagnosis!=max(data$Order)) {
+    abline(h=lastRowforDiagnosis+(LINE.SIZE/2), lty=2, col="gray", lwd=2)
+  }
   
-
+  
 }
 
 #' @title Gets all test results written in a cell
@@ -706,16 +691,20 @@ addErrorMessage <- function(text) {
 #' in the data.
 checkifCombinationExists <- function (data, firstLevel, secondLevel) {
   if (!is.na(firstLevel) & !is.na(secondLevel)) {
-    x <- (!dim(na.omit(data[data$Type==firstLevel & data$Diagnosis==secondLevel,]["Order"]))[[1]]==0)
+    x <- (!dim(na.omit(data[data$Type==firstLevel &
+                              data$Diagnosis==secondLevel,]["Order"]))[[1]]==0)
   }
   if (!is.na(firstLevel) &  is.na(secondLevel)) {
-    x <- (!dim(na.omit(data[data$Type==firstLevel & is.na(data$Diagnosis),]["Order"]))[[1]]==0)
+    x <- (!dim(na.omit(data[data$Type==firstLevel &
+                              is.na(data$Diagnosis),]["Order"]))[[1]]==0)
   }
   if ( is.na(firstLevel) & !is.na(secondLevel)) {
-    x <- (!dim(na.omit(data[is.na(data$Type) & data$Diagnosis==secondLevel,]["Order"]))[[1]]==0)
+    x <- (!dim(na.omit(data[is.na(data$Type) &
+                              data$Diagnosis==secondLevel,]["Order"]))[[1]]==0)
   }
   if ( is.na(firstLevel) &  is.na(secondLevel)) {
-    x <- (!dim(na.omit(data[is.na(data$Type) & is.na(data$Diagnosis),]["Order"]))[[1]]==0)
+    x <- (!dim(na.omit(data[is.na(data$Type) &
+                              is.na(data$Diagnosis),]["Order"]))[[1]]==0)
   }
   return(x)
 }
@@ -753,32 +742,32 @@ sortData <- function (data, sortMethod="BEA",
     return(data[order(data$DateIn), ])
     
   } else { # else return data sorted by the seriation package
-  nTESTS <- length(TEST.RESULT.LEVELS)
-  nDATES <- (DATES.COLUMN.LAST - DATES.COLUMN.FIRST + 1)
-  # initialize matrix to hold info about positive test results
-  # the matrix has a row for every patient and
-  # the columns for every day*result
-  # and will contain 1 where the day+result is realized
-  results <- matrix(0, nrow=nUNITS, ncol=nDATES*nTESTS)
-  colnames(results) <- rep(TEST.RESULT.LEVELS, nDATES)
-  for (i in 1:nUNITS) {
-    for (ii in 1:nDATES) {
-      for (iii in 1:nTESTS) {
-        if(grepl(TEST.RESULT.LEVELS[iii],
-                  data[i, DATES.COLUMN.FIRST + ii - 1])
-           ) {
-          results[i, (ii-1)*nTESTS + iii] <- 1         
-        }
-      }      
+    nTESTS <- length(TEST.RESULT.LEVELS)
+    nDATES <- (DATES.COLUMN.LAST - DATES.COLUMN.FIRST + 1)
+    # initialize matrix to hold info about positive test results
+    # the matrix has a row for every patient and
+    # the columns for every day*result
+    # and will contain 1 where the day+result is realized
+    results <- matrix(0, nrow=nUNITS, ncol=nDATES*nTESTS)
+    colnames(results) <- rep(TEST.RESULT.LEVELS, nDATES)
+    for (i in 1:nUNITS) {
+      for (ii in 1:nDATES) {
+        for (iii in 1:nTESTS) {
+          if(grepl(TEST.RESULT.LEVELS[iii],
+                   data[i, DATES.COLUMN.FIRST + ii - 1])
+          ) {
+            results[i, (ii-1)*nTESTS + iii] <- 1         
+          }
+        }      
+      }
     }
-  }
-  # load library for sorting via similarity
-  library(seriation)
-  # sort, get order by patients dimension
-  series <- seriate(results, method=sortMethod)
-  seriesOrder <- get_order(series,dim=1)
-  
-  # return data resorted
-  return(data[seriesOrder, ])
+    # load library for sorting via similarity
+    library(seriation)
+    # sort, get order by patients dimension
+    series <- seriate(results, method=sortMethod)
+    seriesOrder <- get_order(series,dim=1)
+    
+    # return data resorted
+    return(data[seriesOrder, ])
   }
 }
