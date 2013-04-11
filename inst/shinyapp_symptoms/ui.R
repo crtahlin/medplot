@@ -22,8 +22,9 @@ shinyUI(pageWithSidebar(
   
   # Define the output panel
   mainPanel(
-    plotOutput("plot")
-  )
+    plotOutput("plot"),
+    h3(textOutput("message"))
+    )  
 )
 )
 
