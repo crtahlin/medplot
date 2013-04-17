@@ -11,9 +11,10 @@ Depends:
   Cairo,
 	gplots,
 	RColorBrewer,
-	SVGAnnotation,
 	shiny,
 	scales,
 	reshape2,
 	ggplot2,
   seriation
+Suggests: 
+  SVGAnnotation
