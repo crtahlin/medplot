@@ -16,5 +16,6 @@ Depends:
 	reshape2,
 	ggplot2,
   seriation
-Suggests: 
+  XML
+Imports: 
   SVGAnnotation
