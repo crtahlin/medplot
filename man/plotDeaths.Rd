@@ -1,0 +1,10 @@
+\name{plotDeaths}
+\alias{plotDeaths}
+\title{Plots a death of a patient with a special character}
+\usage{
+  plotDeaths(lineNumber, dayofDeath)
+}
+\description{
+  Not meant to be called by the user.
+}
+

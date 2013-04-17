@@ -1,0 +1,10 @@
+\name{draw1stLevelLabels}
+\alias{draw1stLevelLabels}
+\title{Draws labels for the 1st level groups}
+\usage{
+  draw1stLevelLabels(label, firstRowforType)
+}
+\description{
+  Not meant to be called by the user.
+}
+
