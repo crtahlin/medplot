@@ -15,7 +15,7 @@ Depends:
 	scales,
 	reshape2,
 	ggplot2,
-  seriation
+  seriation,
   XML
 Imports: 
   SVGAnnotation
