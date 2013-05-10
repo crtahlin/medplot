@@ -275,24 +275,28 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
     }
     
     # draw death of patient if they died, at the date of release
-    if (data[data$Order==i,]$Outcome=="died") {
-      dateofDeath <- as.Date((data[data$Order==i,]$DateOut))
-      dayofDeath <- dateofDeath - datesofTests[1]
-      if (dayofDeath < 0) {
-        errorMessages[length(errorMessages)+1] <<-
-          paste("Error: Day of death falls before the date of first test.")
-        criticalError <- TRUE
-      }
-      if (dayofDeath > max(daysofTests)) {
-        errorMessages[length(errorMessages)+1] <<-
-          paste("Warning: Day of death falls after the last date of observation.")
-      }
-      if (dayofDeath >= 0 && dayofDeath <= max(daysofTests)) {
-        plotDeaths(lineNumber=i, dayofDeath= dayofDeath + 1)
-        symbolTooltip[pointCounter+1] <-
-          paste("ID:", data[data$Order==i, "ID"], # "ID" of patient 
-                "; died:", format(dateofDeath, format="%d.%m.%y"))
-        pointCounter <- pointCounter + 1 
+    # but only compare non-NA values of Outcome
+    if (!is.na(data[data$Order==i,]$Outcome)) {
+      if (data[data$Order==i,]$Outcome=="died") {
+        dateofDeath <- as.Date((data[data$Order==i,]$DateOut))
+        dayofDeath <- dateofDeath - datesofTests[1]
+        if (dayofDeath < 0) {
+          errorMessages[length(errorMessages)+1] <<-
+            paste("Error: Day of death falls before the date of first test.")
+          criticalError <- TRUE
+        }
+        if (dayofDeath > max(daysofTests)) {
+          errorMessages[length(errorMessages)+1] <<-
+            paste("Warning: Day of death falls after the last date of
+                  observation.")
+        }
+        if (dayofDeath >= 0 && dayofDeath <= max(daysofTests)) {
+          plotDeaths(lineNumber=i, dayofDeath= dayofDeath + 1)
+          symbolTooltip[pointCounter+1] <-
+            paste("ID:", data[data$Order==i, "ID"], # "ID" of patient 
+                  "; died:", format(dateofDeath, format="%d.%m.%y"))
+          pointCounter <- pointCounter + 1 
+        }
       }
     }
   }
