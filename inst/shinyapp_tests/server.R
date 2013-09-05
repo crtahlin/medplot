@@ -15,16 +15,19 @@ shinyServer(function(input, output) {
   data <- reactive({
     data <- read.xls(input$dataFile$datapath)
     data$DateIn <- 
-      as.character(as.Date(data$DateIn, origin="1899-12-30"),format="%d.%m.%Y")
+      as.POSIXct(as.Date(data$DateIn, origin="1899-12-30"))
     data$DateOut <- 
-      as.character(as.Date(data$DateOut, origin="1899-12-30"),format="%d.%m.%Y")
+      as.POSIXct(as.Date(data$DateOut, origin="1899-12-30"))
+#     data$DateOut <- 
+#       as.character(as.Date(data$DateOut, origin="1899-12-30"),format="%d.%m.%Y")
+    # NOTE: if we want to render the table of data, we have to convert the dates into 
+    # characters, since renderTable seems to use xtable, which seems to not handle
+    # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
     return(data)
     })
   
   output$dataTable <- renderTable(data())
-  
-  output$test <- renderText("blablabla")
-    
+      
   # create dataframe for testing
   # it contains figureParameters to determine how to plot points
   figureParameters <- data.frame(
@@ -42,10 +45,11 @@ shinyServer(function(input, output) {
   # generate plot
   output$dataPlot <- renderImage({
     # create name of temporary file
-    outfile <- tempfile(fileext='.svg')
-    
+    # outfile <- tempfile(fileext='.svg')
+    # workatround
+    outfile <- "C:/Users/Crt Ahlin/Desktop/medplot/example_tooltips.svg"
     # generate the plot
-    plotTests(data=read.xls(input$dataFile$datapath), figureParameters)
+    plotTests(data=data(), figureParameters=figureParameters, graphsDir="C:/Users/Crt Ahlin/Desktop/medplot")
 #     png(outfile, width=400, height=400)
 #     hist(rnorm(input$n))
 #     dev.off()

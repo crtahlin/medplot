@@ -32,10 +32,10 @@ shinyUI(
     ),
     
      mainPanel(
-       textOutput("test"),
+       
        tabsetPanel(
          tabPanel("Data", tableOutput("dataTable")),
-         tabPanel("Graph", plotOutput("dataPlot"))
+         tabPanel("Graph", imageOutput("dataPlot", height="100%"))
        )
     )
   )
