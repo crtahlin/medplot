@@ -17,11 +17,6 @@ shinyServer(function(input, output) {
       as.POSIXct(as.Date(data$DateIn, origin="1899-12-30"))
     data$DateOut <- 
       as.POSIXct(as.Date(data$DateOut, origin="1899-12-30"))
-    #     data$DateOut <- 
-    #       as.character(as.Date(data$DateOut, origin="1899-12-30"),format="%d.%m.%Y")
-    # NOTE: if we want to render the table of data, we have to convert the dates into 
-    # characters, since renderTable seems to use xtable, which seems to not handle
-    # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
     return(data)
   })
   
@@ -38,8 +33,12 @@ shinyServer(function(input, output) {
     data$DateOut <- 
       as.character(as.Date(data$DateOut, origin="1899-12-30"),format="%d.%m.%Y")
     return(data)
+    # NOTE: if we want to render the table of data, we have to convert the dates into 
+    # characters, since renderTable seems to use xtable, which seems to not handle
+    # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
   })
   
+  output$parametersTable <- renderTable(parameters())
   
   # generate plot
   output$dataPlot <- renderImage({

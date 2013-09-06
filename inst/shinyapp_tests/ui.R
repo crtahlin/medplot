@@ -34,8 +34,10 @@ shinyUI(
      mainPanel(
        
        tabsetPanel(
+         
+         tabPanel("Graph", imageOutput("dataPlot", height="100%")),
          tabPanel("Data", tableOutput("dataTable")),
-         tabPanel("Graph", imageOutput("dataPlot", height="100%"))
+         tabPanel("Parameters", tableOutput("parametersTable"))
        )
     )
   )
