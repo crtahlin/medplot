@@ -28,7 +28,12 @@ shinyUI(
       fileInput(inputId="dataFile",
                 label="Upload Excel data file",
                 multiple=FALSE,
-                accept="application/vnd.ms-excel")
+                accept="application/vnd.ms-excel"),
+      
+      # path to save the SVG file to
+      textInput(inputId="graphFile",
+                label="Filename of saved SVG file (optional)"
+        )
     ),
     
      mainPanel(
