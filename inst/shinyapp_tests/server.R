@@ -49,10 +49,7 @@ shinyServer(function(input, output) {
     # workatround
     outfile <- "C:/Users/Crt Ahlin/Desktop/medplot/example_tooltips.svg"
     # generate the plot
-    plotTests(data=data(), figureParameters=figureParameters, graphsDir="C:/Users/Crt Ahlin/Desktop/medplot")
-#     png(outfile, width=400, height=400)
-#     hist(rnorm(input$n))
-#     dev.off()
+    plotTests(data=data(), figureParameters=figureParameters, graphsDir="C:/Users/Crt Ahlin/Desktop/medplot", generateTooltips=input$generateTooltips, sortMethod=input$sortingMethod)
     
     # return a list with generated plot file location
     list(src = outfile,

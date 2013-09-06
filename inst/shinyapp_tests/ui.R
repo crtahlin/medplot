@@ -16,12 +16,12 @@ shinyUI(
       # create selection - should tooltips be generated?
       radioButtons(inputId="generateTooltips",
                    label="Generate tooltips?",
-                   choices=c("Yes","No")),
+                   choices=c("Yes"=TRUE,"No"=FALSE)),
       
       # create selection - which sorting method should be used?
       selectInput(inputId="sortingMethod",
                   label="What kind of sorting should be used?",
-                  choices=c("none","Datein","BEA","BEA_TSP","PCA"),
+                  choices=c("none","DateIn","BEA","BEA_TSP","PCA"),
                   multiple=FALSE),
       
       # create option for uploading file with data
