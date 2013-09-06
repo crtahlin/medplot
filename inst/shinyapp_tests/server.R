@@ -43,11 +43,11 @@ shinyServer(function(input, output) {
   # generate plot
   output$dataPlot <- renderImage({
     # create name of temporary file
-    # outfile <- tempfile(fileext='.svg')
+    outfile <- tempfile(fileext='.svg')
     # workatround
-    outfile <- "C:/Users/Crt Ahlin/Desktop/medplot/example_tooltips.svg"
+    # outfile <- "C:/Users/Crt Ahlin/Desktop/medplot/example_tooltips.svg"
     # generate the plot
-    plotTests(data=data(), figureParameters=parameters(), graphsDir="C:/Users/Crt Ahlin/Desktop/medplot", generateTooltips=input$generateTooltips, sortMethod=input$sortingMethod)
+    plotTests(data=data(), figureParameters=parameters(), graphsDir=outfile, generateTooltips=input$generateTooltips, sortMethod=input$sortingMethod)
     
     # return a list with generated plot file location
     list(src = outfile,

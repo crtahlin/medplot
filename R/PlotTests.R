@@ -166,7 +166,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # set width of plotting region (in centimeters)
   PLOT.WIDTH <- max(c(max(daysofTests), (5+3*length(TEST.RESULT.LEVELS)) ))
   
-  Cairo(paste(graphsDir, "/", "example.svg", sep=""),
+  Cairo(graphsDir,
         type="svg",
         width=PLOT.WIDTH ,
         height=29,
@@ -480,7 +480,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   if (generateTooltips) {
     library(SVGAnnotation)
     # open the generated SVG file
-    doc <- xmlParse(paste(graphsDir, "/", "example.svg", sep=""))
+    doc <- xmlParse(graphsDir)
     
     # only generate graph with tooltips if the number of points is the same
     # as the number of tooltip annotations
@@ -503,7 +503,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       # internal style enable easier sharing of SVG files
       # without having to share referenced CSS files
       addCSS(doc, insert=TRUE)
-      saveXML(doc, paste(graphsDir, "/", "example_tooltips.svg", sep=""))
+      saveXML(doc, graphsDir)
     }
   }
   
