@@ -14,7 +14,7 @@
 #' The B graph shows, via a barchart, how many results were positive on
 #' a certain day for a certain group.
 #' 
-plotTests <- function (data, figureParameters, graphsDir = getwd(),
+plotTests <- function (data, figureParameters, fileName,
                        generateTooltips = TRUE, sortMethod="DateIn") {
   
   # replace missing values with NA (must do because RExcel sends them as 
@@ -166,7 +166,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   # set width of plotting region (in centimeters)
   PLOT.WIDTH <- max(c(max(daysofTests), (5+3*length(TEST.RESULT.LEVELS)) ))
   
-  Cairo(graphsDir,
+  Cairo(fileName,
         type="svg",
         width=PLOT.WIDTH ,
         height=29,
@@ -480,7 +480,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
   if (generateTooltips) {
     library(SVGAnnotation)
     # open the generated SVG file
-    doc <- xmlParse(graphsDir)
+    doc <- xmlParse(fileName)
     
     # only generate graph with tooltips if the number of points is the same
     # as the number of tooltip annotations
@@ -503,7 +503,7 @@ plotTests <- function (data, figureParameters, graphsDir = getwd(),
       # internal style enable easier sharing of SVG files
       # without having to share referenced CSS files
       addCSS(doc, insert=TRUE)
-      saveXML(doc, graphsDir)
+      saveXML(doc, fileName)
     }
   }
   

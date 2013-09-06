@@ -31,7 +31,7 @@ shinyUI(
                 accept="application/vnd.ms-excel"),
       
       # path to save the SVG file to
-      textInput(inputId="graphFile",
+      textInput(inputId="fileName",
                 label="Filename of saved SVG file (optional)"
         )
     ),
