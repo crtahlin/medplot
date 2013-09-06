@@ -2,7 +2,7 @@
 \alias{plotTests}
 \title{Plot test results}
 \usage{
-  plotTests(data, figureParameters, graphsDir = getwd(),
+  plotTests(data, figureParameters, fileName,
     generateTooltips = TRUE, sortMethod = "DateIn")
 }
 \description{

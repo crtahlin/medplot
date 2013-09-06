@@ -43,16 +43,25 @@ shinyServer(function(input, output) {
   # generate plot
   output$dataPlot <- renderImage({
     # create name of temporary file
-    outfile <- tempfile(fileext='.svg')
+    if (input$fileName=="") { outfile <- tempfile(fileext='.svg') } else {
+    outfile <- input$fileName
+    }
+    # TODO: ali to shranjevanje v folder deluje oz. ali je potrebno? 
     # workatround
     # outfile <- "C:/Users/Crt Ahlin/Desktop/medplot/example_tooltips.svg"
     # generate the plot
-    plotTests(data=data(), figureParameters=parameters(), fileName=outfile, generateTooltips=input$generateTooltips, sortMethod=input$sortingMethod)
+    plotTests(data=data(),
+              figureParameters=parameters(),
+              fileName=outfile,
+              generateTooltips=input$generateTooltips,
+              sortMethod=input$sortingMethod)
     
     # return a list with generated plot file location
     list(src = outfile,
          alt = "This is alternate text")
-  }, deleteFile = TRUE)
-  
+  }, deleteFile = {input$fileName==""})
+  # TODO: it seems the checking if input$fileName must be made reactive, to enable correct refreshing of deleting of files on apply (otherwise the value before file upload is used)!
+  # generate debug info 
+  output$debug <- renderText(input$fileName=="")
   
 })

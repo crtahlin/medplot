@@ -33,7 +33,10 @@ shinyUI(
       # path to save the SVG file to
       textInput(inputId="fileName",
                 label="Filename of saved SVG file (optional)"
-        )
+        ),
+      # make a submit button to update changes
+      submitButton(text = "Apply Changes")
+      
     ),
     
      mainPanel(
@@ -42,7 +45,8 @@ shinyUI(
          
          tabPanel("Graph", imageOutput("dataPlot", height="100%")),
          tabPanel("Data", tableOutput("dataTable")),
-         tabPanel("Parameters", tableOutput("parametersTable"))
+         tabPanel("Parameters", tableOutput("parametersTable")),
+         tabPanel("Debug", textOutput("debug"))
        )
     )
   )
