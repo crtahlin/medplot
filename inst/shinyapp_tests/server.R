@@ -10,7 +10,7 @@ library(gdata)
 library(medplot)
 
 # main function 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   
   # load data from Excel
   data <- reactive({
@@ -46,9 +46,10 @@ shinyServer(function(input, output) {
   # generate plot
   output$dataPlot <- renderImage({
     # create name of temporary file
-    if (input$fileName=="") { outfile <- tempfile(fileext='.svg') } else {
-    outfile <- input$fileName
-    }
+    outfile <- tempfile(fileext='.svg')
+    #     if (input$fileName=="") { outfile <- tempfile(fileext='.svg') } else {
+    #     outfile <- input$fileName
+    #    }
     # TODO: ali to shranjevanje v folder deluje oz. ali je potrebno? 
     # workatround
     # outfile <- "C:/Users/Crt Ahlin/Desktop/medplot/example_tooltips.svg"
@@ -60,11 +61,19 @@ shinyServer(function(input, output) {
               sortMethod=input$sortingMethod)
     
     # return a list with generated plot file location
-    list(src = outfile,
-         alt = "This is alternate text")
-  }, deleteFile = {input$fileName==""})
+    list(src = outfile, alt = "This is alternate text", contentType = 'image/svg+xml')
+    }, deleteFile = FALSE)
+  
   # TODO: it seems the checking if input$fileName must be made reactive, to enable correct refreshing of deleting of files on apply (otherwise the value before file upload is used)!
   # generate debug info 
-  output$debug <- renderText(paste("Is file name to save into blank?", input$fileName==""))
-  
+  clientData <- session$clientData
+  output$debug <- renderText({
+    clientDataNames <- names(clientData)
+    
+    allValues <- lapply(clientDataNames, function(name) {
+      paste(name, clientData[[name]], sep=" = ")
+    })
+    paste(allValues, collapse = "\n")
+  })
+                             
 })

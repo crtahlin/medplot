@@ -28,25 +28,28 @@ shinyUI(
       fileInput(inputId="dataFile",
                 label="Upload Excel data file",
                 multiple=FALSE,
-                accept="application/vnd.ms-excel"),
+                accept="application/vnd.ms-excel")  #,
       
-      # path to save the SVG file to
-      textInput(inputId="fileName",
-                label="Filename of saved SVG file (optional)"
-        ),
-      # make a submit button to update changes
-      submitButton(text = "Apply Changes")
+#       # path to save the SVG file to
+#       textInput(inputId="fileName",
+#                 label="Filename of saved SVG file (optional)"
+#         ),
+#       # make a submit button to update changes
+#       submitButton(text = "Apply Changes")
       
     ),
     
      mainPanel(
        
        tabsetPanel(
-         
+         # TODO: to display SVG inside HTML and use the "tooltips",
+         # it must be properly embedded as described in:
+         # http://www.w3schools.com/svg/svg_inhtml.asp
+         # Figure out how to create custom shiny code for this.
          tabPanel("Graph", imageOutput("dataPlot", height="100%")),
          tabPanel("Data", tableOutput("dataTable")),
          tabPanel("Parameters", tableOutput("parametersTable")),
-         tabPanel("Debug", textOutput("debug"))
+         tabPanel(title="Debug",h3("Client Session Parameters"), verbatimTextOutput("debug"))
        )
     )
   )
