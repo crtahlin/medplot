@@ -6,6 +6,9 @@ library(shiny)
 # load library for reading Excel files
 library(gdata)
 
+# load medplot library
+library(medplot)
+
 # main function 
 shinyServer(function(input, output) {
   
@@ -62,6 +65,6 @@ shinyServer(function(input, output) {
   }, deleteFile = {input$fileName==""})
   # TODO: it seems the checking if input$fileName must be made reactive, to enable correct refreshing of deleting of files on apply (otherwise the value before file upload is used)!
   # generate debug info 
-  output$debug <- renderText(input$fileName=="")
+  output$debug <- renderText(paste("Is file name to save into blank?", input$fileName==""))
   
 })
