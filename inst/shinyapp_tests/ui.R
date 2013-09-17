@@ -49,6 +49,7 @@ shinyUI(
          tabPanel("Graph", imageOutput("dataPlot", height="100%")),
          tabPanel("Data", tableOutput("dataTable")),
          tabPanel("Parameters", tableOutput("parametersTable")),
+         tabPanel(title="Errors", verbatimTextOutput("errors")),
          tabPanel(title="Debug",h3("Client Session Parameters"), verbatimTextOutput("debug"))
        )
     )
