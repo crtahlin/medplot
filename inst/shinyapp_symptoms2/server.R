@@ -5,31 +5,29 @@
 library(shiny)
 # load library for generating graph scales
 library(scales)
+# load library for melting data
+library(reshape2)
 
 # Main function
 shinyServer(function(input, output, session) {
   
   # load data from Excel
-  dataFile <- reactive({
+  symptomsData <- reactive(function() {
     data <- read.xls(input$dataFile$datapath, sheet="DATA")
+    
+    # transform date information into R compliant dates
+    data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
+    
+    # transform data into ggplot compliant format
+    data <- melt(data, id.vars = c("Patient", "Date"))
     return(data)
   })
   
-#----------
-    # load library for melting data
-    library(reshape2)
-  
-  # transform date information into R compliant dates
-  mySymptomsData["Date"] <- as.Date(mySymptomsData[,"Date"], "%d.%m.%Y")
-  
-  # transform data into ggplot compliant format
-  symptomsData <- melt(mySymptomsData, id.vars = c("Patient", "Date"))
-    
-# ----------
+
   
   # subset the data with the selected symptoms
   data <- reactive( function() {
-    symptomsData[symptomsData$variable %in% input$selectedSymptoms,]
+    symptomsData()[symptomsData()$variable %in% input$selectedSymptoms,]
   })
   
   # list the subseted data in an output slot
@@ -41,6 +39,21 @@ shinyServer(function(input, output, session) {
                              # characters, since renderTable seems to use xtable, which seems to not handle
                              # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
     })
+  
+  # list all available symptoms in an output slot
+  output$levels <- renderUI( {
+    symptoms <- unlist(levels(symptomsData()[,"variable"]))
+    checkboxGroupInput(inputId="selectedSymptoms",
+                       label="Choose symptoms", 
+                       choices=symptoms)
+  } 
+                             )
+  
+  # Partial example
+#   output$cityControls <- renderUI({
+#     cities <- getNearestCities(input$lat, input$long)
+#     checkboxGroupInput("cities", "Choose Cities", cities)
+#   })
   
   # plot the graph, but only for selected symptoms
   output$plot <- renderPlot(function() {
@@ -64,7 +77,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$message <- renderText(if (dim(data())[1]==0){paste("Please select one or more symptoms.")})
+  output$debug <- renderPrint(symptomsData())
+  
 })
 
-
-# runApp(launch.browser=TRUE)

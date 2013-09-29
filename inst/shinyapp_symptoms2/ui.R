@@ -3,8 +3,6 @@
 
 library(shiny)
 
-# Prepare the list of possible symptoms
-reportedSymptoms <- unlist(levels(symptomsData[,"variable"]))
 
 # Define UI for displaying presence of symptoms
 shinyUI(pageWithSidebar(
@@ -14,13 +12,14 @@ shinyUI(pageWithSidebar(
   
   # Define the selection panel
   sidebarPanel(wellPanel(
-    checkboxGroupInput(inputId="selectedSymptoms",
-                       label=h5("Symptoms:"),
-                       choices=reportedSymptoms),
+    # offer user to upload file
     fileInput(inputId="dataFile",
               label=h5("Upload Excel data file:"),
               multiple=FALSE,
-              accept="application/vnd.ms-excel")
+              accept="application/vnd.ms-excel"),
+    # output checkbox selection generated on the server side
+    uiOutput("levels")
+    
   )
   ),
   
@@ -32,7 +31,7 @@ shinyUI(pageWithSidebar(
                h3(textOutput("message"))),
       tabPanel("Selected transformed data", tableOutput("data")),
       tabPanel("Parameters"),
-      tabPanel("Debug")
+      tabPanel("Debug", textOutput("debug"))
     ) ) 
 )
 )
