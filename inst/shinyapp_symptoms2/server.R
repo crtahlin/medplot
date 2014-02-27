@@ -17,6 +17,8 @@ shinyServer(function(input, output, session) {
   
   # load data from Excel
   symptomsData <- reactive(function() {
+    if (!is.null(input$dataFile)) {
+    # read the data into R
     data <- read.xls(input$dataFile$datapath, sheet="DATA")
     
     # transform date information into R compliant dates
@@ -25,6 +27,20 @@ shinyServer(function(input, output, session) {
     # transform data into ggplot compliant format
     data <- melt(data, id.vars = c("Patient", "Date"))
     return(data)
+    } else {
+      #### load default data
+      # DEMO SCENARIO
+      data <- read.xls("../extdata/PlotSymptoms_shiny.xlsx", sheet="DATA")
+      
+      # transform date information into R compliant dates
+      data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
+      
+      # transform data into ggplot compliant format
+      data <- melt(data, id.vars = c("Patient", "Date"))
+      return(data)
+      #####
+    
+    }
   })
   
 
@@ -53,11 +69,6 @@ shinyServer(function(input, output, session) {
   } 
                              )
   
-  # Partial example
-#   output$cityControls <- renderUI({
-#     cities <- getNearestCities(input$lat, input$long)
-#     checkboxGroupInput("cities", "Choose Cities", cities)
-#   })
   
   # plot the graph, but only for selected symptoms
   output$plot <- renderPlot(function() {
@@ -80,8 +91,12 @@ shinyServer(function(input, output, session) {
     )}
   })
   
-  output$message <- renderText(if (dim(data())[1]==0){paste("Please select one or more symptoms.")})
+  output$message <- renderText(
+    if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
+    if (dim(data())[1]==0){paste("Please select one or more symptoms.")}
+    })
   output$debug <- renderPrint(symptomsData())
+    
   
 })
 

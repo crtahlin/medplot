@@ -46,7 +46,7 @@ shinyUI(
          # it must be properly embedded as described in:
          # http://www.w3schools.com/svg/svg_inhtml.asp
          # Figure out how to create custom shiny code for this.
-         tabPanel("Graph", imageOutput("dataPlot", height="100%")),
+         tabPanel("Graph", h3(textOutput("message")), imageOutput("dataPlot", height="100%")),
          tabPanel("Data", tableOutput("dataTable")),
          tabPanel("Parameters", tableOutput("parametersTable")),
          tabPanel(title="Errors", verbatimTextOutput("errors")),
