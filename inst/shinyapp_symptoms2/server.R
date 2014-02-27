@@ -7,6 +7,10 @@ library(shiny)
 library(scales)
 # load library for melting data
 library(reshape2)
+# library for plotting data
+library(ggplot2)
+# library for reading Excel files
+library(gdata)
 
 # Main function
 shinyServer(function(input, output, session) {
