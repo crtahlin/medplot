@@ -9,6 +9,10 @@ library(gdata)
 # load medplot library
 library(medplot)
 
+# save the location of template data file
+templateLocation <- paste0(path.package("medplot"),"/extdata/PlotTests_shiny.xlsx")
+
+
 # main function 
 shinyServer(function(input, output, session) {
   
@@ -24,7 +28,7 @@ shinyServer(function(input, output, session) {
     return(data)} else {
     ### load default data
       # DEMO SCENARIO
-      data <- read.xls("../extdata/PlotTests_shiny.xlsx", sheet="DATA")
+      data <- read.xls(templateLocation, sheet="DATA")
       # change Excel numeric date format into R dates 
       data$DateIn <- 
         as.POSIXct(as.Date(data$DateIn, origin="1899-12-30"))
@@ -41,7 +45,7 @@ shinyServer(function(input, output, session) {
     return(parameters)} else {
       # loading default parameters
       # DEMO PARAMETERS
-      parameters <- read.xls("../extdata/PlotTests_shiny.xlsx", sheet="PARAMETERS")
+      parameters <- read.xls(templateLocation, sheet="PARAMETERS")
       return(parameters)
     
     }

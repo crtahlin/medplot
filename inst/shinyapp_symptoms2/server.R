@@ -11,6 +11,11 @@ library(reshape2)
 library(ggplot2)
 # library for reading Excel files
 library(gdata)
+# load medplot library
+library(medplot)
+# save the location of template data file
+templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+
 
 # Main function
 shinyServer(function(input, output, session) {
@@ -30,7 +35,7 @@ shinyServer(function(input, output, session) {
     } else {
       #### load default data
       # DEMO SCENARIO
-      data <- read.xls("../extdata/PlotSymptoms_shiny.xlsx", sheet="DATA")
+      data <- read.xls(templateLocation, sheet="DATA")
       
       # transform date information into R compliant dates
       data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
