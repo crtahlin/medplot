@@ -16,7 +16,8 @@ shinyUI(pageWithSidebar(
     fileInput(inputId="dataFile",
               label=h5("Upload Excel data file:"),
               multiple=FALSE,
-              accept="application/vnd.ms-excel"),
+              accept=c("application/vnd.ms-excel",
+                       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")),
     # output checkbox selection generated on the server side
     uiOutput("levels")
     

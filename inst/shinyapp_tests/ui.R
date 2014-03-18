@@ -28,7 +28,8 @@ shinyUI(
       fileInput(inputId="dataFile",
                 label="Upload Excel data file",
                 multiple=FALSE,
-                accept="application/vnd.ms-excel")  #,
+                accept=c("application/vnd.ms-excel",
+                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))  #,
       
 #       # path to save the SVG file to
 #       textInput(inputId="fileName",
