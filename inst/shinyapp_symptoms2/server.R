@@ -30,7 +30,7 @@ shinyServer(function(input, output, session) {
     data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
     
     # transform data into ggplot compliant format
-    data <- melt(data, id.vars = c("Patient", "Date"))
+    data <- melt(data, id.vars = c("PersonID", "Date"))
     return(data)
     } else {
       #### load default data
@@ -41,7 +41,7 @@ shinyServer(function(input, output, session) {
       data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
       
       # transform data into ggplot compliant format
-      data <- melt(data, id.vars = c("Patient", "Date"))
+      data <- melt(data, id.vars = c("PersonID", "Date"))
       return(data)
       #####
     

@@ -1,7 +1,7 @@
 Package: medplot
 Type: Package
 Title: Plotting functions to be used by healthcare workers. 
-Version: 0.9.5
+Version: 0.9.6
 Date: 2013-04-10
 Author: coding by Crt Ahlin with design and coding contribution from Lara Lusa
 Maintainer: Crt Ahlin <crt.ahlin@gmail.com>
