@@ -28,8 +28,8 @@ shinyUI(pageWithSidebar(
   mainPanel(
     tabsetPanel(
       tabPanel(title="Graph",
-               plotOutput("plot"),
-               h3(textOutput("message"))),
+               h3(textOutput("message")),
+               plotOutput("plot")),
       tabPanel("Selected transformed data", tableOutput("data")),
       tabPanel("Parameters"),
       tabPanel("Debug", textOutput("debug"))

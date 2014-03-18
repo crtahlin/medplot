@@ -80,7 +80,7 @@ shinyServer(function(input, output, session) {
     # if no symbols are selected, do not plot
     if (dim(data())[1]>0) {
     print(
-      ggplot(data(), aes(x = Date, y = Patient, size = value, colour = variable)) +
+      ggplot(data(), aes(x = Date, y = PersonID, size = value, colour = variable)) +
         geom_point(shape = 1) + theme_bw() +
         # old scale - scale according to diameter
         #scale_size(range= c(1,20)) +
