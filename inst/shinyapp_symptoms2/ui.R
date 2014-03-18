@@ -30,9 +30,11 @@ shinyUI(pageWithSidebar(
       tabPanel(title="Graph",
                h3(textOutput("message")),
                plotOutput("plot")),
+      tabPanel(title="Pyramid",
+               plotOutput("plotPyramid")),
       tabPanel("Selected transformed data", tableOutput("data")),
       tabPanel("Parameters"),
-      tabPanel("Debug", textOutput("debug"))
+      tabPanel("Debug", tableOutput("debug"))
     ) ) 
 )
 )

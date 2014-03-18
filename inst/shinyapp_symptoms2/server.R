@@ -11,48 +11,62 @@ library(reshape2)
 library(ggplot2)
 # library for reading Excel files
 library(gdata)
+# library for manipulating with data
+library(dplyr)
 # load medplot library
 library(medplot)
 # save the location of template data file
 templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
 
+# variables for melting data into ggplot compliant format
+meltBy <- c("PersonID", "Date", "Measurement")
 
 # Main function
 shinyServer(function(input, output, session) {
   
   # load data from Excel
-  symptomsData <- reactive(function() {
+  symptomsData <- reactive(function() { # returns the DATA sheet
     if (!is.null(input$dataFile)) {
     # read the data into R
     data <- read.xls(input$dataFile$datapath, sheet="DATA")
     
     # transform date information into R compliant dates
     data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
-    
-    # transform data into ggplot compliant format
-    data <- melt(data, id.vars = c("PersonID", "Date", "Measurement"))
     return(data)
-    } else {
-      #### load default data
+    } else { #### load default data
+      
       # DEMO SCENARIO
       data <- read.xls(templateLocation, sheet="DATA")
       
       # transform date information into R compliant dates
       data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
-      
-      # transform data into ggplot compliant format
-      data <- melt(data, id.vars = c("PersonID", "Date", "Measurement"))
       return(data)
       #####
     
     }
   })
   
-
+  symptomsPatients <- reactive(function() { # returns the PATIENTS sheet
+    if (!is.null(input$dataFile)) {
+      # read the data into R
+      data <- read.xls(input$dataFile$datapath, sheet="PATIENTS")
+      return(data)
+    } else { #### load default data
+      
+      # DEMO SCENARIO
+      data <- read.xls(templateLocation, sheet="DATA")
+      return(data)
+      #####
+      
+    }
+  })
   
   # subset the data with the selected symptoms
   data <- reactive( function() {
-    symptomsData()[symptomsData()$variable %in% input$selectedSymptoms,]
+    ### TODO HERE
+    # transform data into ggplot compliant format
+    data <- melt(symptomsData(), id.vars = meltBy)
+    data[data$variable %in% input$selectedSymptoms,]
   })
   
   # list the subseted data in an output slot
@@ -65,9 +79,14 @@ shinyServer(function(input, output, session) {
                              # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
     })
   
+ 
+  
   # list all available symptoms in an output slot
   output$levels <- renderUI( {
-    symptoms <- unlist(levels(symptomsData()[,"variable"]))
+    ### TODO HERE
+    # transform data into ggplot compliant format
+    data <- melt(symptomsData(), id.vars = meltBy)
+    symptoms <- unlist(levels(data[,"variable"]))
     checkboxGroupInput(inputId="selectedSymptoms",
                        label="Choose symptoms", 
                        choices=symptoms)
@@ -100,7 +119,10 @@ shinyServer(function(input, output, session) {
     if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
     if (dim(data())[1]==0){paste("Please select one or more symptoms.")}
     })
-  output$debug <- renderPrint(str(symptomsData()))
+  
+  
+  
+  output$debug <- renderTable(symptomsData())
     
   
 })
