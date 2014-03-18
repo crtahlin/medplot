@@ -30,7 +30,7 @@ shinyServer(function(input, output, session) {
     data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
     
     # transform data into ggplot compliant format
-    data <- melt(data, id.vars = c("PersonID", "Date"))
+    data <- melt(data, id.vars = c("PersonID", "Date", "Measurement"))
     return(data)
     } else {
       #### load default data
@@ -41,7 +41,7 @@ shinyServer(function(input, output, session) {
       data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
       
       # transform data into ggplot compliant format
-      data <- melt(data, id.vars = c("PersonID", "Date"))
+      data <- melt(data, id.vars = c("PersonID", "Date", "Measurement"))
       return(data)
       #####
     
@@ -100,7 +100,7 @@ shinyServer(function(input, output, session) {
     if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
     if (dim(data())[1]==0){paste("Please select one or more symptoms.")}
     })
-  output$debug <- renderPrint(symptomsData())
+  output$debug <- renderPrint(str(symptomsData()))
     
   
 })
