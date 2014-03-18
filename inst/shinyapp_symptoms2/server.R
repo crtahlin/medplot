@@ -54,7 +54,7 @@ shinyServer(function(input, output, session) {
     } else { #### load default data
       
       # DEMO SCENARIO
-      data <- read.xls(templateLocation, sheet="DATA")
+      data <- read.xls(templateLocation, sheet="PATIENTS")
       return(data)
       #####
       
@@ -63,8 +63,6 @@ shinyServer(function(input, output, session) {
   
   # subset the data with the selected symptoms
   data <- reactive( function() {
-    ### TODO HERE
-    # transform data into ggplot compliant format
     data <- melt(symptomsData(), id.vars = meltBy)
     data[data$variable %in% input$selectedSymptoms,]
   })
@@ -121,8 +119,14 @@ shinyServer(function(input, output, session) {
     })
   
   
+  # build extended data set for additional graphs
+  dataExtended <- reactive( function() {
+    data <- inner_join(x = symptomsData(), y = symptomsPatients(), by="PersonID")
+    return(data)
+  })
   
-  output$debug <- renderTable(symptomsData())
+  
+  output$debug <- renderTable(dataExtended())
     
   
 })
