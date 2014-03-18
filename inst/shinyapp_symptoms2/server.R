@@ -126,7 +126,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$plotPyramid <- renderPlot (
-    plotPropWithSymptoms(data=AAA,
+    plotPropWithSymptoms(data=dataExtended(),
                          grouping="Sex",
                          measurements="Measurement",
                          symptomsNames=unlist(levels(data()[,"variable"])))
