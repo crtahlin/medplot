@@ -12,6 +12,7 @@ plotPropWithSymptoms <- function (data,
   my.data.expanded.nNOIS <- data
   which.var <- grouping
   which.symptoms <- symptomsNames # TODO: pass the symptom names as char vector
+  names.symptoms <- symptomsNames
   
   ### EXISTING CODE ####
   
