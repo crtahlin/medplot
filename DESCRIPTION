@@ -17,6 +17,6 @@ Depends:
 	ggplot2,
   seriation,
   XML,
-  dplyr
+  plyr
 Imports:  
   SVGAnnotation

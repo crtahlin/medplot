@@ -11,8 +11,13 @@ library(reshape2)
 library(ggplot2)
 # library for reading Excel files
 library(gdata)
-# library for manipulating with data
+
+
+# library for manipulating with data (does not work with R>3.0.2)
 library(dplyr)
+# library for manipulating data
+library(plyr)
+
 # load medplot library
 library(medplot)
 # save the location of template data file
@@ -121,7 +126,10 @@ shinyServer(function(input, output, session) {
   
   # build extended data set for additional graphs
   dataExtended <- reactive( function() {
-    data <- inner_join(x = symptomsData(), y = symptomsPatients(), by="PersonID")
+    # ddplyer command below - does not work with R<3.0.2
+    # data <- inner_join(x = symptomsData(), y = symptomsPatients(), by="PersonID")
+    # using plyr instead
+    data <- join(x=symptomsData(), y=symptomsPatients(), by="PersonID", type="inner")
     return(data)
   })
   
