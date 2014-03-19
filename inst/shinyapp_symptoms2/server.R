@@ -14,7 +14,7 @@ library(gdata)
 
 
 # library for manipulating with data (does not work with R>3.0.2)
-library(dplyr)
+# library(dplyr)
 # library for manipulating data
 library(plyr)
 
