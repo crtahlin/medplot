@@ -11,8 +11,6 @@ library(reshape2)
 library(ggplot2)
 # library for reading Excel files
 library(gdata)
-
-
 # library for manipulating with data (does not work with R>3.0.2)
 # library(dplyr)
 # library for manipulating data
@@ -82,8 +80,6 @@ shinyServer(function(input, output, session) {
                              # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
     })
   
- 
-  
   # list all available symptoms in an output slot
   output$levels <- renderUI( {
     ### TODO HERE
@@ -93,9 +89,7 @@ shinyServer(function(input, output, session) {
     checkboxGroupInput(inputId="selectedSymptoms",
                        label="Choose symptoms", 
                        choices=symptoms)
-  } 
-                             )
-  
+    })
   
   # plot the graph, but only for selected symptoms
   output$plot <- renderPlot(function() {
@@ -118,11 +112,11 @@ shinyServer(function(input, output, session) {
     )}
   })
   
+  # message for working with DEMO data
   output$message <- renderText(
     if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
     if (dim(data())[1]==0){paste("Please select one or more symptoms.")}
     })
-  
   
   # build extended data set for additional graphs
   dataExtended <- reactive( function() {
@@ -133,6 +127,7 @@ shinyServer(function(input, output, session) {
     return(data)
   })
   
+  # build the second graph
   output$plotPyramid <- renderPlot (
     plotPropWithSymptoms(data=dataExtended(),
                          grouping="Sex",
@@ -140,6 +135,7 @@ shinyServer(function(input, output, session) {
                          symptomsNames=unlist(levels(data()[,"variable"])))
     )
   
+  # debuging information
   output$debug <- renderTable(dataExtended())
     
   
