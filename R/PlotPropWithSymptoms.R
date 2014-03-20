@@ -97,10 +97,10 @@ plotPropWithSymptoms <- function (data,
                 las=1, xlab="Proportion of subjects", add=TRUE ) 
     
     text(x=0, par("usr")[4],
-         labels=paste0(names(my.data.expanded.nNOIS)[which.var], "=" , my.levels[1]), xpd=T, adj=c(0))
+         labels=paste(which.var, "=" , my.levels[1]), xpd=T, adj=c(0))
     
     text(x=0, par("usr")[4],
-         labels=paste0(names(my.data.expanded.nNOIS)[which.var], "="  ,my.levels[2]), xpd=T, adj=c(1))
+         labels=paste(which.var, "="  ,my.levels[2]), xpd=T, adj=c(1))
     }# end if		
 }
 
