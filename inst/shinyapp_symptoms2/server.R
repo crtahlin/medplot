@@ -130,7 +130,7 @@ shinyServer(function(input, output, session) {
   # build the second graph
   output$plotPyramid <- renderPlot (
     plotPropWithSymptoms(data=dataExtended(),
-                         grouping="Sex",
+                         grouping=input$groupingVar,
                          measurements="Measurement",
                          symptomsNames=unlist(levels(data()[,"variable"])))
     )
