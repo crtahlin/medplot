@@ -171,7 +171,8 @@ plotTests <- function (data, figureParameters, fileName,
         width=PLOT.WIDTH ,
         height=29,
         units="cm",
-        dpi=300)
+        dpi=300,
+        pointsize=3)
   
   # Cairo("example.pdf", type="pdf",width=19,height=24,units="cm",dpi=300)
   # svg("example1.svg")

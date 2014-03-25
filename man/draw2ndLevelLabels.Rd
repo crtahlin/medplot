@@ -2,10 +2,9 @@
 \alias{draw2ndLevelLabels}
 \title{Draws labels for the 2nd level groups}
 \usage{
-  draw2ndLevelLabels(label, firstRowforDiagnosis,
-    lastRowforDiagnosis)
+draw2ndLevelLabels(label, firstRowforDiagnosis, lastRowforDiagnosis)
 }
 \description{
-  Not meant to be called by the user.
+Not meant to be called by the user.
 }
 

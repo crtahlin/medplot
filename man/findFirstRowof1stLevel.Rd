@@ -2,9 +2,9 @@
 \alias{findFirstRowof1stLevel}
 \title{Finds first row of 1st level group}
 \usage{
-  findFirstRowof1stLevel(data, firstLevel)
+findFirstRowof1stLevel(data, firstLevel)
 }
 \description{
-  Not meant to be called by the user.
+Not meant to be called by the user.
 }
 

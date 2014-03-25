@@ -9,24 +9,46 @@ library(gdata)
 # load medplot library
 library(medplot)
 
+# save the location of template data file
+templateLocation <- paste0(path.package("medplot"),"/extdata/PlotTests_shiny.xlsx")
+
+
 # main function 
 shinyServer(function(input, output, session) {
   
   # load data from Excel
   data <- reactive({
+    if (!is.null(input$dataFile)) {
     data <- read.xls(input$dataFile$datapath, sheet="DATA")
     # change Excel numeric date format into R dates 
     data$DateIn <- 
       as.POSIXct(as.Date(data$DateIn, origin="1899-12-30"))
     data$DateOut <- 
       as.POSIXct(as.Date(data$DateOut, origin="1899-12-30"))
-    return(data)
+    return(data)} else {
+    ### load default data
+      # DEMO SCENARIO
+      data <- read.xls(templateLocation, sheet="DATA")
+      # change Excel numeric date format into R dates 
+      data$DateIn <- 
+        as.POSIXct(as.Date(data$DateIn, origin="1899-12-30"))
+      data$DateOut <- 
+        as.POSIXct(as.Date(data$DateOut, origin="1899-12-30"))
+      return(data)
+    }
   })
   
   # load parameters from Excel
   parameters <- reactive({
+    if (!is.null(input$dataFile)) {
     parameters <- read.xls(input$dataFile$datapath, sheet="PARAMETERS")
-    return(parameters)
+    return(parameters)} else {
+      # loading default parameters
+      # DEMO PARAMETERS
+      parameters <- read.xls(templateLocation, sheet="PARAMETERS")
+      return(parameters)
+    
+    }
   })
   
   output$dataTable <- renderTable({
@@ -75,4 +97,9 @@ shinyServer(function(input, output, session) {
     })
     paste(allValues, collapse = "\n")
   })
+  
+  # meassage to display over the graph
+  output$message <- renderText(
+    if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} 
+    )
 })

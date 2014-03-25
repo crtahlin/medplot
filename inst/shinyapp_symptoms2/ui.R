@@ -3,7 +3,6 @@
 
 library(shiny)
 
-
 # Define UI for displaying presence of symptoms
 shinyUI(pageWithSidebar(
   
@@ -16,23 +15,28 @@ shinyUI(pageWithSidebar(
     fileInput(inputId="dataFile",
               label=h5("Upload Excel data file:"),
               multiple=FALSE,
-              accept="application/vnd.ms-excel"),
+              accept=c("application/vnd.ms-excel",
+                       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")),
+    # offer selection of patient gruping variable
+    selectInput(inputId="groupingVar",
+                label="Grouping variable",
+                choices=c("Sex", "CaseorControl"),
+                selected="Sex"),
     # output checkbox selection generated on the server side
     uiOutput("levels")
-    
-  )
-  ),
+  )),
   
   # Define the output panel
   mainPanel(
     tabsetPanel(
       tabPanel(title="Graph",
-               plotOutput("plot"),
-               h3(textOutput("message"))),
+               h3(textOutput("message")),
+               plotOutput("plot")),
+      tabPanel(title="Pyramid",
+               plotOutput("plotPyramid")),
       tabPanel("Selected transformed data", tableOutput("data")),
-      tabPanel("Parameters"),
-      tabPanel("Debug", textOutput("debug"))
-    ) ) 
-)
-)
-
+      # tabPanel("Parameters"),
+      tabPanel("Debug", tableOutput("debug"))
+      ))
+  )
+  )
