@@ -29,17 +29,16 @@ shinyUI(pageWithSidebar(
   # Define the output panel
   mainPanel(
     tabsetPanel(
-      tabPanel(title="Graph",
+      tabPanel(title="Timeline",
                h3(textOutput("message")),
                plotOutput("plot")),
-      tabPanel(title="Pyramid",
+      tabPanel(title="Proportions",
                plotOutput("plotPyramid")),
       tabPanel("Clustering",
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram"),
                plotOutput("plotClusterHeatmap")),
       tabPanel("Selected transformed data", tableOutput("data")),
-      # tabPanel("Parameters"),
       tabPanel("Debug", tableOutput("debug"))
       ))
   )
