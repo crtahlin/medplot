@@ -34,6 +34,10 @@ shinyUI(pageWithSidebar(
                plotOutput("plot")),
       tabPanel(title="Pyramid",
                plotOutput("plotPyramid")),
+      tabPanel("Clustering",
+               uiOutput("clusteringUI"),
+               plotOutput("plotClusterDendrogram"),
+               plotOutput("plotClusterHeatmap")),
       tabPanel("Selected transformed data", tableOutput("data")),
       # tabPanel("Parameters"),
       tabPanel("Debug", tableOutput("debug"))
