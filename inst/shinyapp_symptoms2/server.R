@@ -130,40 +130,27 @@ shinyServer(function(input, output, session) {
   
   ########## user interface to select which measurments to cluster
   output$clusteringUI = renderUI({
-    
     #levels of the measurement variable, save as third variable in the dataset symptomsData
-    my.levels=levels(as.factor(symptomsData()[,3]))
-    
+    # TODO: make selection of levels dependent on Sidebar, not fixed to "Measurement"
+    myLevels=levels(as.factor(symptomsData()[,"Measurement"]))
     #select the measurement
-    selectInput(inputId="measurementSelected",
-                label="Select the measurment (time)", 
-                choices=my.levels, select=my.levels[1])
-    
-    
-  })
+    selectInput(inputId="selectedMeasurementValue",
+                label="Select the measurement occasion (time):", 
+                choices=myLevels, selected=myLevels[1])
+    })
   
   
   output$plotClusterDendrogram=renderPlot({
-    print("plot the hierarchical clustering")
     plotClusterDendrogram(data=symptomsData(),
                           variableName="Measurement",
-                          variableValue="T0" )
-#     
-#     #my.data.for.cluster=symptomsData()[symptomsData()[,3]==input$measurementSelected,-c(1:3)]
-#     my.data.for.cluster=symptomsData()[symptomsData()[,3]=="T0",-c(1:3)]
-#     plot(hclust(as.dist(cor(my.data.for.cluster, use="c", method="s"))))
-#     
-    
-  })
-  
-  
-  
+                          variableValue=input$selectedMeasurementValue)
+    })
   
   output$plotClusterHeatmap=renderPlot({
     plotClusterHeatmap(data=symptomsData(),
                        #TODO: make dependent on selection
                        variableName="Measurement",
-                       variableValue="T0") 
+                       variableValue=input$selectedMeasurementValue) 
     })
   
   
