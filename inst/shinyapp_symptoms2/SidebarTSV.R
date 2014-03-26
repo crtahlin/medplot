@@ -2,10 +2,10 @@
   # If missing input, return to avoid error later in function
   
      print("Preparing renderUI")
-     if(is.null(input$dataFileTxt)) return()
+     if(is.null(input$dataFile)) return()
   
       
-      data <-  read.csv(input$dataFileTxt$datapath, header=TRUE, sep="\t")
+      data <-  read.csv(input$dataFile$datapath, header=TRUE, sep="\t")
       names.data=names(data)
       setNames(names.data, 1:length(names.data))
       
