@@ -1,8 +1,11 @@
-
-# napiši funkcijo, ki bo narisala graf
-# inputi
-# - podatki, izbira katera spremenljivka je za grupiranje,
-
+#' @title Plot proportions with symptoms
+#' @description Function that plots proportion of subjects that have a certain 
+#' symptom present.
+#' 
+#' @param data Data to be passed to the function as a data frame. 
+#' @param grouping The column name of the binary grouping variable used to define the groups on the plot.
+#' @param measurements The column name of the variable containing measurement occasions. 
+#' @param symptomsNames A vector of column names containing the symptom severity.
 plotPropWithSymptoms <- function (data,
                                   grouping="Sex",
                                   measurements="Measurement",
