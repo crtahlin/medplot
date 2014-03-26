@@ -145,10 +145,14 @@ shinyServer(function(input, output, session) {
   
   output$plotClusterDendrogram=renderPlot({
     print("plot the hierarchical clustering")
-    #my.data.for.cluster=symptomsData()[symptomsData()[,3]==input$measurementSelected,-c(1:3)]
-    my.data.for.cluster=symptomsData()[symptomsData()[,3]=="T0",-c(1:3)]
-    plot(hclust(as.dist(cor(my.data.for.cluster, use="c", method="s"))))
-    
+    plotClusterDendrogram(data=symptomsData(),
+                          variableName="Measurement",
+                          variableValue="T0" )
+#     
+#     #my.data.for.cluster=symptomsData()[symptomsData()[,3]==input$measurementSelected,-c(1:3)]
+#     my.data.for.cluster=symptomsData()[symptomsData()[,3]=="T0",-c(1:3)]
+#     plot(hclust(as.dist(cor(my.data.for.cluster, use="c", method="s"))))
+#     
     
   })
   
@@ -156,30 +160,11 @@ shinyServer(function(input, output, session) {
   
   
   output$plotClusterHeatmap=renderPlot({
-    print("plot the hierarchical clustering 2")
-    #X=t(symptomsData()[symptomsData()[,3]==input$measurementSelected,-c(1:3)])
-  #  X=t(symptomsData()[symptomsData()[,3]=="T0",-c(1:3)])
-    
-    #  plot(hclust(as.dist(cor(my.data.for.cluster, use="c", method="s"))))
-    
-    
-    #  sex=factor(ifelse(my.data[,6]==TRUE, "Female", "Male"))
-    #  annotation=data.frame(Type=factor(my.group), Sex=sex)
-    
-    #, Sex=my.data[,6])
-    
-    #  X=t(my.data.symptoms[which(my.times==0.5),])
-    
-    #  colnames(X)=1:ncol(X)
-    #rownames(annotation)=as.numeric(colnames(X))
-  #  pheatmap(X) #, main="clustering of patients based on symptoms")#, annotation=annotation)
-    
-  plotClusterHeatmap(data=symptomsData(),
-                     variableName="Measurement",
-                     variableValue="T0") 
-    
-    
-  })
+    plotClusterHeatmap(data=symptomsData(),
+                       #TODO: make dependent on selection
+                       variableName="Measurement",
+                       variableValue="T0") 
+    })
   
   
 })
