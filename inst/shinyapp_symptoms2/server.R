@@ -153,6 +153,10 @@ shinyServer(function(input, output, session) {
                        variableValue=input$selectedMeasurementValue) 
     })
   
+  
+  if (input$dataFileType=="TSV") { output$sidebar <- renderUI(source("SidebarTSV.R")) }
+  if (input$dataFileType=="Excel") { output$sidebar <- renderUI(source("SidebarExcel.R")) }
+  if (input$dataFileType=="Demo") { output$sidebar <- renderUI(source("SidebarExcel.R")) }
   
 })
 
