@@ -130,6 +130,22 @@ output$selectGroupingVar <- renderUI({
               selected="Sex")
 })
 
+output$selectPatientIDVar <- renderUI({
+  allSymptoms <- unlist(names(dataExtended()))
+  selectInput(inputId="patientIDVar",
+              label="Choose patient ID variable:", 
+              choices=allSymptoms,
+              selected="PersonID")
+})
+
+output$selectMeasurementVar <- renderUI({
+  allSymptoms <- unlist(names(dataExtended()))
+  selectInput(inputId="measurementVar",
+              label="Choose measurument occasion variable:", 
+              choices=allSymptoms,
+              selected="Measurement")
+})
+
   ## Plots for different tabs ####
   
   # Timeline tab plots and output ####

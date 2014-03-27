@@ -41,7 +41,10 @@ shinyUI(pageWithSidebar(
 #                   selected="Sex"),
 uiOutput("selectDateVar"),
 uiOutput("selectGroupingVar"),
-uiOutput("selectSymptoms")
+uiOutput("selectPatientIDVar"),
+uiOutput("selectMeasurementVar"),
+uiOutput("selectSymptoms"),
+numericInput("threshold", "Threshold for positivity of the variables", value=0)
      
       
     )),
