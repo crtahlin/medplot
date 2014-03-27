@@ -31,7 +31,19 @@ shinyUI(pageWithSidebar(
                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                            "text/plain"))
       ),
-      uiOutput("sidebar")
+#       selectInput(inputId="groupingVar",
+#                   label="Grouping variable:",
+#                   choices=c(names),
+#                   selected="Sex"),
+#       selectInput(inputId="dateVar",
+#                   label="Date variable:",
+#                   choices=c("Sex", "CaseorControl"),
+#                   selected="Sex"),
+uiOutput("selectDateVar"),
+uiOutput("selectGroupingVar"),
+uiOutput("selectSymptoms")
+     
+      
     )),
   
   # Define the main panel ####
@@ -47,7 +59,7 @@ shinyUI(pageWithSidebar(
                plotOutput("plotClusterDendrogram"),
                plotOutput("plotClusterHeatmap")),
       tabPanel("Selected transformed data", tableOutput("data")),
-      tabPanel("Debug", tableOutput("debug"))
+      tabPanel("Debug", textOutput("symptomsData"))
     ))
 )
 )

@@ -1,6 +1,7 @@
 # This is the server part of the shiny script to plot
 # graph for displaying presence of symptoms. 
 
+# Load libraries ----------------------------------------------------------
 # load library for generation interactive web pages
 library(shiny)
 # load library for generating graph scales
@@ -20,13 +21,14 @@ library(pheatmap)
 # load medplot library
 library(medplot)
 
-
-# variables for melting data into ggplot compliant format
+# Global variables ---------------------------------------------------------------------
+# variables for melting data into ggplot compliant format for Timeline graph
 meltBy <- c("PersonID", "Date", "Measurement")
 
-# Main function
+
+# Main function -----------------------------------------------------------
+
 shinyServer(function(input, output, session) {
-  
   ### Import and prepare data ####
   # load data from Excel
   symptomsData <- reactive(function() { # returns the DATA sheet
@@ -49,19 +51,7 @@ shinyServer(function(input, output, session) {
       # the location of template data file
       templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
       importSymptomsPatients(datafile=templateLocation)    } #else {}
-    
-    #     if (!is.null(input$dataFile)) {
-#       # read the data into R
-#       data <- read.xls(input$dataFile$datapath, sheet="PATIENTS")
-#       return(data)
-#     } else { #### load default data
-#       
-#       # DEMO SCENARIO
-#       data <- read.xls(templateLocation, sheet="PATIENTS")
-#       return(data)
-#       ###
-#       
-#     }
+    # TODO: load patients for "Excel" scenario
   })
   
   # subset the data with the selected symptoms
@@ -112,41 +102,34 @@ shinyServer(function(input, output, session) {
   # debuging information
   output$debug <- renderTable(dataExtended())
   
-  ## Sidebar dynamic output ####
-#   reactive({
-#     if (!is.null(input$dataFile)){
-#       if (input$dataFileType=="TSV") { output$sidebar <- renderUI({source("SidebarTSV.R")}) }
-#       if (input$dataFileType=="Excel") { output$sidebar <- renderUI({source("SidebarExcel.R")}) }
-#       if (input$dataFileType=="Demo") { output$sidebar <- renderUI({source("SidebarExcel.R")}) }
-#       print(input$dataFile) 
-#       print(output$sidebar)
-#       browser()}
-#   })
-  
-  output$sidebar <- renderUI({
+  output$selectSymptoms <- renderUI({
     # Sidebar for Excel and demo files ####
     # TODO: Try to redo this part with switch() statement as
-    # it seems the last evaluated block is returned
-    if (input$dataFileType=="Excel" || input$dataFileType=="Demo") {
-    selectInput(inputId="groupingVar",
-                label="Grouping variable",
-                choices=c("Sex", "CaseorControl"),
-                selected="Sex")
-    # TODO: make a function for the code below, since it repeats?
+    # it seems only the last evaluated block is returned
+    if (!is.null(symptomsData())) {
     data <- melt(symptomsData(), id.vars = meltBy)
     symptoms <- unlist(levels(data[,"variable"]))
     checkboxGroupInput(inputId="selectedSymptoms",
-                       label="Choose symptoms", 
-                       choices=symptoms)
-    } else {
-    
-    # Sidebar for TSV files ####
-     if (input$dataFileType=="TSV") {
-     
-     }
-    }
-    })
+                       label="Choose symptoms:", 
+                       choices=symptoms)}
+      })
   
+output$selectDateVar <- renderUI({
+  allSymptoms <- unlist(names(dataExtended()))
+  selectInput(inputId="dateVar",
+                     label="Choose date variable:", 
+                     choices=allSymptoms,
+              selected="Date")
+})
+
+output$selectGroupingVar <- renderUI({
+  allSymptoms <- unlist(names(dataExtended()))
+  selectInput(inputId="groupingVar",
+              label="Choose grouping variable:", 
+              choices=allSymptoms,
+              selected="Sex")
+})
+
   ## Plots for different tabs ####
   
   # Timeline tab plots and output ####
@@ -193,6 +176,15 @@ shinyServer(function(input, output, session) {
                        variableValue=input$selectedMeasurementValue) 
   })
   
+output$symptomsData <- renderText(names(dataExtended()))
   
 })
+
+
+
+
+
+
+
+
 
