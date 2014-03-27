@@ -6,54 +6,35 @@ library(shiny)
 # Define UI for displaying presence of symptoms
 shinyUI(pageWithSidebar(
   
-  # Application title
+  # Application title ####
   headerPanel("Patients and their symptoms"),
   
-  # Define the selection panel
+  # Define the sidebar panel ####
   sidebarPanel(
     wellPanel(
-      # offer selection of type of data file
+      # selection of type of data file
       selectInput(inputId="dataFileType",
-                label="Select type of data file:",
-                choices=c(
-                  " "=NA,
-                  "Excel template"="Excel",
-                  "Tab separated values (TSV) file"="TSV",
-                  "Demo data"="Demo"
+                  label="Select type of data file:",
+                  choices=c(
+                    " "=NA,
+                    "Excel template"="Excel",
+                    "Tab separated values (TSV) file"="TSV",
+                    "Demo data"="Demo"
                   )),
-      # offer user to upload file
+      # offer user to upload file conditional on previous choice
       conditionalPanel(
-        condition="input.dataFileType =='Excel'",
+        condition="input.dataFileType =='Excel' || input.dataFileType =='TSV'",
         fileInput(inputId="dataFile",
-                label=h5("Upload Excel data file:"),
-                multiple=FALSE,
-                accept=c("application/vnd.ms-excel",
-                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-        ),
-      
-      conditionalPanel(
-        condition="input.dataFileType =='TSV'",
-        fileInput(inputId="dataFile", # ne sme imeti enakege imena, ker ne naloži podatkov!!!!
-                  label=h5("Upload TSV data file:"),
-                  multiple=FALSE #,
-                  #accept=c("text/tab-separated-values")
-                  )
-        )
-      
-      
-#       conditionalPanel(
-#         condition="input.dataFileType =='TSV'",
-#         #uiOutput("sidebar"),
-#         # offer selection of patient gruping variable
-# #         selectInput(inputId="groupingVar",
-# #                     label="Grouping variable",
-# #                     choices=c("Sex", "CaseorControl"),
-# #                     selected="Sex"),
-#         # output checkbox selection generated on the server side
-#         uiOutput("levels"))
-      )),
+                  label={h5("Upload data file:")},
+                  multiple=FALSE,
+                  accept=c("application/vnd.ms-excel",
+                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                           "text/plain"))
+      ),
+      uiOutput("sidebar")
+    )),
   
-  # Define the output panel
+  # Define the main panel ####
   mainPanel(
     tabsetPanel(
       tabPanel(title="Timeline",
@@ -67,6 +48,6 @@ shinyUI(pageWithSidebar(
                plotOutput("plotClusterHeatmap")),
       tabPanel("Selected transformed data", tableOutput("data")),
       tabPanel("Debug", tableOutput("debug"))
-      ))
-  )
-  )
+    ))
+)
+)

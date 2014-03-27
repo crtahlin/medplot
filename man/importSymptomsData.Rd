@@ -1,0 +1,17 @@
+\name{importSymptomsData}
+\alias{importSymptomsData}
+\title{Function that imports data for the plotSymptoms plot}
+\usage{
+importSymptomsData(datafile, format)
+}
+\arguments{
+  \item{datafile}{Path to the file containing data.}
+
+  \item{format}{Format of the file containing data
+  ("Excel", "TSV", "Demo").}
+}
+\description{
+Function is called to import the data in appropriate format
+for the plotSymptoms plot.
+}
+

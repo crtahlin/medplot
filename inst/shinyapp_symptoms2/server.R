@@ -11,7 +11,7 @@ library(reshape2)
 library(ggplot2)
 # library for reading Excel files
 library(gdata)
-# library for manipulating with data (does not work with R>3.0.2)
+# library for manipulating with data (does not work with R<3.0.2)
 # library(dplyr)
 # library for manipulating data
 library(plyr)
@@ -19,8 +19,7 @@ library(plyr)
 library(pheatmap)
 # load medplot library
 library(medplot)
-# save the location of template data file
-templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+
 
 # variables for melting data into ggplot compliant format
 meltBy <- c("PersonID", "Date", "Measurement")
@@ -28,41 +27,41 @@ meltBy <- c("PersonID", "Date", "Measurement")
 # Main function
 shinyServer(function(input, output, session) {
   
+  ### Import and prepare data ####
   # load data from Excel
   symptomsData <- reactive(function() { # returns the DATA sheet
-    if (!is.null(input$dataFile)) {
-    # read the data into R
-    data <- read.xls(input$dataFile$datapath, sheet="DATA")
-    
-    # transform date information into R compliant dates
-    data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
-    return(data)
-    } else { #### load default data
-      
-      # DEMO SCENARIO
-      data <- read.xls(templateLocation, sheet="DATA")
-      
-      # transform date information into R compliant dates
-      data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
-      return(data)
-      #####
-    
-    }
+    if (input$dataFileType=="Demo") {
+      # load default data for Demo scenario
+      # the location of template data file
+      templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+      importSymptomsData(datafile=templateLocation,
+                         format="Excel")
+    } else { # load data for non-demo scenario
+    if (!is.null(input$dataFile) && !(input$dataFileType=="Demo")) {
+      importSymptomsData(datafile=input$dataFile$datapath,
+                         format=input$dataFileType) }
+    } 
   })
   
   symptomsPatients <- reactive(function() { # returns the PATIENTS sheet
-    if (!is.null(input$dataFile)) {
-      # read the data into R
-      data <- read.xls(input$dataFile$datapath, sheet="PATIENTS")
-      return(data)
-    } else { #### load default data
-      
-      # DEMO SCENARIO
-      data <- read.xls(templateLocation, sheet="PATIENTS")
-      return(data)
-      #####
-      
-    }
+    if (input$dataFileType=="Demo") {
+      # load default data for Demo scenario
+      # the location of template data file
+      templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+      importSymptomsPatients(datafile=templateLocation)    } #else {}
+    
+    #     if (!is.null(input$dataFile)) {
+#       # read the data into R
+#       data <- read.xls(input$dataFile$datapath, sheet="PATIENTS")
+#       return(data)
+#     } else { #### load default data
+#       
+#       # DEMO SCENARIO
+#       data <- read.xls(templateLocation, sheet="PATIENTS")
+#       return(data)
+#       ###
+#       
+#     }
   })
   
   # subset the data with the selected symptoms
@@ -76,34 +75,23 @@ shinyServer(function(input, output, session) {
     data <- data()
     data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
     return(data)
-                             # NOTE: if we want to render the table of data, we have to convert the dates into 
-                             # characters, since renderTable seems to use xtable, which seems to not handle
-                             # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
-    })
-  
-  # list all available symptoms in an output slot
-  output$levels <- renderUI( {
-    ### TODO HERE
-    # transform data into ggplot compliant format
-    data <- melt(symptomsData(), id.vars = meltBy)
-    symptoms <- unlist(levels(data[,"variable"]))
-    checkboxGroupInput(inputId="selectedSymptoms",
-                       label="Choose symptoms", 
-                       choices=symptoms)
-    })
-  
-  # plot the graph, but only for selected symptoms
-  output$plot <- renderPlot(function() {
-    # if no symbols are selected, do not plot
-    if (dim(data())[1]>0) {
-    print(plotSymptomsTimeline(data()))}
+    # NOTE: if we want to render the table of data, we have to convert the dates into 
+    # characters, since renderTable seems to use xtable, which seems to not handle
+    # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
   })
   
-  # message for working with DEMO data
-  output$message <- renderText(
-    if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
-    if (dim(data())[1]==0){paste("Please select one or more symptoms.")}
-    })
+#   # list all available symptoms in an output slot
+#   output$levels <- renderUI( {
+#     ### TODO HERE
+#     # transform data into ggplot compliant format
+#     data <- melt(symptomsData(), id.vars = meltBy)
+#     symptoms <- unlist(levels(data[,"variable"]))
+#     checkboxGroupInput(inputId="selectedSymptoms",
+#                        label="Choose symptoms", 
+#                        choices=symptoms)
+#   })
+  
+  
   
   # build extended data set for additional graphs
   dataExtended <- reactive( function() {
@@ -114,21 +102,72 @@ shinyServer(function(input, output, session) {
     return(data)
   })
   
-  # build the second graph
+  ## Mainpanel dynamic output 
+  # message for working with DEMO data
+  output$message <- renderText(
+    if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
+      if (dim(data())[1]==0){paste("Please select one or more symptoms.")}
+    })
+  
+  # debuging information
+  output$debug <- renderTable(dataExtended())
+  
+  ## Sidebar dynamic output ####
+#   reactive({
+#     if (!is.null(input$dataFile)){
+#       if (input$dataFileType=="TSV") { output$sidebar <- renderUI({source("SidebarTSV.R")}) }
+#       if (input$dataFileType=="Excel") { output$sidebar <- renderUI({source("SidebarExcel.R")}) }
+#       if (input$dataFileType=="Demo") { output$sidebar <- renderUI({source("SidebarExcel.R")}) }
+#       print(input$dataFile) 
+#       print(output$sidebar)
+#       browser()}
+#   })
+  
+  output$sidebar <- renderUI({
+    # Sidebar for Excel and demo files ####
+    # TODO: Try to redo this part with switch() statement as
+    # it seems the last evaluated block is returned
+    if (input$dataFileType=="Excel" || input$dataFileType=="Demo") {
+    selectInput(inputId="groupingVar",
+                label="Grouping variable",
+                choices=c("Sex", "CaseorControl"),
+                selected="Sex")
+    # TODO: make a function for the code below, since it repeats?
+    data <- melt(symptomsData(), id.vars = meltBy)
+    symptoms <- unlist(levels(data[,"variable"]))
+    checkboxGroupInput(inputId="selectedSymptoms",
+                       label="Choose symptoms", 
+                       choices=symptoms)
+    } else {
+    
+    # Sidebar for TSV files ####
+     if (input$dataFileType=="TSV") {
+     
+     }
+    }
+    })
+  
+  ## Plots for different tabs ####
+  
+  # Timeline tab plots and output ####
+  # plot the graph, but only for selected symptoms
+  output$plot <- renderPlot(function() {
+    # if no symbols are selected, do not plot
+    if (dim(data())[1]>0) {
+      print(plotSymptomsTimeline(data()))}
+  })
+  
+  # Proportions tab plots and output ####
+  # pyramid plot of proportions
   output$plotPyramid <- renderPlot (
     plotPropWithSymptoms(data=dataExtended(),
                          grouping=input$groupingVar,
                          measurements="Measurement",
                          symptomsNames=unlist(levels(data()[,"variable"])))
-    )
+  )
   
-  # debuging information
-  output$debug <- renderTable(dataExtended())
-    
-  
-  ########### clustering of the symptoms ###################
-  
-  ########## user interface to select which measurments to cluster
+  # Clustering tab plots and output ####
+  # selection of measurement occasions  
   output$clusteringUI = renderUI({
     #levels of the measurement variable, save as third variable in the dataset symptomsData
     # TODO: make selection of levels dependent on Sidebar, not fixed to "Measurement"
@@ -137,26 +176,23 @@ shinyServer(function(input, output, session) {
     selectInput(inputId="selectedMeasurementValue",
                 label="Select the measurement occasion (time):", 
                 choices=myLevels, selected=myLevels[1])
-    })
+  })
   
-  
+  # dendrogram plot on the Clustering tab
   output$plotClusterDendrogram=renderPlot({
     plotClusterDendrogram(data=symptomsData(),
                           variableName="Measurement",
                           variableValue=input$selectedMeasurementValue)
-    })
+  })
   
+  # heatmap plot on the Clustering tab
   output$plotClusterHeatmap=renderPlot({
     plotClusterHeatmap(data=symptomsData(),
                        #TODO: make dependent on selection
                        variableName="Measurement",
                        variableValue=input$selectedMeasurementValue) 
-    })
-  
-  reactive({
-  if (input$dataFileType=="TSV") { output$sidebar <- renderUI(source("SidebarTSV.R")) }
-  if (input$dataFileType=="Excel") { output$sidebar <- renderUI(source("SidebarExcel.R")) }
-  if (input$dataFileType=="Demo") { output$sidebar <- renderUI(source("SidebarExcel.R")) }
   })
+  
+  
 })
 

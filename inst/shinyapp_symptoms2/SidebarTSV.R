@@ -2,7 +2,7 @@
   # If missing input, return to avoid error later in function
   
      print("Preparing renderUI")
-     if(is.null(input$dataFile)) return()
+     if(is.null(input$dataFile)) return() else { 
   
       
       data <-  read.csv(input$dataFile$datapath, header=TRUE, sep="\t")
@@ -35,4 +35,4 @@
       #checkboxGroupInput(inputId="DateVar",
       #                   label="Variable with date of measurement", 
       #                   choices=names.data)
-  
+     }
