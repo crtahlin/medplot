@@ -54,7 +54,7 @@ shinyServer(function(input, output, session) {
     # TODO: load patients for "Excel" scenario
   })
   
-  # subset the data with the selected symptoms
+  # subset the data with the selected symptoms - for 1st graph
   data <- reactive( function() {
     data <- melt(symptomsData(), id.vars = meltBy)
     data[data$variable %in% input$selectedSymptoms,]
@@ -69,65 +69,64 @@ shinyServer(function(input, output, session) {
     # characters, since renderTable seems to use xtable, which seems to not handle
     # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
   })
-  
-#   # list all available symptoms in an output slot
-#   output$levels <- renderUI( {
-#     ### TODO HERE
-#     # transform data into ggplot compliant format
-#     data <- melt(symptomsData(), id.vars = meltBy)
-#     symptoms <- unlist(levels(data[,"variable"]))
-#     checkboxGroupInput(inputId="selectedSymptoms",
-#                        label="Choose symptoms", 
-#                        choices=symptoms)
-#   })
-  
-  
+
   
   # build extended data set for additional graphs
   dataExtended <- reactive( function() {
-    # ddplyer command below - does not work with R<3.0.2
-    # data <- inner_join(x = symptomsData(), y = symptomsPatients(), by="PersonID")
-    # using plyr instead
+
     if (input$dataFileType=="Demo" || input$dataFileType=="Excel")
     {data <- join(x=symptomsData(), y=symptomsPatients(), by="PersonID", type="inner")}
     if (input$dataFileType=="TSV") {
-            data <- symptomsData()
-            # TODO: make date conversion more universal, depending on user selected Date column
-            # - perhaps implement this in the plotting function?
-           data[, "Date"] <- as.Date(as.character(data[, "Date"]), format="%d.%m.%Y")
-           # data[, "Date2"] <- as.character(data[, "Date"])
-           # data[, "Date"] <- strptime(as.character(data[, "Date"]), format="%e.%m.$Y")
-           
-           names.data=names(data)
-                 
-           #       #column with the dates
-                  which.DateID=which(names.data==input$dateVar)
-           #       
-           #       #column with the patient ID
-                  which.PatientID=which(names.data==input$patientIDVar)
-           #       
-           #       #column with the measurement ID
-                  which.MeasurementID=which(names.data==input$measurementVar)
-           #       
-           #       #column with the SymptomsID
-                  which.SymptomsID=which(names.data %in%  input$selectedSymptoms)
-           #       
-           #       print(which.DateID)
-           #       
-           #       # transform date information into R compliant dates
-           #       #changed: the user can specify which is the date in the database
-           #       data[, which.DateID]=as.Date(as.character(data[,which.DateID]), "%d.%m.%Y") 
-           #             
-           #       #maintain only the information about the ID, Date and Symptoms
-           #       
-                  data = data[, c(which.PatientID, which.DateID, which.MeasurementID, which.SymptomsID)]
-           #       
-           #       # transform data into ggplot compliant format
-           #       #data <- melt(data, id.vars = c("PersonID", "Date", "Measurement"))
+      data <- importSymptomsData(datafile=input$dataFile$datapath,
+                                 format="TSV")
+      return(data)
+      
+#             data <- symptomsData()
+#             # TODO: make date conversion more universal, depending on user selected Date column
+#             # - perhaps implement this in the plotting function?
+#            data[, "Date"] <- as.Date(as.character(data[, "Date"]), format="%d.%m.%Y")
+#            # data[, "Date2"] <- as.character(data[, "Date"])
+#            # data[, "Date"] <- strptime(as.character(data[, "Date"]), format="%e.%m.$Y")
+#            
+#            names.data=names(data)
+#                  
+#            #       #column with the dates
+#                   which.DateID=which(names.data==input$dateVar)
+#            #       
+#            #       #column with the patient ID
+#                   which.PatientID=which(names.data==input$patientIDVar)
+#            #       
+#            #       #column with the measurement ID
+#                   which.MeasurementID=which(names.data==input$measurementVar)
+#            #       
+#            #       #column with the SymptomsID
+#                   which.SymptomsID=which(names.data %in%  input$selectedSymptoms)
+#            #       
+#            #       print(which.DateID)
+#            #       
+#            #       # transform date information into R compliant dates
+#            #       #changed: the user can specify which is the date in the database
+#            #       data[, which.DateID]=as.Date(as.character(data[,which.DateID]), "%d.%m.%Y") 
+#            #             
+#            #       #maintain only the information about the ID, Date and Symptoms
+#            #       
+#                   data = data[, c(which.PatientID, which.DateID, which.MeasurementID, which.SymptomsID)]
+#            
            
     }
     return(data)
   })
+  
+  dataFiltered <- reactive(function(){
+    data <- dataExtended()[ , 
+                           c(input$patientIDVar,
+                             input$groupingVar,
+                             input$dateVar,
+                             input$measurementVar,
+                             input$selectedSymptoms
+                             )]
+    return(data)
+    })
   
   ## Mainpanel dynamic output 
   # message for working with DEMO data
@@ -137,7 +136,7 @@ shinyServer(function(input, output, session) {
     })
   
   # debuging information
-  output$debug <- renderTable(dataExtended())
+  output$debug <- renderTable(dataFiltered())
   
   output$selectSymptoms <- renderUI({
     # Sidebar for Excel and demo files ####
@@ -277,7 +276,7 @@ output$plot.boxplot=renderPlot({
                           selectedProportion=input$selectedProportion,
                           measurements=Measurement(),
                           posOnly=input$posOnly,
-                          threshold=input$threshold)
+                          threshold=input$thresholdValue)
   
 #   
 #   print("plotting the distribution of the symptoms - boxplot")

@@ -62,7 +62,7 @@ numericInput("threshold", "Threshold for positivity of the variables", value=0)
                plotOutput("plotClusterDendrogram"),
                plotOutput("plotClusterHeatmap")),
       tabPanel("Selected transformed data", tableOutput("data")),
-      tabPanel("Debug", tableOutput("symptomsData")),
+      tabPanel("Debug", tableOutput("debug")),
       
       tabPanel(title="Distributions of the symptoms",
                uiOutput("proportionUI"),
