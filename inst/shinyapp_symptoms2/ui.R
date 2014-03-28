@@ -62,7 +62,26 @@ numericInput("threshold", "Threshold for positivity of the variables", value=0)
                plotOutput("plotClusterDendrogram"),
                plotOutput("plotClusterHeatmap")),
       tabPanel("Selected transformed data", tableOutput("data")),
-      tabPanel("Debug", textOutput("symptomsData"))
+      tabPanel("Debug", tableOutput("symptomsData")),
+      
+      tabPanel(title="Distributions of the symptoms",
+               uiOutput("proportionUI"),
+               plotOutput("plot.proportion"), 
+               plotOutput("plot.CI"), 
+               #check box - only positive patients displayed
+               plotOutput("plot.boxplot"),
+               checkboxInput("posOnly",
+                             "Display the distribution only for patients with present symptom",
+                             value = FALSE)
+               ######### TODO: add a table with the number
+               
+      ),
+      tabPanel("RCS",
+               uiOutput("rcs.UI"),
+               uiOutput("rcsUI"),
+               plotOutput("plot.rcs")
+               )
+      
     ))
 )
 )

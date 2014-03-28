@@ -88,7 +88,44 @@ shinyServer(function(input, output, session) {
     # ddplyer command below - does not work with R<3.0.2
     # data <- inner_join(x = symptomsData(), y = symptomsPatients(), by="PersonID")
     # using plyr instead
-    data <- join(x=symptomsData(), y=symptomsPatients(), by="PersonID", type="inner")
+    if (input$dataFileType=="Demo" || input$dataFileType=="Excel")
+    {data <- join(x=symptomsData(), y=symptomsPatients(), by="PersonID", type="inner")}
+    if (input$dataFileType=="TSV") {
+            data <- symptomsData()
+            # TODO: make date conversion more universal, depending on user selected Date column
+            # - perhaps implement this in the plotting function?
+           data[, "Date"] <- as.Date(as.character(data[, "Date"]), format="%d.%m.%Y")
+           # data[, "Date2"] <- as.character(data[, "Date"])
+           # data[, "Date"] <- strptime(as.character(data[, "Date"]), format="%e.%m.$Y")
+           
+           names.data=names(data)
+                 
+           #       #column with the dates
+                  which.DateID=which(names.data==input$dateVar)
+           #       
+           #       #column with the patient ID
+                  which.PatientID=which(names.data==input$patientIDVar)
+           #       
+           #       #column with the measurement ID
+                  which.MeasurementID=which(names.data==input$measurementVar)
+           #       
+           #       #column with the SymptomsID
+                  which.SymptomsID=which(names.data %in%  input$selectedSymptoms)
+           #       
+           #       print(which.DateID)
+           #       
+           #       # transform date information into R compliant dates
+           #       #changed: the user can specify which is the date in the database
+           #       data[, which.DateID]=as.Date(as.character(data[,which.DateID]), "%d.%m.%Y") 
+           #             
+           #       #maintain only the information about the ID, Date and Symptoms
+           #       
+                  data = data[, c(which.PatientID, which.DateID, which.MeasurementID, which.SymptomsID)]
+           #       
+           #       # transform data into ggplot compliant format
+           #       #data <- melt(data, id.vars = c("PersonID", "Date", "Measurement"))
+           
+    }
     return(data)
   })
   
@@ -149,6 +186,7 @@ output$selectMeasurementVar <- renderUI({
   ## Plots for different tabs ####
   
   # Timeline tab plots and output ####
+# TODO: make data structure data() for TSV import
   # plot the graph, but only for selected symptoms
   output$plot <- renderPlot(function() {
     # if no symbols are selected, do not plot
@@ -179,20 +217,20 @@ output$selectMeasurementVar <- renderUI({
   
   # dendrogram plot on the Clustering tab
   output$plotClusterDendrogram=renderPlot({
-    plotClusterDendrogram(data=symptomsData(),
+    plotClusterDendrogram(data=dataExtended(),
                           variableName="Measurement",
                           variableValue=input$selectedMeasurementValue)
   })
   
   # heatmap plot on the Clustering tab
   output$plotClusterHeatmap=renderPlot({
-    plotClusterHeatmap(data=symptomsData(),
+    plotClusterHeatmap(data=dataExtended(),
                        #TODO: make dependent on selection
                        variableName="Measurement",
                        variableValue=input$selectedMeasurementValue) 
   })
   
-output$symptomsData <- renderText(names(dataExtended()))
+output$symptomsData <- renderTable((dataExtended()))
   
 })
 
