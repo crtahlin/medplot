@@ -34,40 +34,40 @@ shinyServer(function(input, output, session) {
   ### Import and prepare data ####
   # load data from Excel
   # TODO: are these functions below needed anymore?
-  symptomsData <- reactive(function() { # returns the DATA sheet
-    if (input$dataFileType=="Demo") {
-      # load default data for Demo scenario
-      # the location of template data file
-      templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
-      importSymptomsData(datafile=templateLocation,
-                         format="Excel")
-    } else { # load data for non-demo scenario
-      if (!is.null(input$dataFile) && !(input$dataFileType=="Demo")) {
-        importSymptomsData(datafile=input$dataFile$datapath,
-                           format=input$dataFileType) }
-    } 
-  })
+#   symptomsData <- reactive(function() { # returns the DATA sheet
+#     if (input$dataFileType=="Demo") {
+#       # load default data for Demo scenario
+#       # the location of template data file
+#       templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+#       importSymptomsData(datafile=templateLocation,
+#                          format="Excel")
+#     } else { # load data for non-demo scenario
+#       if (!is.null(input$dataFile) && !(input$dataFileType=="Demo")) {
+#         importSymptomsData(datafile=input$dataFile$datapath,
+#                            format=input$dataFileType) }
+#     } 
+#   })
   
-  symptomsPatients <- reactive(function() { # returns the PATIENTS sheet
-    if (input$dataFileType=="Demo") {
-      # load default data for Demo scenario
-      # the location of template data file
-      templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
-      #if(is.null(input$dataFile)) return()
-      importSymptomsPatients(datafile=templateLocation)    } #else {}
-    # TODO: load patients for "Excel" scenario
-  })
+#   symptomsPatients <- reactive(function() { # returns the PATIENTS sheet
+#     if (input$dataFileType=="Demo") {
+#       # load default data for Demo scenario
+#       # the location of template data file
+#       templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+#       #if(is.null(input$dataFile)) return()
+#       importSymptomsPatients(datafile=templateLocation)    } #else {}
+#     # TODO: load patients for "Excel" scenario
+#   })
   
   # subset the data with the selected symptoms - for 1st graph
   # TODO: is this function still needed?
-  data <- reactive( function() {
-    data <- melt(symptomsData(), id.vars = meltBy)
-    data[data$variable %in% input$selectedSymptoms,]
-  })
+#   data <- reactive( function() {
+#     data <- melt(symptomsData(), id.vars = meltBy)
+#     data[data$variable %in% input$selectedSymptoms,]
+#   })
   
   # list the subseted data in an output slot
   output$data <- renderTable({
-    data <- data()
+    data <- dataExtended()
     data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
     return(data)
     # NOTE: if we want to render the table of data, we have to convert the dates into 
@@ -81,6 +81,15 @@ shinyServer(function(input, output, session) {
     observe(input$dataFile)
     # TODO: napiši kodo za scenarij, ko input$datafile ni null, ampak
     # samo ni v pravem formatu - tudi takrat naj vrne NULL
+    if (input$dataFileType=="Demo") {
+      templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+      patients <- importSymptomsPatients(datafile=templateLocation)
+      symptoms <- importSymptomsData(datafile=templateLocation,
+                                     format="Excel")
+      data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
+      return(data)
+    }
+    
     if(is.null(input$dataFile)) return()
     if (input$dataFileType=="Excel") {
       patients <- importSymptomsPatients(datafile=input$dataFile$datapath)
@@ -88,15 +97,7 @@ shinyServer(function(input, output, session) {
                                      format="Excel")
       data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
     }
-    
-    if (input$dataFileType=="Demo") {
-      templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
-      patients <- importSymptomsPatients(datafile=templateLocation)
-      symptoms <- importSymptomsData(datafile=templateLocation,
-                                     format="Excel")
-      data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
-    }
-    
+        
     if (input$dataFileType=="TSV") {
       data <- importSymptomsData(datafile=input$dataFile$datapath,
                                  format="TSV")
@@ -121,7 +122,7 @@ shinyServer(function(input, output, session) {
   # message for working with DEMO data
   output$message <- renderText(
     if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
-      if (dim(data())[1]==0){paste("Please select one or more symptoms.")}
+      if (dim(dataExtended())[1]==0){paste("Please select one or more symptoms.")}
     })
   
   # debuging information
@@ -131,7 +132,7 @@ shinyServer(function(input, output, session) {
     # Sidebar for Excel and demo files ####
     # TODO: Try to redo this part with switch() statement as
     # it seems only the last evaluated block is returned
-    if (!is.null(symptomsData())) {
+    if (!is.null(dataVariableNames())) {
     #  data <- melt(symptomsData(), id.vars = meltBy)
     #  symptoms <- unlist(levels(data[,"variable"]))
       checkboxGroupInput(inputId="selectedSymptoms",
