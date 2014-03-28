@@ -7,7 +7,7 @@ library(shiny)
 shinyUI(pageWithSidebar(
   
   # Application title ####
-  headerPanel("Patients and their symptoms"),
+  headerPanel("medplot"),
   
   # Define the sidebar panel ####
   sidebarPanel(
@@ -48,7 +48,7 @@ numericInput("threshold", "Threshold for positivity of the variables", value=0)
     tabsetPanel(
       tabPanel(title="Timeline",
                h3(textOutput("message")),
-               plotOutput("plot")),
+               plotOutput("plotTimeline")),
       tabPanel(title="Proportions",
                plotOutput("plotPyramid")),
       tabPanel("Clustering",

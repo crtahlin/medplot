@@ -92,8 +92,8 @@ plotPropWithSymptoms <- function (data,
                 legend.text=c(paste0("T=", my.times[num.times:1])), 
                 args.legend=list(x=par("usr")[2],
                                  y=par("usr")[3], yjust = 0 )
-                ) 
-        
+    ) 
+    
     tmp=barplot(-prop.with.symptoms.2[num.times:1,my.order.symptoms],
                 beside=TRUE, hor=TRUE,
                 names.arg=names.symptoms[my.order.symptoms],
@@ -104,7 +104,7 @@ plotPropWithSymptoms <- function (data,
     
     text(x=0, par("usr")[4],
          labels=paste(which.var, "="  ,my.levels[2]), xpd=T, adj=c(1))
-    }# end if		
+  }# end if		
 }
 
 

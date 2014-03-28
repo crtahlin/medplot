@@ -33,6 +33,7 @@ meltBy <- c("PersonID", "Date", "Measurement")
 shinyServer(function(input, output, session) {
   ### Import and prepare data ####
   # load data from Excel
+  # TODO: are these functions below needed anymore?
   symptomsData <- reactive(function() { # returns the DATA sheet
     if (input$dataFileType=="Demo") {
       # load default data for Demo scenario
@@ -52,11 +53,13 @@ shinyServer(function(input, output, session) {
       # load default data for Demo scenario
       # the location of template data file
       templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+      #if(is.null(input$dataFile)) return()
       importSymptomsPatients(datafile=templateLocation)    } #else {}
     # TODO: load patients for "Excel" scenario
   })
   
   # subset the data with the selected symptoms - for 1st graph
+  # TODO: is this function still needed?
   data <- reactive( function() {
     data <- melt(symptomsData(), id.vars = meltBy)
     data[data$variable %in% input$selectedSymptoms,]
@@ -76,6 +79,9 @@ shinyServer(function(input, output, session) {
   # build extended data set for additional graphs
   dataExtended <- reactive( function() {
     observe(input$dataFile)
+    # TODO: napiši kodo za scenarij, ko input$datafile ni null, ampak
+    # samo ni v pravem formatu - tudi takrat naj vrne NULL
+    if(is.null(input$dataFile)) return()
     if (input$dataFileType=="Excel") {
       patients <- importSymptomsPatients(datafile=input$dataFile$datapath)
       symptoms <- importSymptomsData(datafile=input$dataFile$datapath,
@@ -139,7 +145,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$selectDateVar <- renderUI({
-    allSymptoms <- unlist(names(dataExtended()))
+    #allSymptoms <- unlist(names(dataExtended()))
     selectInput(inputId="dateVar",
                 label="Choose date variable:", 
                 choices=dataVariableNames(),
@@ -147,26 +153,26 @@ shinyServer(function(input, output, session) {
   })
   
   output$selectGroupingVar <- renderUI({
-    allSymptoms <- unlist(names(dataExtended()))
+    #allSymptoms <- unlist(names(dataExtended()))
     selectInput(inputId="groupingVar",
                 label="Choose grouping variable:", 
-                choices=allSymptoms,
+                choices=dataVariableNames(),
                 selected="Sex")
   })
   
   output$selectPatientIDVar <- renderUI({
-    allSymptoms <- unlist(names(dataExtended()))
+    # allSymptoms <- unlist(names(dataExtended()))
     selectInput(inputId="patientIDVar",
                 label="Choose patient ID variable:", 
-                choices=allSymptoms,
+                choices=dataVariableNames(),
                 selected="PersonID")
   })
   
   output$selectMeasurementVar <- renderUI({
-    allSymptoms <- unlist(names(dataExtended()))
+    #allSymptoms <- unlist(names(dataExtended()))
     selectInput(inputId="measurementVar",
                 label="Choose measurument occasion variable:", 
-                choices=allSymptoms,
+                choices=dataVariableNames(),
                 selected="Measurement")
   })
   
@@ -175,7 +181,7 @@ shinyServer(function(input, output, session) {
   # Timeline tab plots and output ####
   # TODO: make data structure data() for TSV import
   # plot the graph, but only for selected symptoms
-  output$plot <- renderPlot(function() {
+  output$plotTimeline <- renderPlot(function() {
     data=dataFiltered()
     # observe({dataFiltered()})
     # if no symbols are selected, do not plot
@@ -192,10 +198,10 @@ shinyServer(function(input, output, session) {
   # Proportions tab plots and output ####
   # pyramid plot of proportions
   output$plotPyramid <- renderPlot (
-    plotPropWithSymptoms(data=dataExtended(),
+    plotPropWithSymptoms(data=dataFiltered(),
                          grouping=input$groupingVar,
-                         measurements="Measurement",
-                         symptomsNames=unlist(levels(data()[,"variable"])))
+                         measurements=input$measurementVar,
+                         symptomsNames=input$selectedSymptoms) #unlist(levels(data()[,"variable"]))
   )
   
   # Clustering tab plots and output ####
