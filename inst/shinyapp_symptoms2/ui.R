@@ -38,7 +38,7 @@ uiOutput("selectGroupingVar"),
 uiOutput("selectPatientIDVar"),
 uiOutput("selectMeasurementVar"),
 uiOutput("selectSymptoms"),
-numericInput("threshold", "Threshold for positivity of the variables", value=0)
+numericInput("thresholdValue", "Threshold for positivity of the variables", value=0)
      
       
     )),
@@ -60,10 +60,10 @@ numericInput("threshold", "Threshold for positivity of the variables", value=0)
       
       tabPanel(title="Distributions of the symptoms",
                uiOutput("proportionUI"),
-               plotOutput("plot.proportion"), 
+               plotOutput("plotProportion"), 
                plotOutput("plot.CI"), 
                #check box - only positive patients displayed
-               plotOutput("plot.boxplot"),
+               plotOutput("plotBoxplot"),
                checkboxInput("posOnly",
                              "Display the distribution only for patients with present symptom",
                              value = FALSE)
