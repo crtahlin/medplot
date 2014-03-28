@@ -11,6 +11,8 @@ importSymptomsData <- function (datafile, format) {
     # read the data into R
     data <- read.xls(datafile, sheet="DATA")
     # transform date information into R compliant dates
+    # TODO: should we remove this line, since transform is done later, when the user select the 
+    # date column?
     data["Date"] <- as.Date(data[,"Date"], "%d.%m.%Y")
     return(data)
   }

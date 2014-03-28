@@ -132,8 +132,8 @@ shinyServer(function(input, output, session) {
     # TODO: Try to redo this part with switch() statement as
     # it seems only the last evaluated block is returned
     if (!is.null(symptomsData())) {
-      data <- melt(symptomsData(), id.vars = meltBy)
-      symptoms <- unlist(levels(data[,"variable"]))
+    #  data <- melt(symptomsData(), id.vars = meltBy)
+    #  symptoms <- unlist(levels(data[,"variable"]))
       checkboxGroupInput(inputId="selectedSymptoms",
                          label="Choose symptoms:", 
                          #choices=symptoms
@@ -209,7 +209,7 @@ shinyServer(function(input, output, session) {
   output$clusteringUI = renderUI({
     #levels of the measurement variable, save as third variable in the dataset symptomsData
     # TODO: make selection of levels dependent on Sidebar, not fixed to "Measurement"
-    myLevels=levels(as.factor(symptomsData()[,"Measurement"]))
+    myLevels=levels(as.factor(dataFiltered()[,"Measurement"]))
     #select the measurement
     selectInput(inputId="selectedMeasurementValue",
                 label="Select the measurement occasion (time):", 
