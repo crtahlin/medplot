@@ -21,9 +21,10 @@ shinyUI(pageWithSidebar(
                     "Tab separated values (TSV) file"="TSV",
                     "Demo data"="Demo"
                   )),
-      # offer user to upload file conditional on previous choice
+
       conditionalPanel(
-        condition="input.dataFileType =='Excel' || input.dataFileType =='TSV'",
+        # condition="input.dataFileType =='Excel' || input.dataFileType =='TSV'",
+        condition="TRUE",
         fileInput(inputId="dataFile",
                   label={h5("Upload data file:")},
                   multiple=FALSE,
@@ -31,14 +32,7 @@ shinyUI(pageWithSidebar(
                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                            "text/plain"))
       ),
-#       selectInput(inputId="groupingVar",
-#                   label="Grouping variable:",
-#                   choices=c(names),
-#                   selected="Sex"),
-#       selectInput(inputId="dateVar",
-#                   label="Date variable:",
-#                   choices=c("Sex", "CaseorControl"),
-#                   selected="Sex"),
+      
 uiOutput("selectDateVar"),
 uiOutput("selectGroupingVar"),
 uiOutput("selectPatientIDVar"),

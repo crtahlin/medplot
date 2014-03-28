@@ -73,9 +73,23 @@ shinyServer(function(input, output, session) {
   
   # build extended data set for additional graphs
   dataExtended <- reactive( function() {
-
-    if (input$dataFileType=="Demo" || input$dataFileType=="Excel")
-    {data <- join(x=symptomsData(), y=symptomsPatients(), by="PersonID", type="inner")}
+    observe(input$dataFile)
+    if (input$dataFileType=="Excel") {
+      patients <- importSymptomsPatients(datafile=input$dataFile$datapath)
+      symptoms <- importSymptomsData(datafile=input$dataFile$datapath,
+                                     format="Excel")
+      data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
+    return(data)
+    }
+    
+    if (input$dataFileType=="Demo") {
+      templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+      patients <- importSymptomsPatients(datafile=templateLocation)
+      symptoms <- importSymptomsData(datafile=templateLocation,
+                                     format="Excel")
+      data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
+    }
+    
     if (input$dataFileType=="TSV") {
       data <- importSymptomsData(datafile=input$dataFile$datapath,
                                  format="TSV")
@@ -147,14 +161,19 @@ shinyServer(function(input, output, session) {
     symptoms <- unlist(levels(data[,"variable"]))
     checkboxGroupInput(inputId="selectedSymptoms",
                        label="Choose symptoms:", 
-                       choices=symptoms)}
+                       #choices=symptoms
+                       choices=dataVariableNames())}
       })
   
+dataVariableNames <- reactive(function(){
+  unlist(names(dataExtended()))
+  })
+
 output$selectDateVar <- renderUI({
   allSymptoms <- unlist(names(dataExtended()))
   selectInput(inputId="dateVar",
                      label="Choose date variable:", 
-                     choices=allSymptoms,
+                     choices=dataVariableNames(),
               selected="Date")
 })
 
