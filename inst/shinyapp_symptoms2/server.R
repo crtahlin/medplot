@@ -20,6 +20,8 @@ library(plyr)
 library(pheatmap)
 # load medplot library
 library(medplot)
+#library for date management
+library(lubridate)
 
 # Global variables ---------------------------------------------------------------------
 # variables for melting data into ggplot compliant format for Timeline graph
@@ -138,10 +140,12 @@ shinyServer(function(input, output, session) {
                              input$dateVar,
                              input$measurementVar,
                              input$selectedSymptoms
-                             )]
+                           )]
+    # try to convert dates into R format
+    data[input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")
     return(data)
-    })
-  
+  })
+
   ## Mainpanel dynamic output 
   # message for working with DEMO data
   output$message <- renderText(

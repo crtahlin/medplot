@@ -17,7 +17,7 @@ importSymptomsData <- function (datafile, format) {
   
   if (format=="TSV") {
     # read the data into R
-    data <- read.csv(datafile, header=TRUE, sep="\t")
+    data <- read.csv(datafile, header=TRUE, sep="\t", stringsAsFactors=FALSE)
     return(data)
   }
   if (format=="Demo") {# Same code as for Excel at the moment
