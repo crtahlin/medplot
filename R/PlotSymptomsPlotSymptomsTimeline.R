@@ -12,8 +12,12 @@
 plotSymptomsTimeline <- function (data, date, personID, measurement, symptoms) {
   # keep only relevant data and melt() it into ggplot format
   data <- data[ , c(date, personID, measurement, symptoms)]
+
+  data <- melt(data=data, id.vars = c(personID, date, measurement))
   # TODO: the reference to x = Date, y = PersonID below is hardcoded at the moment,
-  # make it dynamic - probably by adding another aes(), because this one looks into "data"
+  # make it dynamic - probably by adding another aes(), because this one looks into "data" for
+  # data... or maybe 
+  # http://stackoverflow.com/questions/16509002/ggplot2-two-data-frames-doesnt-know-how-to-deal-with-data-of-class-uneval
   plot <-  ggplot(data, aes(x = Date, y = PersonID, size = value, colour = variable)) +
     geom_point(shape = 1) + theme_bw() + 
     scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
