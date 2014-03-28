@@ -268,23 +268,51 @@ output$plot.proportion=renderPlot({
                    selectedSymptoms=input$selectedSymptoms,
                    selectedProportion=input$measurementSelectedProportion,
                    measurements=Measurement())
+})
+
+
+output$plot.boxplot=renderPlot({
+  plotDistributionBoxplot(data=dataExtended(),
+                          selectedSymptoms=input$selectedSymptoms,
+                          selectedProportion=input$selectedProportion,
+                          measurements=Measurement(),
+                          posOnly=input$posOnly,
+                          threshold=input$threshold)
   
-#   print("plotting the distribution of the symptoms")
+#   
+#   print("plotting the distribution of the symptoms - boxplot")
 #   #print(input$measurementSelectedProportion)
 #   #print(dim(symptomsData.yn()))
 #   #adjust the margins for the labels of the boxplot
-#   linch <-  max(strwidth(input$selectedSymptoms, "inch")+0.4, na.rm = TRUE)
+#   linch <-  max(strwidth(input$SymptomsIDVar, "inch")+0.4, na.rm = TRUE)
 #   par(mai=c(1.02,linch,0.82,0.42))
 #   #par(mfrow=c(1,2))
 #   #calculate the proportion with symptoms and reorder (from the most common to the least common)
 #   prop.with.symptoms=apply(symptomsData.yn()[Measurement()==input$measurementSelectedProportion,], 2, function(x) mean(x==TRUE, na.rm=TRUE))
 #   my.order.symptoms=order(prop.with.symptoms, decreasing=FALSE)
-#   tmp=barplot(prop.with.symptoms[my.order.symptoms], hor=TRUE, names.arg=input$selectedSymptoms[my.order.symptoms], las=1, xlim=c(0,1), xlab="Proportion of patients")
-#   abline(v=seq(0, 1, by=.1), col="light gray", lty=3)
-#   title(paste0("T = ", input$measurementSelectedProportion, "; presence of symptoms"))
-
+#   
+#   #display all the data 
+#   if(!input$posOnly) {
+#     boxplot(t(apply(symptomsData()[Measurement()==input$measurementSelectedProportion,-c(1:3)], 1, function(x) x)), 
+#             horizontal=TRUE, names=input$SymptomsIDVar[my.order.symptoms], las=1, xlab="Value")
+#     
+#     title(paste0("T = ", input$measurementSelectedProportion, "; distribution of symptoms"))
+#   } else { #display the distribution only for positive patients
+#     #remove the non-positive observations
+#     
+#     tmp=(apply(symptomsData()[Measurement()==input$measurementSelectedProportion,-c(1:3)], 1,  function(x) x))
+#     #print(dim(tmp))
+#     
+#     #remove the non-positive values
+#     boxplot(apply(tmp, 1, function(x) x[which(x>input$threshold)]),  
+#             horizontal=TRUE, names=input$SymptomsIDVar[my.order.symptoms], las=1, xlab="Value")
+#     
+#     title(paste0("T = ", input$measurementSelectedProportion, "; distribution of symptoms"))
+#     
+#     
+#   }
+  
 })
-
 
 
 })

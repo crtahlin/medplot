@@ -21,3 +21,56 @@ plotDistribution <- function (data, selectedSymptoms, selectedProportion, measur
   title(paste0("T = ", selectedProportion, "; presence of symptoms"))
   
 }
+
+
+#' @title Plots boxplots of symptoms. 
+#'
+#'@param data Data for the boxplots.
+#'@param selectedSymptoms Column names of symptoms in data frame.
+#'@param selectedProportion User selected measurement time.
+#'@param measurements Vector of measurement values.
+#'@param posOnly TRUE/FALSE
+#'@param threshold User selected threshold value of symptoms. 
+plotDistributionBoxplot <- function (data,
+                                     selectedSymptoms,
+                                     selectedProportion,
+                                     measurements,
+                                     posOnly,
+                                     threshold  ) {
+
+  print("plotting the distribution of the symptoms - boxplot")
+  #print(input$measurementSelectedProportion)
+  #print(dim(symptomsData.yn()))
+  #adjust the margins for the labels of the boxplot
+  linch <-  max(strwidth(selectedSymptoms, "inch")+0.4, na.rm = TRUE)
+  par(mai=c(1.02,linch,0.82,0.42))
+  #par(mfrow=c(1,2))
+  #calculate the proportion with symptoms and reorder (from the most common to the least common)
+  prop.with.symptoms=apply(data[measurements==selectedProportion,], 2, function(x) mean(x==TRUE, na.rm=TRUE))
+  my.order.symptoms=order(prop.with.symptoms, decreasing=FALSE)
+  
+  #display all the data 
+  if(!posOnly) {
+    print("Drawing boxplot")
+    boxplot(t(apply(data[measurements==selectedProportion,selectedSymptoms], 1, function(x) x)), 
+            horizontal=TRUE, names=selectedSymptoms[my.order.symptoms], las=1, xlab="Value")
+    
+    title(paste0("T = ", selectedProportion, "; distribution of symptoms"))
+  } else { #display the distribution only for positive patients
+    #remove the non-positive observations
+    
+    tmp=(apply(data[measurements==selectedProportion,selectedSymptoms], 1,  function(x) x))
+    #print(dim(tmp))
+    
+    #remove the non-positive values
+    boxplot(apply(tmp, 1, function(x) x[which(x>threshold)]),  
+            horizontal=TRUE, names=selectedSymptoms[my.order.symptoms], las=1, xlab="Value")
+    
+    title(paste0("T = ", selectedProportion, "; distribution of symptoms"))
+    
+    
+  }
+}
+
+
+
