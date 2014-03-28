@@ -2,7 +2,7 @@
 \alias{plotClusterDendrogram}
 \title{Plot dendrogram of patient groups based on symptoms.}
 \usage{
-plotClusterDendrogram(data, variableName, variableValue)
+plotClusterDendrogram(data, variableName, variableValue, selectedSymptoms)
 }
 \arguments{
   \item{data}{Data fram to be passed to the function.}

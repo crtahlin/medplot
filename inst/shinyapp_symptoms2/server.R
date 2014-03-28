@@ -218,17 +218,19 @@ shinyServer(function(input, output, session) {
   
   # dendrogram plot on the Clustering tab
   output$plotClusterDendrogram=renderPlot({
-    plotClusterDendrogram(data=dataExtended(),
-                          variableName="Measurement",
-                          variableValue=input$selectedMeasurementValue)
+    plotClusterDendrogram(data=dataFiltered(),
+                          variableName=input$measurementVar,
+                          variableValue=input$selectedMeasurementValue,
+                          selectedSymptoms=input$selectedSymptoms)
   })
   
   # heatmap plot on the Clustering tab
   output$plotClusterHeatmap=renderPlot({
     plotClusterHeatmap(data=dataExtended(),
                        #TODO: make dependent on selection
-                       variableName="Measurement",
-                       variableValue=input$selectedMeasurementValue) 
+                       variableName=input$measurementVar,
+                       variableValue=input$selectedMeasurementValue,
+                       selectedSymptoms=input$selectedSymptoms) 
   })
   
   output$symptomsData <- renderTable((dataExtended()))

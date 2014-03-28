@@ -6,9 +6,9 @@
 #' @param data Data fram to be passed to the function.
 #' @param variableName The column name of the variable used for filtering.
 #' @param variableValues The value of the filtering variable used to filter.
-plotClusterDendrogram <- function (data, variableName, variableValue ) {
+plotClusterDendrogram <- function (data, variableName, variableValue, selectedSymptoms ) {
 
-  dataSubset=data[data[,variableName]==variableValue,-c(1:3)]
+  dataSubset=data[data[,variableName]==variableValue, selectedSymptoms]
   plot(hclust(as.dist(cor(dataSubset, use="c", method="s"))))
 
 }
@@ -31,8 +31,8 @@ plotClusterDendrogram <- function (data, variableName, variableValue ) {
 #' @param data Data fram to be passed to the function.
 #' @param variableName The column name of the variable used for filtering.
 #' @param variableValues The value of the filtering variable used to filter.
-plotClusterHeatmap <- function (data, variableName, variableValue) {
-  dataSubset=t(data[data[,variableName]==variableValue,-c(1:3)])
+plotClusterHeatmap <- function (data, variableName, variableValue, selectedSymptoms ) {
+  dataSubset=t(data[data[,variableName]==variableValue, selectedSymptoms])
   #TODO: remove reference above to the first three columns "-c(1:3)"
   pheatmap(dataSubset)
 }
