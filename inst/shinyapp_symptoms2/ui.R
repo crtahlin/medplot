@@ -78,8 +78,8 @@ numericInput("threshold", "Threshold for positivity of the variables", value=0)
       ),
       tabPanel("RCS",
                uiOutput("rcs.UI"),
-               uiOutput("rcsUI"),
-               plotOutput("plot.rcs")
+               uiOutput("rcsUI")#,
+               #plotOutput("plot.rcs")
                )
       
     ))

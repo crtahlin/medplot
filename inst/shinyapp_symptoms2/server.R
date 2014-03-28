@@ -231,7 +231,62 @@ output$selectMeasurementVar <- renderUI({
   })
   
 output$symptomsData <- renderTable((dataExtended()))
+
+### TODO: organize, make independent of column order
+# TODO: rename into dataExtended.yn() ?; comment on data structure
+#dataset with the positive/negative values for the selected symptoms
+symptomsData.yn=reactive({
+  #apply(symptomsData()[, -c(1:3)], 1, function(x) ifelse(x>input$threshold, 1, 0))
+  data=ifelse(dataExtended()[, -c(1:3)]>input$threshold, 1, 0)
+  return(data)
+})
+
+#saving Measurment in a reactive object - useful?
+# TODO: reference via column name
+Measurement=reactive({
+  dataExtended()[,3]
   
+})
+
+output$proportionUI = renderUI({
+  
+  #levels of the measurement variable, save as third variable in the dataset symptomsData
+  # TODO: reference to measurementVar instead of 3rd column
+  my.levels=levels(as.factor(symptomsData()[,3]))
+  
+  #select the measurement
+  selectInput(inputId="measurementSelectedProportion",
+              label="Select the measurment (time)", 
+              choices=my.levels, selected=my.levels[1])
+  
+  
+})
+
+
+output$plot.proportion=renderPlot({
+  plotDistribution(data=symptomsData.yn(),
+                   selectedSymptoms=input$selectedSymptoms,
+                   selectedProportion=input$measurementSelectedProportion,
+                   measurements=Measurement())
+  
+#   print("plotting the distribution of the symptoms")
+#   #print(input$measurementSelectedProportion)
+#   #print(dim(symptomsData.yn()))
+#   #adjust the margins for the labels of the boxplot
+#   linch <-  max(strwidth(input$selectedSymptoms, "inch")+0.4, na.rm = TRUE)
+#   par(mai=c(1.02,linch,0.82,0.42))
+#   #par(mfrow=c(1,2))
+#   #calculate the proportion with symptoms and reorder (from the most common to the least common)
+#   prop.with.symptoms=apply(symptomsData.yn()[Measurement()==input$measurementSelectedProportion,], 2, function(x) mean(x==TRUE, na.rm=TRUE))
+#   my.order.symptoms=order(prop.with.symptoms, decreasing=FALSE)
+#   tmp=barplot(prop.with.symptoms[my.order.symptoms], hor=TRUE, names.arg=input$selectedSymptoms[my.order.symptoms], las=1, xlim=c(0,1), xlab="Proportion of patients")
+#   abline(v=seq(0, 1, by=.1), col="light gray", lty=3)
+#   title(paste0("T = ", input$measurementSelectedProportion, "; presence of symptoms"))
+
+})
+
+
+
 })
 
 
