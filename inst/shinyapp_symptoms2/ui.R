@@ -70,10 +70,10 @@ numericInput("thresholdValue", "Threshold for positivity of the variables", valu
                ######### TODO: add a table with the number
                
       ),
-      tabPanel("RCS",
-               uiOutput("rcs.UI"),
-               uiOutput("rcsUI")#,
-               #plotOutput("plot.rcs")
+      tabPanel(title="RCS",
+               uiOutput("rcsUI"),
+               uiOutput("rcsUI2"),
+               plotOutput("plotRCS")
                )
       
     ))

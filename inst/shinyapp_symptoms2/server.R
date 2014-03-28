@@ -292,6 +292,36 @@ shinyServer(function(input, output, session) {
     })
   
 
+  ########## user interface to select a numerical variable to associate with the presence of symptom
+  output$rcsUI= renderUI({
+    print("UI for rcs variable selection")
+    selectInput(inputId="rcsIDVar",
+                label="Numerical variable", 
+                choices=dataVariableNames(),#[-c(input$selectedSymptoms)],
+                selected=NULL, multiple=FALSE)   
+  })
+  
+  ########## user interface to select which measurments to cluster
+  output$rcsUI2 = renderUI({
+    
+    #levels of the measurement variable, save as third variable in the dataset symptomsData
+    my.levels=levels(as.factor(dataFiltered()[,input$measurementVar]))
+    
+    #select the measurement
+    selectInput(inputId="measurementSelectedrcs",
+                label="Select the measurement (time)", 
+                choices=my.levels, selected=my.levels[1])
+  })
+  
+  
+  output$plotRCS=renderPlot({
+    plotRCS(data.all=dataExtended(),
+                         data.yn=dataFiltered.yn(),
+                         measurement=Measurement(),
+                         selectedSymptoms=input$selectedSymptoms,
+                         measurementSelectedrcs=input$measurementSelectedrcs,
+                         rcsIDVar=input$rcsIDVar)   
+  }, height=1000)
   
   
   
