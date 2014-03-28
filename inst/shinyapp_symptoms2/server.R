@@ -207,9 +207,17 @@ output$selectMeasurementVar <- renderUI({
 # TODO: make data structure data() for TSV import
   # plot the graph, but only for selected symptoms
   output$plot <- renderPlot(function() {
+    data=dataFiltered()
+    # observe({dataFiltered()})
     # if no symbols are selected, do not plot
-    if (dim(data())[1]>0) {
-      print(plotSymptomsTimeline(data()))}
+    #if (dim(dataFiltered())[1]>0) {
+      print(plotSymptomsTimeline(data=data,
+                                 date=input$dateVar,
+                                 personID=input$patientIDVar,
+                                 measurement=input$measurementVar,
+                                 symptoms=input$selectedSymptoms)
+      )#}
+    
   })
   
   # Proportions tab plots and output ####
