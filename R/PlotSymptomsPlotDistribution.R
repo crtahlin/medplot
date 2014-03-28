@@ -66,5 +66,78 @@ plotDistributionBoxplot <- function (data,
       }
 }
 
+#' @title Ploting confidence intervals
+#' 
+#' @param ddd dddd
+plotCI <- function (data.yn,
+                    measurements,
+                    selectedSymptoms,
+                    selectedProportion) {
+
+  for.CI=t(apply(data.yn[measurements==selectedProportion,], 2, function(x) {a=prop.test(sum(x==1, na.rm=T), length(x))
+                                                                                                         return( c(sum(x==1, na.rm=T), length(x), a$estimate, a$conf.int ))
+  }))
+  
+  prop.with.symptoms=apply(data.yn[measurements==selectedProportion,], 2, function(x) mean(x==TRUE, na.rm=TRUE))
+  my.order.symptoms=order(prop.with.symptoms, decreasing=FALSE)
+  
+  #reorder the symptoms
+  for.CI=for.CI[my.order.symptoms, ]
+  
+  
+  num.symptoms=length(selectedSymptoms)
+  
+  
+  linch <-  max(strwidth(selectedSymptoms, "inch")+0.4, na.rm = TRUE)
+  par(mai=c(1.02,linch,0.82,0.42))
+  
+  
+  for(i in 1:num.symptoms){
+    plot( for.CI[,3], 1:num.symptoms, cex=2, axes=FALSE, xlab="Proportion of patients", ylab="", xlim=c(0,1))
+    segments( for.CI[,4], 1:num.symptoms, for.CI[,5], 1:num.symptoms)#, lty=2 )
+    axis(2, at=1:num.symptoms, labels=selectedSymptoms[my.order.symptoms], las=1)
+    axis(1)
+    abline(v=seq(0, 1, by=.2), lty=2, col="light gray")
+    box()
+  }
+  
+  title(paste0("T = ", selectedProportion, ";\n  95% confidence intervals for the presence of symptom"))
+  
+}
 
 
+################## confidence intervals
+# 
+# #
+# output$plot.CI=renderPlot({
+#   
+#   for.CI=t(apply(symptomsData.yn()[Measurement()==input$measurementSelectedProportion,], 2, function(x) {a=prop.test(sum(x==1, na.rm=T), length(x))
+#                                                                                                          return( c(sum(x==1, na.rm=T), length(x), a$estimate, a$conf.int ))
+#   }))
+#   
+#   prop.with.symptoms=apply(symptomsData.yn()[Measurement()==input$measurementSelectedProportion,], 2, function(x) mean(x==TRUE, na.rm=TRUE))
+#   my.order.symptoms=order(prop.with.symptoms, decreasing=FALSE)
+#   
+#   #reorder the symptoms
+#   for.CI=for.CI[my.order.symptoms, ]
+#   
+#   
+#   num.symptoms=length(input$SymptomsIDVar)
+#   
+#   
+#   linch <-  max(strwidth(input$SymptomsIDVar, "inch")+0.4, na.rm = TRUE)
+#   par(mai=c(1.02,linch,0.82,0.42))
+#   
+#   
+#   for(i in 1:num.symptoms){
+#     plot( for.CI[,3], 1:num.symptoms, cex=2, axes=FALSE, xlab="Proportion of patients", ylab="", xlim=c(0,1))
+#     segments( for.CI[,4], 1:num.symptoms, for.CI[,5], 1:num.symptoms)#, lty=2 )
+#     axis(2, at=1:num.symptoms, labels=input$SymptomsIDVar[my.order.symptoms], las=1)
+#     axis(1)
+#     abline(v=seq(0, 1, by=.2), lty=2, col="light gray")
+#     box()
+#   }
+#   
+#   title(paste0("T = ", input$measurementSelectedProportion, ";\n  95% confidence intervals for the presence of symptom"))
+#   
+# })

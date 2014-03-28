@@ -61,7 +61,7 @@ numericInput("thresholdValue", "Threshold for positivity of the variables", valu
       tabPanel(title="Distributions of the symptoms",
                uiOutput("proportionUI"),
                plotOutput("plotProportion"), 
-               plotOutput("plot.CI"), 
+               plotOutput("plotCI"), 
                #check box - only positive patients displayed
                plotOutput("plotBoxplot"),
                checkboxInput("posOnly",
