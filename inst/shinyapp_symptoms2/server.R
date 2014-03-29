@@ -350,6 +350,18 @@ output$logistf.UI= renderUI({
   })
 
 
+output$plotLogistf <- renderPlot({
+  plotLogistf(data=dataExtended(),
+              data.yn=dataFiltered.yn(),
+              measurement=Measurement(),
+              measurementSelectedlogistf=input$measurementSelectedlogistf,
+              logistfIDVar=input$logistfIDVar,
+              selectedSymptoms=input$selectedSymptoms,
+              numSymptoms=length(input$selectedSymptoms))
+  
+  
+  })
+
 })
 
 
