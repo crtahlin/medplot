@@ -77,7 +77,7 @@ numericInput("thresholdValue", "Threshold for positivity of the variables", valu
                plotOutput("plotRCS")
                ),
       tabPanel(title="Logistf",
-               uiOutput("logistf.UI"),
+               uiOutput("logistfUI2"),
                uiOutput("logistfUI"),
                plotOutput("plotLogistf"))
       

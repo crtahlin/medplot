@@ -31,6 +31,8 @@ library(logistf)
 # variables for melting data into ggplot compliant format for Timeline graph
 meltBy <- c("PersonID", "Date", "Measurement")
 
+# TEMP for debuging
+# source("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_package/R/TablePropWithSymptoms.r")
 
 # Main function -----------------------------------------------------------
 
@@ -69,6 +71,9 @@ shinyServer(function(input, output, session) {
 #     data[data$variable %in% input$selectedSymptoms,]
 #   })
   
+#how much space should be used for the graphical output of the Rcs estimates and others?  
+NumRows <- function(){ceiling(length(input$selectedSymptoms)/3)*300  }
+
   # list the subseted data in an output slot
   output$data <- renderTable({
     data <- dataExtended()
@@ -202,13 +207,13 @@ shinyServer(function(input, output, session) {
   
   # Proportions tab plots and output ####
   # pyramid plot of proportions
-  output$plotPyramid <- renderPlot (
+  output$plotPyramid <- renderPlot ({
     plotPropWithSymptoms(data=dataFiltered(),
                          grouping=input$groupingVar,
                          measurements=input$measurementVar,
                          symptomsNames=input$selectedSymptoms) #unlist(levels(data()[,"variable"]))
     # TODO: adapt the height of the figure based on the number of symptoms: does not work now>>>>
-  )
+  } ,height="auto")  #height=NumRows)
   
   # Clustering tab plots and output ####
   # selection of measurement occasions  
@@ -316,9 +321,10 @@ shinyServer(function(input, output, session) {
     #select the measurement
     selectInput(inputId="measurementSelectedrcs",
                 label="Select the measurement (time)", 
-                choices=my.levels, selected=my.levels[1])
+                choices=Measurement(), selected=NULL)
   })
   
+
   
   output$plotRCS=renderPlot({
     plotRCS(data.all=dataExtended(),
@@ -327,7 +333,7 @@ shinyServer(function(input, output, session) {
                          selectedSymptoms=input$selectedSymptoms,
                          measurementSelectedrcs=input$measurementSelectedrcs,
                          rcsIDVar=input$rcsIDVar)   
-  }, height=1000)
+  }, height=NumRows)
   
 ################ association of variables with the outcome using logistic regression with Firth correction
 
@@ -335,18 +341,18 @@ shinyServer(function(input, output, session) {
 output$logistfUI = renderUI({
   #select the measurement
   selectInput(inputId="measurementSelectedlogistf",
-              label="Select the measurment (time)", 
+              label="Select the measurement (time)", 
               choices=Measurement(), selected=Measurement()[1])
   })
 
   
 ########## user interface to select a numerical variable to associate with the presence of symptom
-output$logistf.UI= renderUI({
+output$logistfUI2= renderUI({
   
   print("UI for logistf variable selection")
   selectInput(inputId="logistfIDVar",
               label="Select a numeric variable to associate with presence of symptoms:", 
-              choices=dataVariableNames(), selected=NULL, multiple=FALSE)
+              choices=dataVariableNames())
   })
 
 
@@ -361,6 +367,28 @@ output$plotLogistf <- renderPlot({
   
   
   })
+
+### TEMP
+
+# build the second graph
+output$tablePyramid <- renderTable ({
+  print("table pyramid")
+  ### TODO: adapt the height of the figure based on the number of symptoms: does not work now>>>> 
+  # browser()
+  #  num.symptoms=length(unlist(levels(data()[,"variable"])))
+  
+  
+  my.table.list=TablePropWithSymptoms(data=dataFiltered(),
+                                      grouping=input$groupingVar,
+                                      measurements="Measurement",
+                                      symptomsNames=input$selectedSymptoms)
+  
+  
+  
+  return(my.table.list[[1]])
+  
+})
+
 
 })
 

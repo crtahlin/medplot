@@ -16,7 +16,7 @@ plotRCS <- function (data.all,
   #temp: use age
   my.var=data.all[measurement==measurementSelectedrcs,rcsIDVar] # should be which.rcsId ? or will it work like this?
   
-  par(mfrow=c(ceiling(num.symptoms/4), 4))
+  par(mfrow=c(ceiling(num.symptoms/3), 3))
   
   for(i in c(1:num.symptoms)){
     
