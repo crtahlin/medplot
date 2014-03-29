@@ -24,6 +24,8 @@ library(medplot)
 library(lubridate)
 # library for regression modeling 
 library(rms)
+# library for logistic regression modeling
+library(logistf)
 
 # Global variables ---------------------------------------------------------------------
 # variables for melting data into ggplot compliant format for Timeline graph
@@ -327,8 +329,27 @@ shinyServer(function(input, output, session) {
                          rcsIDVar=input$rcsIDVar)   
   }, height=1000)
   
+################ association of variables with the outcome using logistic regression with Firth correction
+
+########## user interface to select which measurments to cluster
+output$logistfUI = renderUI({
+  #select the measurement
+  selectInput(inputId="measurementSelectedlogistf",
+              label="Select the measurment (time)", 
+              choices=Measurement(), selected=Measurement()[1])
+  })
+
   
+########## user interface to select a numerical variable to associate with the presence of symptom
+output$logistf.UI= renderUI({
   
+  print("UI for logistf variable selection")
+  selectInput(inputId="logistfIDVar",
+              label="Select a numeric variable to associate with presence of symptoms:", 
+              choices=dataVariableNames(), selected=NULL, multiple=FALSE)
+  })
+
+
 })
 
 
