@@ -205,6 +205,7 @@ shinyServer(function(input, output, session) {
                          grouping=input$groupingVar,
                          measurements=input$measurementVar,
                          symptomsNames=input$selectedSymptoms) #unlist(levels(data()[,"variable"]))
+    # TODO: adapt the height of the figure based on the number of symptoms: does not work now>>>>
   )
   
   # Clustering tab plots and output ####

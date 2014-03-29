@@ -9,7 +9,8 @@
 plotClusterDendrogram <- function (data, variableName, variableValue, selectedSymptoms ) {
 
   dataSubset=data[data[,variableName]==variableValue, selectedSymptoms]
-  plot(hclust(as.dist(cor(dataSubset, use="c", method="s"))))
+  #distance: 1-Spearman's correlation, agglomeration method='complete',
+  plot(hclust(as.dist(1-cor(dataSubset, use="c", method="s"))), ann=FALSE)
 
 }
 

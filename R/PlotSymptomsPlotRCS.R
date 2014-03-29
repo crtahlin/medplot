@@ -21,7 +21,6 @@ plotRCS <- function (data.all,
   for(i in c(1:num.symptoms)){
     
     my.mod=glm(my.data.symptoms.yn[,i]~rcs(my.var), family="binomial", x=T, y=T)
-    # CRT: what is this plot.rcs.mod? It's only here - is this unfinished? This is probabyl why the error!
     plotRCSmod(my.mod,
                  my.mod$x[,2],
                  my.ylab="Probability of reporting the symptom",
