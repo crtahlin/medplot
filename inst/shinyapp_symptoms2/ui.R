@@ -50,7 +50,8 @@ numericInput("thresholdValue", "Threshold for positivity of the variables", valu
                h3(textOutput("message")),
                plotOutput("plotTimeline")),
       tabPanel(title="Proportions",
-               plotOutput("plotPyramid")),
+               plotOutput("plotPyramid"),
+               tableOutput("tablePyramid")),
       tabPanel("Clustering",
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram"),
@@ -74,7 +75,11 @@ numericInput("thresholdValue", "Threshold for positivity of the variables", valu
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),
                plotOutput("plotRCS")
-               )
+               ),
+      tabPanel(title="Logistf",
+               uiOutput("logistf.UI"),
+               uiOutput("logistfUI"),
+               plotOutput("plot.logistf")),
       
     ))
 )
