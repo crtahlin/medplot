@@ -22,6 +22,8 @@ library(pheatmap)
 library(medplot)
 #library for date management
 library(lubridate)
+# library for regression modeling 
+library(rms)
 
 # Global variables ---------------------------------------------------------------------
 # variables for melting data into ggplot compliant format for Timeline graph
