@@ -2,6 +2,7 @@
 # graph for displaying presence of symptoms. 
 
 # Load libraries ----------------------------------------------------------
+
 # load library for generation interactive web pages
 library(shiny)
 # load library for generating graph scales
@@ -12,8 +13,6 @@ library(reshape2)
 library(ggplot2)
 # library for reading Excel files
 library(gdata)
-# library for manipulating with data (does not work with R<3.0.2)
-# library(dplyr)
 # library for manipulating data
 library(plyr)
 # library for clustering
@@ -29,7 +28,8 @@ library(logistf)
 
 # Global variables ---------------------------------------------------------------------
 # variables for melting data into ggplot compliant format for Timeline graph
-meltBy <- c("PersonID", "Date", "Measurement")
+# obsolete?
+# meltBy <- c("PersonID", "Date", "Measurement")
 
 # TEMP for debuging
 # source("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_package/R/TablePropWithSymptoms.r")
@@ -314,10 +314,6 @@ NumRows <- function(){ceiling(length(input$selectedSymptoms)/3)*300  }
   
   ########## user interface to select which measurments to cluster
   output$rcsUI2 = renderUI({
-    
-    #levels of the measurement variable, save as third variable in the dataset symptomsData
-    my.levels=levels(as.factor(dataFiltered()[,input$measurementVar]))
-    
     #select the measurement
     selectInput(inputId="measurementSelectedrcs",
                 label="Select the measurement (time)", 

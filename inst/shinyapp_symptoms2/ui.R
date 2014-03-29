@@ -21,9 +21,10 @@ shinyUI(pageWithSidebar(
                     "Tab separated values (TSV) file"="TSV",
                     "Demo data"="Demo"
                   )),
-
+      
       conditionalPanel(
         # condition="input.dataFileType =='Excel' || input.dataFileType =='TSV'",
+        # Q : make displaying conditional? Looks OK as it is?
         condition="TRUE",
         fileInput(inputId="dataFile",
                   label={h5("Upload data file:")},
@@ -33,14 +34,17 @@ shinyUI(pageWithSidebar(
                            "text/plain"))
       ),
       
-uiOutput("selectDateVar"),
-uiOutput("selectGroupingVar"),
-uiOutput("selectPatientIDVar"),
-uiOutput("selectMeasurementVar"),
-uiOutput("selectSymptoms"),
-numericInput("thresholdValue", "Threshold for positivity of the variables", value=0)
-     
+      uiOutput("selectDateVar"),
       
+      uiOutput("selectGroupingVar"),
+      
+      uiOutput("selectPatientIDVar"),
+      
+      uiOutput("selectMeasurementVar"),
+      
+      uiOutput("selectSymptoms"),
+      
+      numericInput("thresholdValue", "Threshold for positivity of the variables", value=0)
     )),
   
   # Define the main panel ####
@@ -49,38 +53,42 @@ numericInput("thresholdValue", "Threshold for positivity of the variables", valu
       tabPanel(title="Timeline",
                h3(textOutput("message")),
                plotOutput("plotTimeline")),
+      
       tabPanel(title="Proportions",
                plotOutput("plotPyramid"),
                tableOutput("tablePyramid")),
+      
       tabPanel("Clustering",
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram"),
                plotOutput("plotClusterHeatmap")),
-      tabPanel("Selected transformed data", tableOutput("data")),
-      tabPanel("Debug", tableOutput("debug")),
       
       tabPanel(title="Distributions of the symptoms",
                uiOutput("proportionUI"),
                plotOutput("plotProportion"), 
                plotOutput("plotCI"), 
-               #check box - only positive patients displayed
                plotOutput("plotBoxplot"),
                checkboxInput("posOnly",
                              "Display the distribution only for patients with present symptom",
                              value = FALSE)
                ######### TODO: add a table with the number
-               
       ),
+      
       tabPanel(title="RCS",
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),
                plotOutput("plotRCS")
-               ),
+      ),
+      
       tabPanel(title="Logistf",
                uiOutput("logistfUI2"),
                uiOutput("logistfUI"),
-               plotOutput("plotLogistf"))
+               plotOutput("plotLogistf")),
       
-    ))
+      tabPanel("Selected transformed data", tableOutput("data")),
+      
+      tabPanel("Debug", tableOutput("debug"))
+    )
+  )
 )
 )
