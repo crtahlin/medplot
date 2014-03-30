@@ -52,7 +52,10 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       tabPanel(title="Timeline",
                h3(textOutput("message")),
-               plotOutput("plotTimeline")),
+               plotOutput("plotTimeline"),
+               checkboxInput(inputId="displaySinceInclusion",
+                             label="Display the data as time from inclusion in the study?",
+                             value= FALSE)),
       
       tabPanel(title="Proportions",
                plotOutput("plotPyramid"),

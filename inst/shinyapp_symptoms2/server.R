@@ -157,7 +157,8 @@ shinyServer(function(input, output, session) {
                                date=input$dateVar,
                                personID=input$patientIDVar,
                                measurement=input$measurementVar,
-                               symptoms=input$selectedSymptoms)
+                               symptoms=input$selectedSymptoms,
+                               displaySinceInclusion = input$displaySinceInclusion)
     )#}    
   })
   

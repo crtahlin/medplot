@@ -2,7 +2,8 @@
 \alias{plotSymptomsTimeline}
 \title{Plot timeline of symptom presence}
 \usage{
-plotSymptomsTimeline(data, date, personID, measurement, symptoms)
+plotSymptomsTimeline(data, date, personID, measurement, symptoms,
+  displaySinceInclusion = FALSE)
 }
 \arguments{
   \item{data}{The data frame used by the plot.}
