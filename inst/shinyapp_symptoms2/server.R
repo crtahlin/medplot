@@ -110,9 +110,10 @@ shinyServer(function(input, output, session) {
   # GUI - selecting symptoms ####
   output$selectSymptoms <- renderUI({
     if (!is.null(dataVariableNames())) {
-      checkboxGroupInput(inputId="selectedSymptoms",
-                         label="Choose symptoms:", 
-                         choices=dataVariableNames())}
+      selectInput(inputId="selectedSymptoms",
+                  label="Choose symptoms:", 
+                  choices=dataVariableNames(),
+                  multiple=TRUE)}
   })
  
   # GUI - selecting Date variable ####

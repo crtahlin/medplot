@@ -34,13 +34,13 @@ shinyUI(pageWithSidebar(
                            "text/plain"))
       ),
       
-      uiOutput("selectDateVar"),
-      
-      uiOutput("selectGroupingVar"),
-      
       uiOutput("selectPatientIDVar"),
       
+      uiOutput("selectDateVar"),
+      
       uiOutput("selectMeasurementVar"),
+      
+      uiOutput("selectGroupingVar"),
       
       uiOutput("selectSymptoms"),
       
