@@ -82,7 +82,7 @@ shinyServer(function(input, output, session) {
                              input$selectedSymptoms
                            )]
     # try to convert dates into R format
-    data[input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")
+    try(expr={data[input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")}, silent=TRUE)
     return(data)
   })
   
@@ -323,13 +323,12 @@ shinyServer(function(input, output, session) {
     ### TODO: adapt the height of the figure based on the number of symptoms: does not work now>>>> 
     # browser()
     #  num.symptoms=length(unlist(levels(data()[,"variable"])))
-    my.table.list=TablePropWithSymptoms(data=dataFiltered(),
-                                        grouping=input$groupingVar,
-                                        measurements="Measurement",
-                                        symptomsNames=input$selectedSymptoms)
-  
-    return(my.table.list[[1]])
-  })
+    tablePropWithSymptoms(data=dataFiltered(),
+                          groupingVar=input$groupingVar,
+                          measurementVar=input$measurementVar,
+                          forMeasurement="T0",
+                          symptomsNames=input$selectedSymptoms,
+                          thresholdValue=input$thresholdValue)  })
   
   
 })
