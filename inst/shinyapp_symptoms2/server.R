@@ -282,7 +282,6 @@ shinyServer(function(input, output, session) {
   
   # ui - user interface to select a numerical variable to associate with the presence of symptom ###
   output$logistfUI2= renderUI({
-    print("UI for logistf variable selection")
     selectInput(inputId="logistfIDVar",
                 label="Select a numeric variable to associate with presence of symptoms:", 
                 choices=dataVariableNames())
@@ -317,18 +316,29 @@ shinyServer(function(input, output, session) {
   
   ### TEMP CODE ####
   
+  # ui - user interface to select which measurements to draw tables for ###
+  output$UIpropTable = renderUI({
+    #select the measurement
+    selectInput(inputId="measurementSelectedprop",
+                label="Select the measurement (time)", 
+                choices=Measurement(), selected=NULL)
+  })
+    
   # build the second graph
   output$tablePyramid <- renderTable ({
     print("table pyramid")
     ### TODO: adapt the height of the figure based on the number of symptoms: does not work now>>>> 
     # browser()
     #  num.symptoms=length(unlist(levels(data()[,"variable"])))
-    tablePropWithSymptoms(data=dataFiltered(),
+      tablePropWithSymptoms(data=dataFiltered(),
                           groupingVar=input$groupingVar,
                           measurementVar=input$measurementVar,
-                          forMeasurement="T0",
+                          forMeasurement=input$measurementSelectedprop,
                           symptomsNames=input$selectedSymptoms,
-                          thresholdValue=input$thresholdValue)  })
+                          thresholdValue=input$thresholdValue)
+     
+    })
+  
   
   
 })

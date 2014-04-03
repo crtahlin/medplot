@@ -59,7 +59,11 @@ shinyUI(pageWithSidebar(
       
       tabPanel(title="Proportions",
                plotOutput("plotPyramid"),
-               tableOutput("tablePyramid")),
+               uiOutput("UIpropTable"),
+               tableOutput("tablePyramid")
+               ),
+      
+      
       
       tabPanel("Clustering",
                uiOutput("clusteringUI"),
