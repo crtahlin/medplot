@@ -60,7 +60,9 @@ shinyUI(pageWithSidebar(
       tabPanel(title="Proportions",
                plotOutput("plotPyramid"),
                uiOutput("UIpropTable"),
-               tableOutput("tablePyramid")
+               tableOutput("tablePyramid"),
+               tableOutput("tablePyramid2"),
+               tableOutput("tablePyramid3")
                ),
       
       

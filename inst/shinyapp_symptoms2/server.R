@@ -326,11 +326,7 @@ shinyServer(function(input, output, session) {
     
   # build the second graph
   output$tablePyramid <- renderTable ({
-    print("table pyramid")
-    ### TODO: adapt the height of the figure based on the number of symptoms: does not work now>>>> 
-    # browser()
-    #  num.symptoms=length(unlist(levels(data()[,"variable"])))
-      tablePropWithSymptoms(data=dataFiltered(),
+              tablePropWithSymptoms(data=dataFiltered(),
                           groupingVar=input$groupingVar,
                           measurementVar=input$measurementVar,
                           forMeasurement=input$measurementSelectedprop,
@@ -339,6 +335,24 @@ shinyServer(function(input, output, session) {
      
     })
   
+  output$tablePyramid2 <- renderTable ({
+    tableMediansWithSymptoms(data=dataFiltered(),
+                             groupingVar=input$groupingVar,
+                             measurementVar=input$measurementVar,
+                             forMeasurement=input$measurementSelectedprop,
+                             symptomsNames=input$selectedSymptoms,
+                             thresholdValue=input$thresholdValue)
+    
+    })
+  
+  output$tablePyramid3 <- renderTable({ 
+    tableAllWithSymptoms(data=dataFiltered(),
+                         measurementVar=input$measurementVar,
+                         forMeasurement=input$measurementSelectedprop,
+                         symptomsNames=input$selectedSymptoms,
+                         thresholdValue=input$thresholdValue)
+    
+    })
   
   
 })
