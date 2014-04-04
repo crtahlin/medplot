@@ -317,7 +317,8 @@ shinyServer(function(input, output, session) {
     selectInput(inputId="rcsIDVar",
                 label="Numerical variable", 
                 choices=dataVariableNames(),
-                selected=NULL, multiple=FALSE)   
+                multiple=FALSE,
+                if (input$dataFileType=="Demo"){selected=c("Age")})   
   })
   
   # ui - user interface to select which measurments to cluster ###
@@ -354,7 +355,8 @@ shinyServer(function(input, output, session) {
   output$logistfUI2= renderUI({
     selectInput(inputId="logistfIDVar",
                 label="Select a numeric variable to associate with presence of symptoms:", 
-                choices=dataVariableNames())
+                choices=dataVariableNames(),
+                if (input$dataFileType=="Demo"){selected=c("Age")})
   })
   
   # plot - logistf ###
