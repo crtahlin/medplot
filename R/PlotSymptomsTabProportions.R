@@ -22,12 +22,12 @@ plotPropWithSymptoms <- function (data,
   
   ##################### which of the variables are symptoms
   # which.symptoms=c(4:13) #TODO: remove line after testing
-  my.data.expanded.nNOIS
+  #my.data.expanded.nNOIS
   
   #derive the matrix with the symptom intensity only
-  my.data.symptoms=my.data.expanded.nNOIS[, which.symptoms]
+  my.data.symptoms=my.data.expanded.nNOIS[, which.symptoms, drop=FALSE]
   #derive the matrix with the symptom positivity/negativity only
-  my.data.symptoms.yn=ifelse(my.data.expanded.nNOIS[,which.symptoms]>0, 1, 0)
+  my.data.symptoms.yn=ifelse(my.data.expanded.nNOIS[,which.symptoms, drop=FALSE]>0, 1, 0)
   
   #how many symptoms
   num.symptoms=ncol(my.data.symptoms)
