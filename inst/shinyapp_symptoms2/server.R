@@ -175,6 +175,44 @@ shinyServer(function(input, output, session) {
     # and window becomes scrollable (anoying)
   } ,height="auto")  #height=NumRows)
   
+  # ui - user interface to select which measurements to draw tables for ###
+  output$UIpropTable = renderUI({
+    #select the measurement
+    selectInput(inputId="measurementSelectedprop",
+                label="Select the measurement (time)", 
+                choices=Measurement(), selected=NULL)
+  })
+  
+  # table - of proportions of patients in a group with a symptom
+  output$tablePyramid <- renderTable ({
+    tablePropWithSymptoms(data=dataFiltered(),
+                          groupingVar=input$groupingVar,
+                          measurementVar=input$measurementVar,
+                          forMeasurement=input$measurementSelectedprop,
+                          symptomsNames=input$selectedSymptoms,
+                          thresholdValue=input$thresholdValue)
+    })
+  
+  # table - with medians of symptoms values in a group
+  output$tablePyramid2 <- renderTable ({
+    tableMediansWithSymptoms(data=dataFiltered(),
+                             groupingVar=input$groupingVar,
+                             measurementVar=input$measurementVar,
+                             forMeasurement=input$measurementSelectedprop,
+                             symptomsNames=input$selectedSymptoms,
+                             thresholdValue=input$thresholdValue)
+    })
+  
+  # table - for all patients - proportions and medians
+  output$tablePyramid3 <- renderTable({ 
+    tableAllWithSymptoms(data=dataFiltered(),
+                         measurementVar=input$measurementVar,
+                         forMeasurement=input$measurementSelectedprop,
+                         symptomsNames=input$selectedSymptoms,
+                         thresholdValue=input$thresholdValue)
+    })
+  
+  
   # TAB - Clustering ####
   # ui - selection of measurement occasions  ###
   output$clusteringUI = renderUI({
@@ -316,43 +354,8 @@ shinyServer(function(input, output, session) {
   
   ### TEMP CODE ####
   
-  # ui - user interface to select which measurements to draw tables for ###
-  output$UIpropTable = renderUI({
-    #select the measurement
-    selectInput(inputId="measurementSelectedprop",
-                label="Select the measurement (time)", 
-                choices=Measurement(), selected=NULL)
-  })
+ 
     
-  # build the second graph
-  output$tablePyramid <- renderTable ({
-              tablePropWithSymptoms(data=dataFiltered(),
-                          groupingVar=input$groupingVar,
-                          measurementVar=input$measurementVar,
-                          forMeasurement=input$measurementSelectedprop,
-                          symptomsNames=input$selectedSymptoms,
-                          thresholdValue=input$thresholdValue)
-     
-    })
-  
-  output$tablePyramid2 <- renderTable ({
-    tableMediansWithSymptoms(data=dataFiltered(),
-                             groupingVar=input$groupingVar,
-                             measurementVar=input$measurementVar,
-                             forMeasurement=input$measurementSelectedprop,
-                             symptomsNames=input$selectedSymptoms,
-                             thresholdValue=input$thresholdValue)
-    
-    })
-  
-  output$tablePyramid3 <- renderTable({ 
-    tableAllWithSymptoms(data=dataFiltered(),
-                         measurementVar=input$measurementVar,
-                         forMeasurement=input$measurementSelectedprop,
-                         symptomsNames=input$selectedSymptoms,
-                         thresholdValue=input$thresholdValue)
-    
-    })
   
   
 })
