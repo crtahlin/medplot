@@ -43,6 +43,11 @@ shinyServer(function(input, output, session) {
     dataFiltered()[,input$measurementVar]
   })
   
+  # reactive - the measurement levels available
+  measurementLevels <- reactive ({
+    sort(unique(Measurement()))
+    })
+  
   # reactive - data set with all the imported data ####
   dataExtended <- reactive( function() {
     observe(input$dataFile)
@@ -275,7 +280,7 @@ shinyServer(function(input, output, session) {
   output$proportionUI = renderUI({
     selectInput(inputId="measurementSelectedProportion",
                 label="Select the measurement (time)", 
-                choices=Measurement(), selected=Measurement()[1])
+                choices=measurementLevels(), selected=measurementLevels()[1])
   })
   
   # plot - proportions ###
@@ -320,7 +325,7 @@ shinyServer(function(input, output, session) {
     #select the measurement
     selectInput(inputId="measurementSelectedrcs",
                 label="Select the measurement (time)", 
-                choices=Measurement(), selected=NULL)
+                choices=measurementLevels(), selected=measurementLevels()[1])
   })
   
   # plot - RCS plot ###
@@ -341,7 +346,7 @@ shinyServer(function(input, output, session) {
     #select the measurement
     selectInput(inputId="measurementSelectedlogistf",
                 label="Select the measurement (time)", 
-                choices=Measurement(), selected=Measurement()[1])
+                choices=measurementLevels(), selected=measurementLevels()[1])
   })
   
   
