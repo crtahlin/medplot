@@ -49,11 +49,15 @@ shinyServer(function(input, output, session) {
     # TODO: napiši kodo za scenarij, ko input$datafile ni null, ampak
     # samo ni v pravem formatu - tudi takrat naj vrne NULL
     if (input$dataFileType=="Demo") {
-      templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
-      patients <- importSymptomsPatients(datafile=templateLocation)
-      symptoms <- importSymptomsData(datafile=templateLocation,
-                                     format="Excel")
-      data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
+      # commented code for importing Excel DEMO file
+#       templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+#       patients <- importSymptomsPatients(datafile=templateLocation)
+#       symptoms <- importSymptomsData(datafile=templateLocation,
+#                                      format="Excel")
+#       data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
+      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEM.txt")
+      data <- importSymptomsData(datafile=templateLocation,
+                                 format="TSV")
       return(data)
     }
     
