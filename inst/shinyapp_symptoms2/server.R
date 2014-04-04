@@ -120,8 +120,13 @@ shinyServer(function(input, output, session) {
                   multiple=TRUE,
                   if (input$dataFileType=="Demo"){selected=c("Fatigue","Malaise",
                                                              "Arthralgia","Headache",
-                                                             "Myalgia","Back.C")})}
-  })
+                                                             "Myalgia","Back.C",
+                                                             "Dizziness", "Nausea",
+                                                             "Sleepiness", "Forgetfulness",
+                                                             "Concentration", "Paresthesias",
+                                                             "Irritability","Back.L",
+                                                             "Back.Th", "Insomnia")})}
+    })
   
   # GUI - selecting Date variable ####
   output$selectDateVar <- renderUI({
@@ -243,13 +248,11 @@ shinyServer(function(input, output, session) {
   
   # ui - selection of annotation variables
   output$selectClusterAnnotations <- renderUI({
-    print(dataVariableNames())
-    print(str(dataVariableNames()))
-    #browser()
+    selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
     selectInput(inputId="selectedClusterAnnotations",
                 label="Select variables for annotating graph:",
                 # TODO: remove some variables from selection
-                choices=dataVariableNames(),
+                choices=dataVariableNames()[-selectedSymptoms],
                 selected=c(input$groupingVar),
                 multiple=TRUE)
   })
