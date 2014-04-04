@@ -35,7 +35,11 @@ shinyServer(function(input, output, session) {
   
   # FUNCTIONS ####
   #how much space should be used for the graphical output of the Rcs estimates and others?  
-  numRowsTimeline <- function(){ceiling(length(input$selectedSymptoms))*40  }
+  numRowsTimeline <- function(){max(ceiling(length(input$selectedSymptoms))*40, # so that legend is visible
+                                    (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
+                                    400 # at least this size
+  )}
+  
   NumRows <- function(){ceiling(length(input$selectedSymptoms)/3)*300  }
   
   # REACTIVE FUNCTIONS ####
