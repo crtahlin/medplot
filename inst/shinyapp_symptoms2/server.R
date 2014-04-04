@@ -35,6 +35,7 @@ shinyServer(function(input, output, session) {
   
   # FUNCTIONS ####
   #how much space should be used for the graphical output of the Rcs estimates and others?  
+  numRowsTimeline <- function(){ceiling(length(input$selectedSymptoms))*40  }
   NumRows <- function(){ceiling(length(input$selectedSymptoms)/3)*300  }
   
   # REACTIVE FUNCTIONS ####
@@ -178,7 +179,7 @@ shinyServer(function(input, output, session) {
                                symptoms=input$selectedSymptoms,
                                displaySinceInclusion = input$displaySinceInclusion)
     )#}    
-  })
+  }, height=numRowsTimeline)
   
   # TAB - Proportions ####
   # plot - pyramid plot of proportions ###

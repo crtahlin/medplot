@@ -50,13 +50,17 @@ shinyUI(pageWithSidebar(
   # Define the main panel ####
   mainPanel(
     tabsetPanel(
+      # TAB - Timeline ####
       tabPanel(title="Timeline",
-               h3(textOutput("message")),
-               plotOutput("plotTimeline"),
+               #h3(textOutput("message")),
                checkboxInput(inputId="displaySinceInclusion",
                              label="Display the data as time from inclusion in the study?",
-                             value= FALSE)),
+                             value= FALSE),
+               plotOutput("plotTimeline", height="auto")
+              
+              ),
       
+      # TAB - Proportions ####
       tabPanel(title="Proportions",
                plotOutput("plotPyramid"),
                uiOutput("UIpropTable"),
@@ -87,7 +91,7 @@ shinyUI(pageWithSidebar(
       tabPanel(title="RCS",
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),
-               plotOutput("plotRCS")
+               plotOutput("plotRCS", height="100%")
       ),
       
       tabPanel(title="Logistf",
