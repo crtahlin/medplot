@@ -379,8 +379,12 @@ shinyServer(function(input, output, session) {
   # table - list the subseted data in an output slot ###
   output$data <- renderTable({
     data <- dataExtended()
-    browser()
-    data[,input$dateVar] <- as.character(as.Date(data[,input$dateVar], format="%d.%m.%Y"))
+    # TODO: We could render a renderDataTable(), but how to display dates in 
+    # format 1.12.2014 and still sort them correctly?
+    # Sys.setlocale("LC_TIME", "Slovenian")
+    #data[,input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")
+    data[,input$dateVar] <- as.character(as.Date(data[,input$dateVar], format="%d.%m.%Y"),
+                                         format="%d.%m.%Y")
     
     #data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
     

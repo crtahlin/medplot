@@ -70,13 +70,14 @@ shinyUI(pageWithSidebar(
                ),
       
       
-      
+      # TAB - Clustering ####
       tabPanel("Clustering",
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram"),
                uiOutput("selectClusterAnnotations"),
                plotOutput("plotClusterHeatmap")),
       
+      # TAB - Distributions ####
       tabPanel(title="Distributions of the symptoms",
                uiOutput("proportionUI"),
                plotOutput("plotProportion"), 
@@ -88,19 +89,23 @@ shinyUI(pageWithSidebar(
                ######### TODO: add a table with the number
       ),
       
+      # TAB - RCS ####
       tabPanel(title="RCS",
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),
                plotOutput("plotRCS", height="100%")
       ),
       
+      # TAB - Logistf ####
       tabPanel(title="Logistf",
                uiOutput("logistfUI2"),
                uiOutput("logistfUI"),
                plotOutput("plotLogistf")),
       
-      tabPanel("Selected transformed data", tableOutput("data")),
+      # TAB - Selected data ####
+      tabPanel("Selected data", tableOutput("data")),
       
+      # TAB - Debug ####
       tabPanel("Debug", tableOutput("debug"))
     )
   )
