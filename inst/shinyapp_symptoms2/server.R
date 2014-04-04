@@ -50,11 +50,11 @@ shinyServer(function(input, output, session) {
     # samo ni v pravem formatu - tudi takrat naj vrne NULL
     if (input$dataFileType=="Demo") {
       # commented code for importing Excel DEMO file
-#       templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
-#       patients <- importSymptomsPatients(datafile=templateLocation)
-#       symptoms <- importSymptomsData(datafile=templateLocation,
-#                                      format="Excel")
-#       data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
+      #       templateLocation <- paste0(path.package("medplot"),"/extdata/PlotSymptoms_shiny.xlsx")
+      #       patients <- importSymptomsPatients(datafile=templateLocation)
+      #       symptoms <- importSymptomsData(datafile=templateLocation,
+      #                                      format="Excel")
+      #       data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
       templateLocation <- paste0(path.package("medplot"),"/extdata/DataEM.txt")
       data <- importSymptomsData(datafile=templateLocation,
                                  format="TSV")
@@ -117,9 +117,12 @@ shinyServer(function(input, output, session) {
       selectInput(inputId="selectedSymptoms",
                   label="Choose symptoms:", 
                   choices=dataVariableNames(),
-                  multiple=TRUE)}
+                  multiple=TRUE,
+                  if (input$dataFileType=="Demo"){selected=c("Fatigue","Malaise",
+                                                             "Arthralgia","Headache",
+                                                             "Myalgia","Back.C")})}
   })
- 
+  
   # GUI - selecting Date variable ####
   output$selectDateVar <- renderUI({
     selectInput(inputId="dateVar",
@@ -195,7 +198,7 @@ shinyServer(function(input, output, session) {
                           forMeasurement=input$measurementSelectedprop,
                           symptomsNames=input$selectedSymptoms,
                           thresholdValue=input$thresholdValue)
-    })
+  })
   
   # table - with medians of symptoms values in a group
   output$tablePyramid2 <- renderTable ({
@@ -205,7 +208,7 @@ shinyServer(function(input, output, session) {
                              forMeasurement=input$measurementSelectedprop,
                              symptomsNames=input$selectedSymptoms,
                              thresholdValue=input$thresholdValue)
-    })
+  })
   
   # table - for all patients - proportions and medians
   output$tablePyramid3 <- renderTable({ 
@@ -214,7 +217,7 @@ shinyServer(function(input, output, session) {
                          forMeasurement=input$measurementSelectedprop,
                          symptomsNames=input$selectedSymptoms,
                          thresholdValue=input$thresholdValue)
-    })
+  })
   
   
   # TAB - Clustering ####
@@ -237,16 +240,33 @@ shinyServer(function(input, output, session) {
                           selectedSymptoms=input$selectedSymptoms)
   })
   
+  
+  # ui - selection of annotation variables
+  output$selectClusterAnnotations <- renderUI({
+    print(dataVariableNames())
+    print(str(dataVariableNames()))
+    #browser()
+    selectInput(inputId="selectedClusterAnnotations",
+                label="Select variables for annotating graph:",
+                # TODO: remove some variables from selection
+                choices=dataVariableNames(),
+                selected=c(input$groupingVar),
+                multiple=TRUE)
+  })
+  
+  
+  
   # plot - heatmap plot on the Clustering tab ###
   output$plotClusterHeatmap=renderPlot({
     plotClusterHeatmap(data=dataExtended(),
                        #TODO: make dependent on selection
                        variableName=input$measurementVar,
                        variableValue=input$selectedMeasurementValue,
-                       selectedSymptoms=input$selectedSymptoms) 
+                       selectedSymptoms=input$selectedSymptoms,
+                       annotationVars=input$selectedClusterAnnotations) 
   })
   
- 
+  
   # TAB - Distributions of symptoms ####
   # ui - select measurement occasion ###
   output$proportionUI = renderUI({
@@ -272,7 +292,7 @@ shinyServer(function(input, output, session) {
                             measurements=Measurement(),
                             posOnly=input$posOnly,
                             threshold=input$thresholdValue)
-    })
+  })
   
   # plot - CI ###
   output$plotCI <- renderPlot({
@@ -280,7 +300,7 @@ shinyServer(function(input, output, session) {
            measurements=Measurement(),
            selectedSymptoms=input$selectedSymptoms,
            selectedProportion=input$measurementSelectedProportion)
-    })
+  })
   
   # TAB - RCS ####
   # ui - user interface to select a numerical variable to associate with the presence of symptom ###
@@ -357,9 +377,11 @@ shinyServer(function(input, output, session) {
   
   
   ### TEMP CODE ####
+  #  
+  #
   
- 
-    
+  
+  
   
   
 })

@@ -70,6 +70,7 @@ shinyUI(pageWithSidebar(
       tabPanel("Clustering",
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram"),
+               uiOutput("selectClusterAnnotations"),
                plotOutput("plotClusterHeatmap")),
       
       tabPanel(title="Distributions of the symptoms",

@@ -32,8 +32,15 @@ plotClusterDendrogram <- function (data, variableName, variableValue, selectedSy
 #' @param data Data fram to be passed to the function.
 #' @param variableName The column name of the variable used for filtering.
 #' @param variableValues The value of the filtering variable used to filter.
-plotClusterHeatmap <- function (data, variableName, variableValue, selectedSymptoms ) {
+plotClusterHeatmap <- function (data,
+                                variableName,
+                                variableValue,
+                                selectedSymptoms,
+                                annotationVars=NA) {
   dataSubset=t(data[data[,variableName]==variableValue, selectedSymptoms])
   #TODO: remove reference above to the first three columns "-c(1:3)"
-  pheatmap(dataSubset)
+  #browser()
+  annotation <- data.frame(data[, annotationVars])
+  
+  pheatmap(dataSubset, annotation=annotation)
 }
