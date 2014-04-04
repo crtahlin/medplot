@@ -379,7 +379,11 @@ shinyServer(function(input, output, session) {
   # table - list the subseted data in an output slot ###
   output$data <- renderTable({
     data <- dataExtended()
-    data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
+    browser()
+    data[,input$dateVar] <- as.character(as.Date(data[,input$dateVar], format="%d.%m.%Y"))
+    
+    #data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
+    
     return(data)
     # NOTE: if we want to render the table of data, we have to convert the dates into 
     # characters, since renderTable seems to use xtable, which seems to not handle
