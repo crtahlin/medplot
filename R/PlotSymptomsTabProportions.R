@@ -133,17 +133,18 @@ tablePropWithSymptoms <- function (data,
   column4Name <- paste("Poz./all for ", groupingLevels[2])
   column5Name <- paste("P-value for diff. or prop.")
   column6Name <- paste("Conf. int. for diff. of prop. ")
-  
+
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
   group2Data <- data[data[groupingVar]==groupingLevels[2],]
   group2Data[, symptomsNames] <- (group2Data[,symptomsNames]>thresholdValue)
-  
+
   for (symptom in symptomsNames) {
-    group1Positive <- sum(group1Data[,symptom])
-    group1Negative <- sum(!group1Data[,symptom])
-    group2Positive <- sum(group2Data[,symptom])
-    group2Negative <- sum(!group2Data[,symptom])
+    group1Positive <- sum(group1Data[,symptom], na.rm=TRUE)
+    group1Negative <- sum(!group1Data[,symptom], na.rm=TRUE)
+    group2Positive <- sum(group2Data[,symptom], na.rm=TRUE)
+    group2Negative <- sum(!group2Data[,symptom], na.rm=TRUE)
+
     testMatrix <- matrix(c(group1Positive, group1Negative,
                            group2Positive, group2Negative),
                          byrow=TRUE, ncol=2)
@@ -199,10 +200,10 @@ tableMediansWithSymptoms <- function (data,
   # group2Data[, symptomsNames] <- (group2Data[,symptomsNames]>thresholdValue)
   
   for (symptom in symptomsNames) {
-    group1Median <- median(group1Data[,symptom])
-    group1IQR <- quantile(group1Data[,symptom], c(0.25, 0.75))
-    group2Median <- median(group2Data[,symptom])
-    group2IQR <- quantile(group2Data[,symptom], c(0.25, 0.75))
+    group1Median <- median(group1Data[,symptom], na.rm=TRUE)
+    group1IQR <- quantile(group1Data[,symptom], c(0.25, 0.75), na.rm=TRUE)
+    group2Median <- median(group2Data[,symptom], na.rm=TRUE)
+    group2IQR <- quantile(group2Data[,symptom], c(0.25, 0.75), na.rm=TRUE)
 #     testMatrix <- matrix(c(group1Positive, group1Negative,
 #                            group2Positive, group2Negative),
 #                          byrow=TRUE, ncol=2)
@@ -255,8 +256,8 @@ tableAllWithSymptoms <- function (data,
   #group2Data[, symptomsNames] <- (group2Data[,symptomsNames]>thresholdValue)
   
   for (symptom in symptomsNames) {
-    patientsPositive <- sum(aboveThresholdData[,symptom])
-    patientsNegative <- sum(!aboveThresholdData[,symptom])
+    patientsPositive <- sum(aboveThresholdData[,symptom], na.rm=TRUE)
+    patientsNegative <- sum(!aboveThresholdData[,symptom], na.rm=TRUE)
 #     group2Positive <- sum(group2Data[,symptom])
 #     group2Negative <- sum(!group2Data[,symptom])
 #     testMatrix <- matrix(c(group1Positive, group1Negative,
@@ -268,11 +269,11 @@ tableData[tableData["Variable"]==symptom, column1Name ] <-
   patientsPositive / (patientsPositive + patientsNegative)
 tableData[tableData["Variable"]==symptom, column2Name ] <- 
   paste(patientsPositive, "/", patientsPositive+patientsNegative)
-tableData[tableData["Variable"]==symptom, column3Name ] <- median(data[,symptom])
+tableData[tableData["Variable"]==symptom, column3Name ] <- median(data[,symptom], na.rm=TRUE)
   
 tableData[tableData["Variable"]==symptom, column4Name ] <- 
-      paste(quantile(data[,symptom], c(0.25, 0.75))[1], "/",
-            quantile(data[,symptom], c(0.25, 0.75))[2])
+      paste(quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[1], "/",
+            quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[2])
 
 
 
