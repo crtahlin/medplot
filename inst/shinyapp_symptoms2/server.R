@@ -100,6 +100,15 @@ shinyServer(function(input, output, session) {
     return(data)
   })
   
+  # reactive - filtered data set with threshold value honored #### 
+  # sets all symptom values below threshold value to zero
+  dataFilteredwithThreshold <- reactive ( function () {
+    data <- dataFiltered()
+    data[,input$selectedSymptoms] <- 
+      ifelse(data[, input$selectedSymptoms]>input$thresholdValue, 1, 0)
+    return(data)
+    })
+  
   # reactive - returns the names of all column of imported data ####
   dataVariableNames <- reactive(function(){
     unlist(names(dataExtended()))
@@ -188,7 +197,7 @@ shinyServer(function(input, output, session) {
   # TAB - Proportions ####
   # plot - pyramid plot of proportions ###
   output$plotPyramid <- renderPlot ({
-    plotPropWithSymptoms(data=dataFiltered(),
+    plotPropWithSymptoms(data=dataFilteredwithThreshold(),
                          grouping=input$groupingVar,
                          measurements=input$measurementVar,
                          symptomsNames=input$selectedSymptoms) #unlist(levels(data()[,"variable"]))
