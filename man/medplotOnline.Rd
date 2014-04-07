@@ -1,0 +1,11 @@
+\name{medplotOnline}
+\alias{medplotOnline}
+\title{Function to load the medplot plotSymptoms shiny web app}
+\usage{
+medplotOnline()
+}
+\description{
+Function call loads the shiny app in located the default
+installation folder.
+}
+
