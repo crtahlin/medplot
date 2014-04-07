@@ -521,7 +521,7 @@ output$selectPosOnly <- renderUI({
   
   # TAB - Debug ####
   # table - debuging information ###
-  output$debug <- renderTable(dataFiltered.yn())
+  output$debug <- renderPrint(paste(str(dataExtended())))
   
   
   ### TEMP CODE ####

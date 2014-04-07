@@ -106,7 +106,7 @@ shinyUI(pageWithSidebar(
       tabPanel("Selected data", tableOutput("data")),
       
       # TAB - Debug ####
-      tabPanel("Debug", tableOutput("debug"))
+      tabPanel("Debug", verbatimTextOutput("debug"))
     )
   )
 )
