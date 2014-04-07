@@ -1,8 +1,8 @@
 Package: medplot
 Type: Package
 Title: Plotting functions to be used by healthcare workers. 
-Version: 0.9.6
-Date: 2013-04-10
+Version: 0.9.7
+Date: 2014-04-07
 Author: coding by Crt Ahlin with design and coding contribution from Lara Lusa
 Maintainer: Crt Ahlin <crt.ahlin@gmail.com>
 Description: Collection of plotting functions to be used by healthcare workers. Contains: function to plot presence of medical test results on given days; function to plot presence of symptoms on given days.
@@ -17,6 +17,16 @@ Depends:
 	ggplot2,
   seriation,
   XML,
-  plyr
+  plyr,
+  gdata,
+  lubridate,
+  survival,
+  date,
+  rms,
+  xtable,
+  nlme,
+  lme4,
+  pheatmap,
+  logistf
 Imports:  
   SVGAnnotation
