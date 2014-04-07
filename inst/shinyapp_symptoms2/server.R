@@ -35,26 +35,61 @@ shinyServer(function(input, output, session) {
   
   # FUNCTIONS ####
   #how much space should be used for the graphical output of the Rcs estimates and others?  
-  numRowsTimeline <- function(){max(ceiling(length(input$selectedSymptoms))*40, # so that legend is visible
-                                    (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
-                                    400 # at least this size
-  )}
+  # TODO: could drawing graphs be done if(no graph){height=0)?
+  numRowsTimeline <- function(){if(!is.null(dataFiltered())){
+    max(ceiling(length(input$selectedSymptoms))*40, # so that legend is visible
+        (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
+        400) # at least this size
+        } else {return(0)} # if there is no data, height of plot should be zero
+  }
   
+  
+  numRowsProportions <- function(){if(!is.null(dataFilteredwithThreshold())){
+    max(ceiling(length(input$selectedSymptoms))*40,
+                                       # if there are less than cca. 4 measurement occasions,
+                                       # each symptom should get aprox. 40 lines
+                                       length(input$selectedSymptoms)*length(measurementLevels())*15,
+                                       # for more than 4 measurement occasions,
+                                       # this should give extra vertical space for 
+                                       # measurements to be visible
+                                       300 # minumum reserved space
+    )}else{return(0)} # height of plot when no data available
+  }
+  
+  numRowsClustering <- function() {if(!is.null(dataFiltered())){
+    max(ceiling(length(input$selectedSymptoms))*40,
+        300)}else{return(0)}}
+  numRowsClustering2 <- function() {if(!is.null(dataFiltered())){
+    max(ceiling(length(input$selectedSymptoms))*40,
+        300)}else{return(0)}}
+  
+  numRowsDistributions <- function() {if(!is.null(dataFiltered())){
+    max(ceiling(length(input$selectedSymptoms))*30,
+        300)}else{return(0)}}
+  
+  numRowsLogistf <- function() {if(!is.null(dataFiltered())){
+    max(ceiling(length(input$selectedSymptoms))*30,
+        300)}else{return(0)}}
+    
   NumRows <- function(){ceiling(length(input$selectedSymptoms)/3)*300  }
   
   # REACTIVE FUNCTIONS ####
-  # reactive - values of variable selected as measurement occasion variable ####
+  # Measurement() - values of variable selected as measurement occasion variable ####
   Measurement <- reactive({
+    if(!is.null(dataFiltered())){
     dataFiltered()[,input$measurementVar]
+    }
   })
   
-  # reactive - the measurement levels available
+  # measurementLevels() - the measurement levels available
   measurementLevels <- reactive ({
+    if(!is.null(Measurement())){
     sort(unique(Measurement()))
+    }
     })
   
-  # reactive - data set with all the imported data ####
-  dataExtended <- reactive( function() {
+  # dataExtended() - data set with all the imported data ####
+  dataExtended <- reactive({
     observe(input$dataFile)
     # TODO: napiši kodo za scenarij, ko input$datafile ni null, ampak
     # samo ni v pravem formatu - tudi takrat naj vrne NULL
@@ -86,8 +121,9 @@ shinyServer(function(input, output, session) {
     return(data)
   })
   
-  # reactive - data set with data only for selected variables ####
-  dataFiltered <- reactive(function(){
+  # dataFiltered() - data set with data only for selected variables ####
+  dataFiltered <- reactive({
+    if(!is.null(dataExtended())){
     data <- dataExtended()[ , 
                            c(input$patientIDVar,
                              input$groupingVar,
@@ -98,36 +134,43 @@ shinyServer(function(input, output, session) {
     # try to convert dates into R format
     try(expr={data[input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")}, silent=TRUE)
     return(data)
+    }
   })
   
-  # reactive - filtered data set with threshold value honored #### 
+  # dataFilteredwithThreshold() - filtered data set with threshold value honored #### 
   # sets all symptom values below threshold value to zero
-  dataFilteredwithThreshold <- reactive ( function () {
+  dataFilteredwithThreshold <- reactive ({
+    if(!is.null(dataFiltered())){
     data <- dataFiltered()
     data[,input$selectedSymptoms] <- 
       ifelse(data[, input$selectedSymptoms]>input$thresholdValue, 1, 0)
     return(data)
+    }
     })
   
-  # reactive - returns the names of all column of imported data ####
-  dataVariableNames <- reactive(function(){
+  # dataVariableNames() - returns the names of all column of imported data ####
+  dataVariableNames <- reactive({
+    if(!is.null(dataExtended())){
     unlist(names(dataExtended()))
+    }
   })
   
-  # reactive - dataset with the positive/negative values for the selected symptoms ####
+  # dataFiltered.yn() - dataset with the positive/negative values for the selected symptoms ####
   dataFiltered.yn=reactive({
+    if(!is.null(dataFiltered())){
     #apply(symptomsData()[, -c(1:3)], 1, function(x) ifelse(x>input$threshold, 1, 0))
     data=ifelse(dataFiltered()[, input$selectedSymptoms]>input$thresholdValue, 1, 0)
     return(data)
+    }
   })
   
   
   # MAINPANEL ####
   # message for working with DEMO data
-  output$message <- renderText(
-    if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
-      if (dim(dataExtended())[1]==0){paste("Please select one or more symptoms.")}
-    })
+#   output$message <- renderText(
+#     if (is.null(input$dataFile)) {paste("WORKING WITH DEMO DATA!")} else {
+#       if (dim(dataExtended())[1]==0){paste("Please select one or more symptoms.")}
+#     })
   
   # SIDEBAR ####
   # GUI - selecting symptoms ####
@@ -149,38 +192,69 @@ shinyServer(function(input, output, session) {
   
   # GUI - selecting Date variable ####
   output$selectDateVar <- renderUI({
+    if (!is.null(dataVariableNames())){
     selectInput(inputId="dateVar",
                 label="Choose date variable:", 
                 choices=dataVariableNames(),
                 selected="Date")
+    }
   })
   
   # GUI - selecting grouping variable ####
   output$selectGroupingVar <- renderUI({
+    if (!is.null(dataVariableNames())){
     selectInput(inputId="groupingVar",
                 label="Choose grouping variable:", 
                 choices=dataVariableNames(),
                 selected="Sex")
+    }
   })
   
   # GUI - selecting person ID variable ####
   output$selectPatientIDVar <- renderUI({
+    if (!is.null(dataVariableNames())) {
     selectInput(inputId="patientIDVar",
                 label="Choose patient ID variable:", 
                 choices=dataVariableNames(),
                 selected="PersonID")
+    }
   })
   
   # GUI - selecting measurements variable
   output$selectMeasurementVar <- renderUI({
+    if (!is.null(dataVariableNames())) {
     selectInput(inputId="measurementVar",
                 label="Choose measurument occasion variable:", 
                 choices=dataVariableNames(),
                 selected="Measurement")
+    }
   })
+
+  # GUI - selecting treshold value
+  output$selectThresholdValue <- renderUI({
+    if (!is.null(dataVariableNames())){
+    numericInput(inputId="thresholdValue",
+                 "Threshold for positivity of the variables",
+                 value=0,
+                 min=0,
+                 max=10)
+    }
+    })
+  
   
   # TAB - Timeline ####
-  output$plotTimeline <- renderPlot(function() {
+
+output$selectDisplayFormat <- renderUI({
+  if(!is.null(dataFiltered())){
+  checkboxInput(inputId="displaySinceInclusion",
+                label="Display the data as time from inclusion in the study?",
+                value= FALSE)
+  }
+  })
+
+
+output$plotTimeline <- renderPlot({
+    if(!is.null(dataFiltered())){
     data=dataFiltered()
     # observe({dataFiltered()})
     # if no symbols are selected, do not plot
@@ -191,12 +265,13 @@ shinyServer(function(input, output, session) {
                                measurement=input$measurementVar,
                                symptoms=input$selectedSymptoms,
                                displaySinceInclusion = input$displaySinceInclusion)
-    )#}    
+    )} else {print("Please select some variables to plot.")}    
   }, height=numRowsTimeline)
   
   # TAB - Proportions ####
   # plot - pyramid plot of proportions ###
   output$plotPyramid <- renderPlot ({
+    if(!is.null(dataFilteredwithThreshold())){
     plotPropWithSymptoms(data=dataFilteredwithThreshold(),
                          grouping=input$groupingVar,
                          measurements=input$measurementVar,
@@ -204,14 +279,17 @@ shinyServer(function(input, output, session) {
     # TODO: adapt the height of the figure based on the number of symptoms: does not work now>>>>
     # CRT: it seems that heaight will also have to be set in plotOutput, otherwise the graph might not fit
     # and window becomes scrollable (anoying)
-  } ,height="auto")  #height=NumRows)
+    }
+  } ,height=numRowsProportions)  #height=NumRows)
   
   # ui - user interface to select which measurements to draw tables for ###
   output$UIpropTable = renderUI({
+    if(!is.null(measurementLevels())){
     #select the measurement
     selectInput(inputId="measurementSelectedprop",
                 label="Select the measurement (time)", 
-                choices=Measurement(), selected=NULL)
+                choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   })
   
   # table - of proportions of patients in a group with a symptom
@@ -226,47 +304,53 @@ shinyServer(function(input, output, session) {
   
   # table - with medians of symptoms values in a group
   output$tablePyramid2 <- renderTable ({
+    if(!is.null(dataFiltered())){
     tableMediansWithSymptoms(data=dataFiltered(),
                              groupingVar=input$groupingVar,
                              measurementVar=input$measurementVar,
                              forMeasurement=input$measurementSelectedprop,
                              symptomsNames=input$selectedSymptoms,
                              thresholdValue=input$thresholdValue)
+    }
   })
   
   # table - for all patients - proportions and medians
   output$tablePyramid3 <- renderTable({ 
+    if(!is.null(dataFiltered())){
     tableAllWithSymptoms(data=dataFiltered(),
                          measurementVar=input$measurementVar,
                          forMeasurement=input$measurementSelectedprop,
                          symptomsNames=input$selectedSymptoms,
                          thresholdValue=input$thresholdValue)
+    }
   })
   
   
   # TAB - Clustering ####
   # ui - selection of measurement occasions  ###
   output$clusteringUI = renderUI({
-    #levels of the measurement variable, save as third variable in the dataset symptomsData
-    # TODO: make selection of levels dependent on Sidebar, not fixed to "Measurement"
-    myLevels=levels(as.factor(dataFiltered()[,"Measurement"]))
+    if(!is.null(measurementLevels())){
     #select the measurement
     selectInput(inputId="selectedMeasurementValue",
                 label="Select the measurement occasion (time):", 
-                choices=myLevels, selected=myLevels[1])
+                choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   })
   
   # plot - dendrogram plot on the Clustering tab ###
   output$plotClusterDendrogram=renderPlot({
+    if(!is.null(dataFiltered())){
     plotClusterDendrogram(data=dataFiltered(),
                           variableName=input$measurementVar,
                           variableValue=input$selectedMeasurementValue,
                           selectedSymptoms=input$selectedSymptoms)
-  })
+    }
+  },height=numRowsClustering)
   
   
   # ui - selection of annotation variables
   output$selectClusterAnnotations <- renderUI({
+    if(!is.null(dataVariableNames())){
     selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
     selectInput(inputId="selectedClusterAnnotations",
                 label="Select variables for annotating graph:",
@@ -274,39 +358,57 @@ shinyServer(function(input, output, session) {
                 choices=dataVariableNames()[-selectedSymptoms],
                 selected=c(input$groupingVar),
                 multiple=TRUE)
+    }
   })
   
   
   
   # plot - heatmap plot on the Clustering tab ###
   output$plotClusterHeatmap=renderPlot({
+    if(!is.null(dataExtended())){
     plotClusterHeatmap(data=dataExtended(),
                        #TODO: make dependent on selection
                        variableName=input$measurementVar,
                        variableValue=input$selectedMeasurementValue,
                        selectedSymptoms=input$selectedSymptoms,
                        annotationVars=input$selectedClusterAnnotations) 
-  })
+    }
+  },height=numRowsClustering2)
   
   
   # TAB - Distributions of symptoms ####
   # ui - select measurement occasion ###
-  output$proportionUI = renderUI({
+output$proportionUI = renderUI({
+  if(!is.null(measurementLevels())){ 
     selectInput(inputId="measurementSelectedProportion",
                 label="Select the measurement (time)", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
-  })
-  
+  }
+})
+
+# ui - select distribution only for patients above a threshold
+output$selectPosOnly <- renderUI({
+  if(!is.null(dataFiltered())){
+  checkboxInput(inputId="posOnly",
+                "Display the distribution only for patients with variable values
+                above the selected threshold?",
+                value = FALSE)
+  }
+})
+
   # plot - proportions ###
   output$plotProportion=renderPlot({
+    if(!is.null(dataFiltered.yn())){
     plotDistribution(data=dataFiltered.yn(),
                      selectedSymptoms=input$selectedSymptoms,
                      selectedProportion=input$measurementSelectedProportion,
                      measurements=Measurement())
-  })
+    }
+  }, height=numRowsDistributions)
   
   # plot - boxplots ###
   output$plotBoxplot=renderPlot({
+    if(!is.null(dataFiltered())){
     plotDistributionBoxplot(data=dataFiltered(),
                             data.yn=dataFiltered.yn(),
                             selectedSymptoms=input$selectedSymptoms,
@@ -314,33 +416,39 @@ shinyServer(function(input, output, session) {
                             measurements=Measurement(),
                             posOnly=input$posOnly,
                             threshold=input$thresholdValue)
-  })
+    }
+  }, height=numRowsDistributions)
   
   # plot - CI ###
   output$plotCI <- renderPlot({
+    if(!is.null(dataFiltered.yn())){
     plotCI(data.yn=dataFiltered.yn(),
            measurements=Measurement(),
            selectedSymptoms=input$selectedSymptoms,
            selectedProportion=input$measurementSelectedProportion)
-  })
+    }
+  }, height=numRowsDistributions)
   
   # TAB - RCS ####
   # ui - user interface to select a numerical variable to associate with the presence of symptom ###
   output$rcsUI= renderUI({
-    print("UI for rcs variable selection")
+    if(!is.null(dataVariableNames())){
     selectInput(inputId="rcsIDVar",
-                label="Numerical variable", 
+                label="Numerical variable:", 
                 choices=dataVariableNames(),
                 multiple=FALSE,
                 if (input$dataFileType=="Demo"){selected=c("Age")})   
+    }
   })
   
   # ui - user interface to select which measurments to cluster ###
   output$rcsUI2 = renderUI({
+    if(!is.null(measurementLevels())){
     #select the measurement
     selectInput(inputId="measurementSelectedrcs",
                 label="Select the measurement (time)", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   })
   
   # plot - RCS plot ###
@@ -358,23 +466,28 @@ shinyServer(function(input, output, session) {
   # TAB - Logistf ####
   # ui - user interface to select which measurments to cluster ###
   output$logistfUI = renderUI({
+    if(!is.null(measurementLevels())){
     #select the measurement
     selectInput(inputId="measurementSelectedlogistf",
                 label="Select the measurement (time)", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   })
   
   
   # ui - user interface to select a numerical variable to associate with the presence of symptom ###
   output$logistfUI2= renderUI({
+    if(!is.null(dataVariableNames())){
     selectInput(inputId="logistfIDVar",
                 label="Select a numeric variable to associate with presence of symptoms:", 
                 choices=dataVariableNames(),
                 if (input$dataFileType=="Demo"){selected=c("Age")})
+    }
   })
   
   # plot - logistf ###
   output$plotLogistf <- renderPlot({
+    if(!is.null(Measurement())){
     plotLogistf(data=dataExtended(),
                 data.yn=dataFiltered.yn(),
                 measurement=Measurement(),
@@ -382,11 +495,13 @@ shinyServer(function(input, output, session) {
                 logistfIDVar=input$logistfIDVar,
                 selectedSymptoms=input$selectedSymptoms,
                 numSymptoms=length(input$selectedSymptoms))
-  })
+    }
+  }, height=numRowsLogistf)
   
   # TAB - Selected transformed data ####
   # table - list the subseted data in an output slot ###
   output$data <- renderTable({
+    if(!is.null(dataExtended())){
     data <- dataExtended()
     # TODO: We could render a renderDataTable(), but how to display dates in 
     # format 1.12.2014 and still sort them correctly?
@@ -401,6 +516,7 @@ shinyServer(function(input, output, session) {
     # NOTE: if we want to render the table of data, we have to convert the dates into 
     # characters, since renderTable seems to use xtable, which seems to not handle
     # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
+    }
   })
   
   # TAB - Debug ####

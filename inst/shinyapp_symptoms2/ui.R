@@ -12,6 +12,10 @@ shinyUI(pageWithSidebar(
   # Define the sidebar panel ####
   sidebarPanel(
     wellPanel(
+      conditionalPanel(
+        condition="input.dataFileType =='Demo'",
+        h2("Working with DEMO data!")),
+      
       # selection of type of data file
       selectInput(inputId="dataFileType",
                   label="Select type of data file:",
@@ -44,7 +48,7 @@ shinyUI(pageWithSidebar(
       
       uiOutput("selectSymptoms"),
       
-      numericInput("thresholdValue", "Threshold for positivity of the variables", value=0)
+      uiOutput("selectThresholdValue")
     )),
   
   # Define the main panel ####
@@ -52,17 +56,13 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       # TAB - Timeline ####
       tabPanel(title="Timeline",
-               #h3(textOutput("message")),
-               checkboxInput(inputId="displaySinceInclusion",
-                             label="Display the data as time from inclusion in the study?",
-                             value= FALSE),
-               plotOutput("plotTimeline", height="auto")
-              
+               uiOutput("selectDisplayFormat"),
+               plotOutput("plotTimeline", height="auto")              
               ),
       
       # TAB - Proportions ####
       tabPanel(title="Proportions",
-               plotOutput("plotPyramid"),
+               plotOutput("plotPyramid", height="auto"),
                uiOutput("UIpropTable"),
                tableOutput("tablePyramid"),
                tableOutput("tablePyramid2"),
@@ -73,19 +73,18 @@ shinyUI(pageWithSidebar(
       # TAB - Clustering ####
       tabPanel("Clustering",
                uiOutput("clusteringUI"),
-               plotOutput("plotClusterDendrogram"),
+               plotOutput("plotClusterDendrogram", height="auto"),
                uiOutput("selectClusterAnnotations"),
-               plotOutput("plotClusterHeatmap")),
+               plotOutput("plotClusterHeatmap"), height="auto"),
       
       # TAB - Distributions ####
       tabPanel(title="Distributions of the symptoms",
                uiOutput("proportionUI"),
-               plotOutput("plotProportion"), 
-               plotOutput("plotCI"), 
-               plotOutput("plotBoxplot"),
-               checkboxInput("posOnly",
-                             "Display the distribution only for patients with present symptom",
-                             value = FALSE)
+               plotOutput("plotProportion", height="auto"), 
+               plotOutput("plotCI", height="auto"), 
+               plotOutput("plotBoxplot", height="auto"),
+               uiOutput("selectPosOnly")
+               
                ######### TODO: add a table with the number
       ),
       
@@ -100,7 +99,8 @@ shinyUI(pageWithSidebar(
       tabPanel(title="Logistf",
                uiOutput("logistfUI2"),
                uiOutput("logistfUI"),
-               plotOutput("plotLogistf")),
+               plotOutput("plotLogistf", height="auto")
+               ),
       
       # TAB - Selected data ####
       tabPanel("Selected data", tableOutput("data")),
