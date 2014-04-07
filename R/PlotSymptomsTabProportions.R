@@ -16,14 +16,10 @@ plotPropWithSymptoms <- function (data,
   which.var <- grouping
   which.symptoms <- symptomsNames # TODO: pass the symptom names as char vector
   names.symptoms <- symptomsNames
-  print(which.symptoms)
-  print(names.symptoms)
   ### EXISTING CODE ####
   
   ##################### which of the variables are symptoms
-  # which.symptoms=c(4:13) #TODO: remove line after testing
-  #my.data.expanded.nNOIS
-  
+    
   #derive the matrix with the symptom intensity only
   my.data.symptoms=my.data.expanded.nNOIS[, which.symptoms, drop=FALSE]
   #derive the matrix with the symptom positivity/negativity only

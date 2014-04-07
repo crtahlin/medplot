@@ -2,7 +2,8 @@
 \alias{plotClusterHeatmap}
 \title{Plot clustered heatmaps.}
 \usage{
-plotClusterHeatmap(data, variableName, variableValue, selectedSymptoms)
+plotClusterHeatmap(data, variableName, variableValue, selectedSymptoms,
+  annotationVars = NA)
 }
 \arguments{
   \item{data}{Data fram to be passed to the function.}

@@ -45,7 +45,6 @@ plotDistributionBoxplot <- function (data,
   
   #display all the data 
   if(!posOnly) {
-    print("Drawing boxplot")
     boxplot(t(apply(data[measurements==selectedProportion, selectedSymptoms], 1, function(x) x)), 
             horizontal=TRUE, names=selectedSymptoms[my.order.symptoms], las=1, xlab="Value")
     
