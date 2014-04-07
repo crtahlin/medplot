@@ -21,7 +21,6 @@ Depends:
   gdata,
   lubridate,
   survival,
-  date,
   rms,
   xtable,
   nlme,
