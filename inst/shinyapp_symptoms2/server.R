@@ -388,7 +388,9 @@ shinyServer(function(input, output, session) {
     if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the proportion of subjects in a
   certain group, P value for the difference of proportions and the 
-  95% confidence interval for the difference of proportions.", br(), br()))
+  95% confidence interval for the difference of proportions. 
+              Data with missing values for grouping variable 
+              are removed from analysis.", br(), br()))
     }
   })
   
@@ -409,7 +411,9 @@ shinyServer(function(input, output, session) {
     if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the median value for subjects in a
 certain group, interquantile range for of the variable 
-(25th to 75th percentile) and P value for the difference of medians.", br(), br() ))
+(25th to 75th percentile) and P value for the difference of medians. 
+              Data with missing values for grouping variable 
+              are removed from analysis.", br(), br() ))
     }
   })
   

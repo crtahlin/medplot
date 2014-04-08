@@ -99,3 +99,65 @@ plotCI <- function (data.yn,
   
   title(paste0("T = ", selectedProportion, ";\n  95% confidence intervals for the presence of symptom"))
 }
+
+#' @title Table for both groups 
+#' 
+#' @description TODO Thresholds take into account for proportions, not for medians.
+#' 
+#' @param TODO
+tableAllWithSymptoms <- function (data,
+                                  measurementVar,
+                                  forMeasurement,
+                                  symptomsNames,
+                                  thresholdValue=0) {
+  
+  # TODO: create a Groupinga() reactive vector to pass to this and other functions?
+  #groupingLevels <- as.character(unlist(unique(data[groupingVar])))
+  
+  data <- data[data[measurementVar]==forMeasurement,]
+  
+  tableData <- data.frame("Variable"=symptomsNames)
+  
+  column1Name <- paste("Prop. with positive ")
+  column2Name <- paste("Positive/all")
+  column3Name <- paste("Median")
+  column4Name <- paste("IQR")
+  #column5Name <- paste("P-value for diff. or prop.")
+  #column6Name <- paste("Conf. int. for diff. of prop. ")
+  
+  aboveThresholdData <- data
+  aboveThresholdData[, symptomsNames] <- (data[,symptomsNames]>thresholdValue)
+  #group2Data <- data[data[groupingVar]==groupingLevels[2],]
+  #group2Data[, symptomsNames] <- (group2Data[,symptomsNames]>thresholdValue)
+  
+  for (symptom in symptomsNames) {
+    patientsPositive <- sum(aboveThresholdData[,symptom], na.rm=TRUE)
+    patientsNegative <- sum(!aboveThresholdData[,symptom], na.rm=TRUE)
+    #     group2Positive <- sum(group2Data[,symptom])
+    #     group2Negative <- sum(!group2Data[,symptom])
+    #     testMatrix <- matrix(c(group1Positive, group1Negative,
+    #                            group2Positive, group2Negative),
+    #                          byrow=TRUE, ncol=2)
+    #     results <- prop.test(testMatrix)
+    
+    tableData[tableData["Variable"]==symptom, column1Name ] <- 
+      patientsPositive / (patientsPositive + patientsNegative)
+    tableData[tableData["Variable"]==symptom, column2Name ] <- 
+      paste(patientsPositive, "/", patientsPositive+patientsNegative)
+    tableData[tableData["Variable"]==symptom, column3Name ] <- median(data[,symptom], na.rm=TRUE)
+    
+    tableData[tableData["Variable"]==symptom, column4Name ] <- 
+      paste(quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[1], " to ",
+            quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[2])
+    
+    
+    
+    #     tableData[tableData["Variable"]==symptom, column5Name ] <- 
+    #       format(results$p.value, digits=2)
+    #     tableData[tableData["Variable"]==symptom, column6Name ] <- 
+    #       paste(format(results$conf.int[[1]], digits=2),
+    #             format(results$conf.int[[2]], digits=2), sep=";")
+  }
+  
+  return(tableData)
+}
