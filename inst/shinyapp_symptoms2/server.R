@@ -177,7 +177,7 @@ shinyServer(function(input, output, session) {
   output$selectSymptoms <- renderUI({
     if (!is.null(dataVariableNames())) {
       selectInput(inputId="selectedSymptoms",
-                  label="Choose symptoms:", 
+                  label="Choose variables to analyse:", 
                   choices=dataVariableNames(),
                   multiple=TRUE,
                   if (input$dataFileType=="Demo"){selected=c("Fatigue","Malaise",
@@ -224,7 +224,7 @@ shinyServer(function(input, output, session) {
   output$selectMeasurementVar <- renderUI({
     if (!is.null(dataVariableNames())) {
       selectInput(inputId="measurementVar",
-                  label="Choose measurument occasion variable:", 
+                  label="Choose measurement occasion variable:", 
                   choices=dataVariableNames(),
                   selected="Measurement")
     }
@@ -234,7 +234,7 @@ shinyServer(function(input, output, session) {
   output$selectThresholdValue <- renderUI({
     if (!is.null(dataVariableNames())){
       numericInput(inputId="thresholdValue",
-                   "Threshold for positivity of the variables",
+                   "Threshold for positivity of the variables:",
                    value=0,
                    min=0,
                    max=10)
@@ -247,7 +247,7 @@ shinyServer(function(input, output, session) {
   output$selectDisplayFormat <- renderUI({
     if(!is.null(dataFiltered())){
       checkboxInput(inputId="displaySinceInclusion",
-                    label="Display the data as time from inclusion in the study?",
+                    label="Display time from inclusion in the study on the horizontal axis?",
                     value= FALSE)
     }
   })
@@ -273,7 +273,7 @@ shinyServer(function(input, output, session) {
   output$proportionUI = renderUI({
     if(!is.null(measurementLevels())){ 
       selectInput(inputId="measurementSelectedProportion",
-                  label="Select the measurement (time)", 
+                  label="Select the measurement occasion (time):", 
                   choices=measurementLevels(), selected=measurementLevels()[1])
     }
   })
@@ -284,7 +284,7 @@ shinyServer(function(input, output, session) {
       tagList(
       checkboxInput(inputId="posOnly",
                     "Display the distribution only for patients with variable values
-                  above the selected threshold?",
+                  above the selected threshold of positivity?",
                     value = FALSE),
       br(), br()
       )
@@ -362,7 +362,7 @@ shinyServer(function(input, output, session) {
     if(!is.null(measurementLevels())){
       #select the measurement
       selectInput(inputId="measurementSelectedprop",
-                  label="Select the measurement (time)", 
+                  label="Select the measurement occasion (time):", 
                   choices=measurementLevels(), selected=measurementLevels()[1])
     }
   })
@@ -473,7 +473,7 @@ certain group, interquantile range for of the variable
     if(!is.null(measurementLevels())){
       #select the measurement
       selectInput(inputId="measurementSelectedrcs",
-                  label="Select the measurement (time)", 
+                  label="Select the measurement occasion (time):", 
                   choices=measurementLevels(), selected=measurementLevels()[1])
     }
   })
@@ -496,7 +496,7 @@ certain group, interquantile range for of the variable
     if(!is.null(measurementLevels())){
       #select the measurement
       selectInput(inputId="measurementSelectedlogistf",
-                  label="Select the measurement (time)", 
+                  label="Select the measurement occasion (time):", 
                   choices=measurementLevels(), selected=measurementLevels()[1])
     }
   })
