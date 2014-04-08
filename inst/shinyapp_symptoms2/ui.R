@@ -11,6 +11,7 @@ shinyUI(pageWithSidebar(
   
   # Define the sidebar panel ####
   sidebarPanel(
+    uiOutput("messageSelectVars"),
     wellPanel(
       conditionalPanel(
         condition="input.dataFileType =='Demo'",
@@ -56,13 +57,14 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       # TAB - Timeline ####
       tabPanel(title="Timeline",
-               #textOutput("messageSelectVars"),
+              # textOutput("messageSelectVars"),
                uiOutput("selectDisplayFormat"),
                plotOutput("plotTimeline", height="auto")              
               ),
       
       # TAB - Distribution of the variables ####
       tabPanel(title="Distribution of the variables",
+              # textOutput("messageSelectVars"),
                uiOutput("proportionUI"),
                plotOutput("plotProportion", height="auto"), 
                plotOutput("plotCI", height="auto"), 
@@ -75,6 +77,7 @@ shinyUI(pageWithSidebar(
       
       # TAB - Distribution of the variables: by grouping variable ####
       tabPanel(title="Distribution of the variables: by grouping variable",
+              # textOutput("messageSelectVars"),
                plotOutput("plotPyramid", height="auto"),
                uiOutput("UIpropTable"),
                
@@ -89,6 +92,7 @@ shinyUI(pageWithSidebar(
       
       # TAB - Clustering ####
       tabPanel("Clustering",
+              # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram", height="auto"),
                uiOutput("selectClusterAnnotations"),
@@ -98,6 +102,7 @@ shinyUI(pageWithSidebar(
       
       # TAB - RCS ####
       tabPanel(title="RCS",
+               #textOutput("messageSelectVars"),
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),
                plotOutput("plotRCS", height="100%")
@@ -105,13 +110,16 @@ shinyUI(pageWithSidebar(
       
       # TAB - Logistf ####
       tabPanel(title="Logistf",
+              # textOutput("messageSelectVars"),
                uiOutput("logistfUI2"),
                uiOutput("logistfUI"),
                plotOutput("plotLogistf", height="auto")
                ),
       
       # TAB - Selected data ####
-      tabPanel("Selected data", tableOutput("data")),
+      tabPanel(title="Selected data", 
+              # textOutput("messageSelectVars"),
+               tableOutput("data")),
       
       # TAB - Debug ####
       tabPanel("Debug", verbatimTextOutput("debug"))

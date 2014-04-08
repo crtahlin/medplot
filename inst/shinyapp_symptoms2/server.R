@@ -242,25 +242,23 @@ shinyServer(function(input, output, session) {
   })
   
   # TABS ####
+  # message - used on all tabs
+  output$messageSelectVars <- renderUI(
+{if(is.null(dataFiltered())) {h4("Please use the menus below to upload data, select parameters and one or more variables to analyse.")}
+})
+
   # TAB - Timeline ####
-  
-#   output$messageSelectVars <- renderText(
-#     {if(is.null(dataFiltered())) {
-#       print("Please use the sidebar menus on the left to upload data, select parameters and one or more variables to analyse.")}
-#   })
-#   
-  
   output$selectDisplayFormat <- renderUI({
-    #if(!is.null(dataFiltered())){
+    if(!is.null(dataFiltered())){
       checkboxInput(inputId="displaySinceInclusion",
                     label="Display time from inclusion in the study on the horizontal axis?",
                     value= FALSE)
-    #}
+    }
   })
   
   
   output$plotTimeline <- renderPlot({
-    if(!is.null(dataFiltered())){
+    if(!(is.null(dataFiltered()) || is.null(input$displaySinceInclusion))){
       data=dataFiltered()
       # observe({dataFiltered()})
       # if no symbols are selected, do not plot
