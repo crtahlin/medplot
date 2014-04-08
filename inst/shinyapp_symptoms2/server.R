@@ -214,7 +214,7 @@ shinyServer(function(input, output, session) {
   output$selectPatientIDVar <- renderUI({
     if (!is.null(dataVariableNames())) {
       selectInput(inputId="patientIDVar",
-                  label="Choose patient ID variable:", 
+                  label="Choose subject ID variable:", 
                   choices=dataVariableNames(),
                   selected="PersonID")
     }
