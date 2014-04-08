@@ -124,11 +124,11 @@ tablePropWithSymptoms <- function (data,
   tableData <- data.frame("Variable"=symptomsNames)
   
   column1Name <- paste("Prop. of ", groupingLevels[1])
-  column2Name <- paste("Poz./all for ", groupingLevels[1])
+  column2Name <- paste("Positive/all for ", groupingLevels[1])
   column3Name <- paste("Prop. of ", groupingLevels[2])
-  column4Name <- paste("Poz./all for ", groupingLevels[2])
-  column5Name <- paste("P-value for diff. or prop.")
-  column6Name <- paste("Conf. int. for diff. of prop. ")
+  column4Name <- paste("Positive/all for ", groupingLevels[2])
+  column5Name <- paste("P value")
+  column6Name <- paste("95% CI for the difference")
 
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
@@ -158,7 +158,7 @@ tablePropWithSymptoms <- function (data,
       format(results$p.value, digits=2)
     tableData[tableData["Variable"]==symptom, column6Name ] <- 
       paste(format(results$conf.int[[1]], digits=2),
-            format(results$conf.int[[2]], digits=2), sep=";")
+            format(results$conf.int[[2]], digits=2), sep=" to ")
   }
   
   return(tableData)
@@ -187,7 +187,7 @@ tableMediansWithSymptoms <- function (data,
   column2Name <- paste("IQR for ", groupingLevels[1])
   column3Name <- paste("Median of ", groupingLevels[2])
   column4Name <- paste("IQR for ", groupingLevels[2])
-  column5Name <- paste("P-value for diff. or medians")
+  column5Name <- paste("P value")
   # column6Name <- paste("Conf. int. for diff. of prop. ")
   
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
@@ -209,9 +209,9 @@ tableMediansWithSymptoms <- function (data,
 result <- wilcox.test(x=group1Data[,symptom], y=group2Data[,symptom])
 
 tableData[tableData["Variable"]==symptom, column1Name ] <- group1Median
-tableData[tableData["Variable"]==symptom, column2Name ] <- paste(group1IQR[1], "/", group1IQR[2])
+tableData[tableData["Variable"]==symptom, column2Name ] <- paste(group1IQR[1], " to ", group1IQR[2])
 tableData[tableData["Variable"]==symptom, column3Name ] <- group2Median
-tableData[tableData["Variable"]==symptom, column4Name ] <- paste(group2IQR[1], "/", group2IQR[2])
+tableData[tableData["Variable"]==symptom, column4Name ] <- paste(group2IQR[1], " to ", group2IQR[2])
 tableData[tableData["Variable"]==symptom, column5Name ] <- format(result$p.value, digits=2)
 # tableData[tableData["Variable"]==symptom, column6Name ] <- 
 #   paste(format(results$conf.int[[1]], digits=2),
@@ -239,8 +239,8 @@ tableAllWithSymptoms <- function (data,
   
   tableData <- data.frame("Variable"=symptomsNames)
   
-  column1Name <- paste("Prop. with poz. ")
-  column2Name <- paste("Poz./all")
+  column1Name <- paste("Prop. with positive ")
+  column2Name <- paste("Positive/all")
   column3Name <- paste("Median")
   column4Name <- paste("IQR")
   #column5Name <- paste("P-value for diff. or prop.")
@@ -268,7 +268,7 @@ tableData[tableData["Variable"]==symptom, column2Name ] <-
 tableData[tableData["Variable"]==symptom, column3Name ] <- median(data[,symptom], na.rm=TRUE)
   
 tableData[tableData["Variable"]==symptom, column4Name ] <- 
-      paste(quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[1], "/",
+      paste(quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[1], " to ",
             quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[2])
 
 

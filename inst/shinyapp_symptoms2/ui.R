@@ -60,13 +60,29 @@ shinyUI(pageWithSidebar(
                plotOutput("plotTimeline", height="auto")              
               ),
       
-      # TAB - Proportions ####
-      tabPanel(title="Proportions",
+      # TAB - Distribution of the variables ####
+      tabPanel(title="Distribution of the variables",
+               uiOutput("proportionUI"),
+               plotOutput("plotProportion", height="auto"), 
+               plotOutput("plotCI", height="auto"), 
+               plotOutput("plotBoxplot", height="auto"),
+               uiOutput("selectPosOnly"),
+               
+               tableOutput("tablePropMedian"),
+               uiOutput("textTablePropMedian")
+      ),
+      
+      # TAB - Distribution of the variables: by grouping variable ####
+      tabPanel(title="Distribution of the variables: by grouping variable",
                plotOutput("plotPyramid", height="auto"),
                uiOutput("UIpropTable"),
-               tableOutput("tablePyramid"),
-               tableOutput("tablePyramid2"),
-               tableOutput("tablePyramid3")
+               
+               tableOutput("tablePropGroups"),
+               uiOutput("textTablePropGroups"),
+               
+               tableOutput("tableMedianGroups"),
+               uiOutput("textTableMedianGroups")
+               
                ),
       
       
@@ -77,16 +93,7 @@ shinyUI(pageWithSidebar(
                uiOutput("selectClusterAnnotations"),
                plotOutput("plotClusterHeatmap"), height="auto"),
       
-      # TAB - Distributions ####
-      tabPanel(title="Distributions of the symptoms",
-               uiOutput("proportionUI"),
-               plotOutput("plotProportion", height="auto"), 
-               plotOutput("plotCI", height="auto"), 
-               plotOutput("plotBoxplot", height="auto"),
-               uiOutput("selectPosOnly")
-               
-               ######### TODO: add a table with the number
-      ),
+      
       
       # TAB - RCS ####
       tabPanel(title="RCS",
