@@ -159,7 +159,7 @@ shinyServer(function(input, output, session) {
   dataFiltered.yn=reactive({
     if(!is.null(dataFiltered())){
       #apply(symptomsData()[, -c(1:3)], 1, function(x) ifelse(x>input$threshold, 1, 0))
-      data=ifelse(dataFiltered()[, input$selectedSymptoms]>input$thresholdValue, 1, 0)
+      data=ifelse(dataFiltered()[, input$selectedSymptoms, drop=FALSE]>input$thresholdValue, 1, 0)
       return(data)
     }
   })
