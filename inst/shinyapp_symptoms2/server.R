@@ -123,7 +123,7 @@ shinyServer(function(input, output, session) {
   
   # dataFiltered() - data set with data only for selected variables ####
   dataFiltered <- reactive({
-    if(!is.null(dataExtended())){
+    if(! (is.null(dataExtended()) || is.null(input$selectedSymptoms) )){
       data <- dataExtended()[ , 
                              c(input$patientIDVar,
                                input$groupingVar,
@@ -241,15 +241,21 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  
+  # TABS ####
   # TAB - Timeline ####
   
+#   output$messageSelectVars <- renderText(
+#     {if(is.null(dataFiltered())) {
+#       print("Please use the sidebar menus on the left to upload data, select parameters and one or more variables to analyse.")}
+#   })
+#   
+  
   output$selectDisplayFormat <- renderUI({
-    if(!is.null(dataFiltered())){
+    #if(!is.null(dataFiltered())){
       checkboxInput(inputId="displaySinceInclusion",
                     label="Display time from inclusion in the study on the horizontal axis?",
                     value= FALSE)
-    }
+    #}
   })
   
   
@@ -324,8 +330,6 @@ shinyServer(function(input, output, session) {
     }
   }, height=numRowsDistributions)
   
-  
-  
   # table - for all patients - proportions and medians
   output$tablePropMedian <- renderTable({ 
     if(!is.null(dataFiltered())){
@@ -339,9 +343,11 @@ shinyServer(function(input, output, session) {
   
   # text - explainig tableMedianGroups
   output$textTablePropMedian <- renderUI({
+    if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the proportion of subject with
             positive values of a variable,  median value and interquantile
             range for of the variable (25th to 75th percentile).", br(), br() ))
+    }
   })
   
   
@@ -369,19 +375,23 @@ shinyServer(function(input, output, session) {
   
   # table - of proportions of patients in a group with a symptom
   output$tablePropGroups <- renderTable ({
+    if(!is.null(dataFiltered())){
     tablePropWithSymptoms(data=dataFiltered(),
                           groupingVar=input$groupingVar,
                           measurementVar=input$measurementVar,
                           forMeasurement=input$measurementSelectedprop,
                           symptomsNames=input$selectedSymptoms,
                           thresholdValue=input$thresholdValue)
+    }
   })
   
   # text - explainig tablePropGroups
   output$textTablePropGroups <- renderUI({
+    if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the proportion of subjects in a
   certain group, P value for the difference of proportions and the 
   95% confidence interval for the difference of proportions.", br(), br()))
+    }
   })
   
   # table - with medians of symptoms values in a group
@@ -398,9 +408,11 @@ shinyServer(function(input, output, session) {
   
   # text - explainig tableMedianGroups
   output$textTableMedianGroups <- renderUI({
+    if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the median value for subjects in a
 certain group, interquantile range for of the variable 
 (25th to 75th percentile) and P value for the difference of medians.", br(), br() ))
+    }
   })
   
   
@@ -429,7 +441,7 @@ certain group, interquantile range for of the variable
   
   # ui - selection of annotation variables
   output$selectClusterAnnotations <- renderUI({
-    if(!is.null(dataVariableNames())){
+    if(!is.null(dataFiltered())){
       selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
       selectInput(inputId="selectedClusterAnnotations",
                   label="Select variables for annotating graph:",
@@ -459,7 +471,7 @@ certain group, interquantile range for of the variable
   # TAB - RCS ####
   # ui - user interface to select a numerical variable to associate with the presence of symptom ###
   output$rcsUI= renderUI({
-    if(!is.null(dataVariableNames())){
+    if(!is.null(dataFiltered())){
       selectInput(inputId="rcsIDVar",
                   label="Numerical variable:", 
                   choices=dataVariableNames(),
@@ -480,12 +492,14 @@ certain group, interquantile range for of the variable
   
   # plot - RCS plot ###
   output$plotRCS=renderPlot({
+    if(!is.null(dataFiltered())){
     plotRCS(data.all=dataExtended(),
             data.yn=dataFiltered.yn(),
             measurement=Measurement(),
             selectedSymptoms=input$selectedSymptoms,
             measurementSelectedrcs=input$measurementSelectedrcs,
             rcsIDVar=input$rcsIDVar)   
+    }
   }, height=NumRows)
   
   ################ association of variables with the outcome using logistic regression with Firth correction
@@ -504,7 +518,7 @@ certain group, interquantile range for of the variable
   
   # ui - user interface to select a numerical variable to associate with the presence of symptom ###
   output$logistfUI2= renderUI({
-    if(!is.null(dataVariableNames())){
+    if(!is.null(dataFiltered())){
       selectInput(inputId="logistfIDVar",
                   label="Select a numeric variable to associate with presence of symptoms:", 
                   choices=dataVariableNames(),
@@ -528,8 +542,8 @@ certain group, interquantile range for of the variable
   # TAB - Selected transformed data ####
   # table - list the subseted data in an output slot ###
   output$data <- renderTable({
-    if(!is.null(dataExtended())){
-      data <- dataExtended()
+    if(!is.null(dataFiltered())){
+      data <- dataFiltered()
       # TODO: We could render a renderDataTable(), but how to display dates in 
       # format 1.12.2014 and still sort them correctly?
       # Sys.setlocale("LC_TIME", "Slovenian")
@@ -555,7 +569,7 @@ certain group, interquantile range for of the variable
   #  
   #
   
-  
+ 
   
   
   

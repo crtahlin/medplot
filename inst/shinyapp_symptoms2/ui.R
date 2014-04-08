@@ -56,6 +56,7 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       # TAB - Timeline ####
       tabPanel(title="Timeline",
+               #textOutput("messageSelectVars"),
                uiOutput("selectDisplayFormat"),
                plotOutput("plotTimeline", height="auto")              
               ),
