@@ -11,6 +11,7 @@ shinyUI(pageWithSidebar(
   
   # Define the sidebar panel ####
   sidebarPanel(
+    textOutput("medplotVersion"),
     uiOutput("messageSelectVars"),
     wellPanel(
       conditionalPanel(

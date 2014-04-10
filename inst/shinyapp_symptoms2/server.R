@@ -572,7 +572,10 @@ certain group, interquantile range for of the variable
   #
   
  
-  
+  output$medplotVersion <- renderText({
+    
+    paste("Version:",packageVersion(pkg="medplot"))
+    })
   
   
 })
