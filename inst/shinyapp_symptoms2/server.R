@@ -173,6 +173,13 @@ shinyServer(function(input, output, session) {
   #     })
   
   # SIDEBAR ####
+  
+  # GUI - printing medpot package version
+  output$medplotVersion <- renderText({
+    paste("Version:",packageVersion(pkg="medplot"))
+  })
+  
+  
   # GUI - selecting symptoms ####
   output$selectSymptoms <- renderUI({
     if (!is.null(dataVariableNames())) {
@@ -555,6 +562,8 @@ certain group, interquantile range for of the variable
       
       #data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
       
+      save(data, file="dataFiltered.Rdata")
+      
       return(data)
       # NOTE: if we want to render the table of data, we have to convert the dates into 
       # characters, since renderTable seems to use xtable, which seems to not handle
@@ -572,11 +581,7 @@ certain group, interquantile range for of the variable
   #
   
  
-  output$medplotVersion <- renderText({
-    
-    paste("Version:",packageVersion(pkg="medplot"))
-    })
-  
+
   
 })
 

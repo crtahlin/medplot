@@ -132,6 +132,8 @@ tablePropWithSymptoms <- function (data,
   column4Name <- paste("Positive/all for ", groupingLevels[2])
   column5Name <- paste("P value")
   column6Name <- paste("95% CI for the difference")
+  column7Name <- paste("cor. P value (Holm-Bonferroni)")
+  column8Name <- paste("Q-value (Benjamini-Yekutieli)")
 
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
@@ -164,6 +166,11 @@ tablePropWithSymptoms <- function (data,
             format(results$conf.int[[2]], digits=2), sep=" to ")
   }
   
+  # add a Holm-Bonferoni corrected P value column
+  tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
+  # add a Benjamini-Yekutieli Q-value - see ?p.adjust
+  tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
+  
   return(tableData)
 }
 
@@ -195,6 +202,8 @@ tableMediansWithSymptoms <- function (data,
   column4Name <- paste("IQR for ", groupingLevels[2])
   column5Name <- paste("P value")
   # column6Name <- paste("Conf. int. for diff. of prop. ")
+  column7Name <- paste("cor. P value (Holm-Bonferroni)")
+  column8Name <- paste("Q-value (Benjamini-Yekutieli)")
   
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   # group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
@@ -224,6 +233,11 @@ tableData[tableData["Variable"]==symptom, column5Name ] <- format(result$p.value
 #         format(results$conf.int[[2]], digits=2), sep=";")
   }
   
+# add a Holm-Bonferoni corrected P value column
+tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
+# add a Benjamini-Yekutieli Q-value - see ?p.adjust
+tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
+
   return(tableData)
 }
 
