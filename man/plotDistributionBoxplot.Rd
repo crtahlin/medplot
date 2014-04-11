@@ -3,7 +3,7 @@
 \title{Plots boxplots of symptoms.}
 \usage{
 plotDistributionBoxplot(data, data.yn, selectedSymptoms, selectedProportion,
-  measurements, posOnly, threshold)
+  measurements, posOnly = FALSE, threshold)
 }
 \arguments{
   \item{data}{Data for the boxplots.}

@@ -33,7 +33,7 @@ plotDistributionBoxplot <- function (data,
                                      selectedSymptoms,
                                      selectedProportion,
                                      measurements,
-                                     posOnly,
+                                     posOnly=FALSE,
                                      threshold  ) {
   
   #adjust the margins for the labels of the boxplot
@@ -46,13 +46,13 @@ plotDistributionBoxplot <- function (data,
   
   #display all the data 
   if(!posOnly) {
-    boxplot(t(apply(data[measurements==selectedProportion, selectedSymptoms], 1, function(x) x)), 
+    boxplot(t(apply(data[measurements==selectedProportion, selectedSymptoms[my.order.symptoms]], 1, function(x) x)), 
             horizontal=TRUE, names=selectedSymptoms[my.order.symptoms], las=1, xlab="Value")
     
     title(paste0("T = ", selectedProportion, "; distribution of symptoms"))
   } else { #display the distribution only for positive patients
     #remove the non-positive observations
-    tmp=(apply(data[measurements==selectedProportion, selectedSymptoms], 1,  function(x) x))
+    tmp=(apply(data[measurements==selectedProportion, selectedSymptoms[my.order.symptoms]], 1,  function(x) x))
     #print(dim(tmp))
     
     #remove the non-positive values
