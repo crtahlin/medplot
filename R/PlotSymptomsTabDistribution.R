@@ -123,8 +123,8 @@ tableAllWithSymptoms <- function (data,
   column2Name <- paste("Positive/all")
   column3Name <- paste("Median")
   column4Name <- paste("IQR")
-  #column5Name <- paste("P-value for diff. or prop.")
-  #column6Name <- paste("Conf. int. for diff. of prop. ")
+  column5Name <- paste("Median w threshold")
+  column6Name <- paste("IQR w threshold")
   
   aboveThresholdData <- data
   aboveThresholdData[, symptomsNames] <- (data[,symptomsNames]>thresholdValue)
@@ -151,6 +151,12 @@ tableAllWithSymptoms <- function (data,
       paste(quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[1], " to ",
             quantile(data[,symptom], c(0.25, 0.75), na.rm=TRUE)[2])
     
+    tableData[tableData["Variable"]==symptom, column5Name ] <- 
+      median(data[data[symptom]>thresholdValue, symptom], na.rm=TRUE)
+    
+    tableData[tableData["Variable"]==symptom, column6Name ] <-
+      paste(quantile(data[data[symptom]>thresholdValue, symptom], c(0.25, 0.75), na.rm=TRUE)[1], " to ",
+            quantile(data[data[symptom]>thresholdValue, symptom], c(0.25, 0.75), na.rm=TRUE)[2])
     
     
     #     tableData[tableData["Variable"]==symptom, column5Name ] <- 

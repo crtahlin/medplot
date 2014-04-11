@@ -424,7 +424,7 @@ shinyServer(function(input, output, session) {
 certain group, interquantile range for of the variable 
 (25th to 75th percentile) and P value for the difference of medians. 
               Data with missing values for grouping variable 
-              are removed from analysis.", br(), br() ))
+              are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
     }
   })
   
