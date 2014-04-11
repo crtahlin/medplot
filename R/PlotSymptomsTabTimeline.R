@@ -14,12 +14,12 @@ plotSymptomsTimeline <- function (data,
                                   personID,
                                   measurement,
                                   symptoms, 
-                                  displaySinceInclusion = FALSE) {
+                                  displayFormat = "dates") {
   
   
-  
+  # Scenario - timeFromInclusion
   # add info about days since inclusion in the study in a column if needed for ploting
-  if (displaySinceInclusion == TRUE) {
+  if (displayFormat == "timeFromInclusion") {
     # find the day of inclusion in the study for each person
     uniquePeople <- as.data.frame(unique(data[personID]))
     colnames(uniquePeople) <- personID
@@ -35,44 +35,65 @@ plotSymptomsTimeline <- function (data,
   }
     
   # keep only relevant data and melt() it into ggplot format
-  if (displaySinceInclusion == TRUE) { # in case of ploting days since inclusion on horizontal axis
+  if (displayFormat == "timeFromInclusion") { # in case of ploting days since inclusion on horizontal axis
     
     data <- data[ , c("daysSinceInclusion", personID, measurement, symptoms)]
     data <- melt(data=data, id.vars = c(personID, "daysSinceInclusion", measurement))
-    horizontalAxisVariable <- "daysSinceInclusion" 
+    #horizontalAxisVariable <- "daysSinceInclusion" 
     colnames(data)[which(colnames(data)=="daysSinceInclusion")] <- "horizontalAxisVariable"
     
-  } else { # in case of ploting with dates on horzontal axis
+  } 
+  
+  # Scenario - dates
+  # in case dates are used on the horizontal axis
+  if (displayFormat == "dates") { # in case of ploting with dates on horzontal axis
     data <- data[ , c(date, personID, measurement, symptoms)]
     data <- melt(data=data, id.vars = c(personID, date, measurement))
     
-    horizontalAxisVariable <- "Date"
+    #horizontalAxisVariable <- "Date"
     colnames(data)[which(colnames(data)==date)] <- "horizontalAxisVariable"
   }
   
   # rename column names to make sure ggplot recognizes them and that the code below works
   colnames(data)[which(colnames(data)==personID)] <- "PersonID"
-  colnames(data)[which(colnames(data)==measurement)] <- "Measurement"
+  #colnames(data)[which(colnames(data)==measurement)] <- "Measurement"
+ 
+  # Scenario - measurement occasions
+  if (displayFormat == "measurementOccasions") {
+    
+    data <- data[ , c(date, personID, measurement, symptoms)]
+    data[ ,measurement] <- as.factor(data[ ,measurement])
+    data <- melt(data=data, id.vars = c(personID, date, measurement))
+    #horizontalAxisVariable <- "Measurement"
+    colnames(data)[which(colnames(data)==measurement)] <- "horizontalAxisVariable"
+  }
   
+  # Ploting function ####
   plot <-  ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value, colour = variable)) +
     geom_point(shape = 1) + theme_bw() + 
     scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
                     guide="legend",
                     limits=c(1,10),
-                    max_size=10) +
-    theme(axis.text.x = element_text(angle=90))
+                    max_size=10) 
   
-  # if plotting dates
-  if (displaySinceInclusion==FALSE) {
+  # if plotting dates on horizontal axis
+  if (displayFormat == "dates") {
     plot <- plot + scale_x_date(breaks = date_breaks("1 week"),
                                 labels = date_format("%d %b"),
                                 minor_breaks = date_breaks("1 day")) +
-      xlab("Date")
+      xlab("Date") +
+      theme(axis.text.x = element_text(angle=90))
   }
   
-  # if ploting days since inclusion
-  if (displaySinceInclusion==TRUE) { 
-    plot <- plot + xlab("Days since inclusion") }
+  # if ploting days since inclusion on horizontal axis
+  if (displayFormat == "timeFromInclusion") { 
+    plot <- plot + xlab("Days since inclusion") 
+  }
+  
+  # if ploting measurement occasion on horizontal axis
+  if (displayFormat == "measurementOccasions") { 
+    plot <- plot + xlab("Measurement occasions") 
+  }
   
   return(plot)
 }

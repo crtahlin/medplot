@@ -257,15 +257,19 @@ shinyServer(function(input, output, session) {
   # TAB - Timeline ####
   output$selectDisplayFormat <- renderUI({
     if(!is.null(dataFiltered())){
-      checkboxInput(inputId="displaySinceInclusion",
-                    label="Display time from inclusion in the study on the horizontal axis?",
-                    value= FALSE)
+      selectInput(inputId="displayFormat",
+                  label="Choose what to display on the horizontal axis:",
+                  choices=c("Dates" = "dates",
+                            "Time from inclusion" ="timeFromInclusion",
+                            "Measurement occasions" = "measurementOccasions"),
+                  selected="dates",
+                  multiple=FALSE)
     }
   })
   
   
   output$plotTimeline <- renderPlot({
-    if(!(is.null(dataFiltered()) || is.null(input$displaySinceInclusion))){
+    if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
       data=dataFiltered()
       # observe({dataFiltered()})
       # if no symbols are selected, do not plot
@@ -275,7 +279,7 @@ shinyServer(function(input, output, session) {
                                  personID=input$patientIDVar,
                                  measurement=input$measurementVar,
                                  symptoms=input$selectedSymptoms,
-                                 displaySinceInclusion = input$displaySinceInclusion)
+                                 displayFormat = input$displayFormat)
       )} else {print("Please select some variables to plot.")}    
   }, height=numRowsTimeline)
   
