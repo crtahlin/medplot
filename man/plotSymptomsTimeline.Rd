@@ -3,7 +3,7 @@
 \title{Plot timeline of symptom presence}
 \usage{
 plotSymptomsTimeline(data, date, personID, measurement, symptoms,
-  displaySinceInclusion = FALSE)
+  displayFormat = "dates")
 }
 \arguments{
   \item{data}{The data frame used by the plot.}
