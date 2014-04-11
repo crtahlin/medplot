@@ -63,6 +63,11 @@ shinyUI(pageWithSidebar(
                plotOutput("plotTimeline", height="auto")              
               ),
       
+	  
+	  # TAB - summary of data 
+	  tabPanel(title="Data summary",verbatimTextOutput("dataSummary")), 
+	  
+	  
       # TAB - Distribution of the variables ####
       tabPanel(title="Distribution of the variables",
               # textOutput("messageSelectVars"),

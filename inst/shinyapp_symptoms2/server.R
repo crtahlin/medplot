@@ -257,19 +257,15 @@ shinyServer(function(input, output, session) {
   # TAB - Timeline ####
   output$selectDisplayFormat <- renderUI({
     if(!is.null(dataFiltered())){
-      selectInput(inputId="displayFormat",
-                  label="Choose what to display on the horizontal axis:",
-                  choices=c("Dates" = "dates",
-                            "Time from inclusion" ="timeFromInclusion",
-                            "Measurement occasions" = "measurementOccasions"),
-                  selected="dates",
-                  multiple=FALSE)
+      checkboxInput(inputId="displaySinceInclusion",
+                    label="Display time from inclusion in the study on the horizontal axis?",
+                    value= FALSE)
     }
   })
   
   
   output$plotTimeline <- renderPlot({
-    if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
+    if(!(is.null(dataFiltered()) || is.null(input$displaySinceInclusion))){
       data=dataFiltered()
       # observe({dataFiltered()})
       # if no symbols are selected, do not plot
@@ -279,9 +275,88 @@ shinyServer(function(input, output, session) {
                                  personID=input$patientIDVar,
                                  measurement=input$measurementVar,
                                  symptoms=input$selectedSymptoms,
-                                 displayFormat = input$displayFormat)
+                                 displaySinceInclusion = input$displaySinceInclusion)
       )} else {print("Please select some variables to plot.")}    
   }, height=numRowsTimeline)
+  
+  
+  
+  ############# added lara: 11/4/2014, summary of the imported/filtered data
+  
+  output$dataSummary <- renderPrint({
+
+    
+    #how many different subjects are included
+    num.obs=nrow(dataFiltered())
+    cat(paste("Number of observations included in the data set: ", num.obs, "\n"))
+
+    
+    #how many different subjects are included
+    num.samples.unique=length(unique(dataFiltered()[,input$patientIDVar]))
+    cat(paste("Number of unique subjects: ", num.samples.unique, "\n"))
+    
+    
+    my.summary=summary(dataFiltered())
+    
+    #how many measurement occasions
+    num.measurement.occasions=length(unique(dataFiltered()[,input$measurementVar]))
+    cat(paste("Number of measurement occasions: ", num.measurement.occasions, "\n"))
+    
+    
+    #how many subjects were measured at each measurement occasion, treated as a data frame for better display
+    num.measurement.per.occasion= as.data.frame(table(dataFiltered()[,input$measurementVar])  )
+    dimnames(num.measurement.per.occasion)[[2]]=c("Measurement occasion", "Number of subjects")
+    
+    cat("\nNumber of observations per measurement occasion \n")
+    
+    #print(as.table(num.measurement.per.occasion))
+    print(num.measurement.per.occasion)
+    
+    
+    #how many times was a single subject measured
+    num.measurement.per.patient=as.data.frame(table(table(dataFiltered()[,input$patientIDVar]))  )
+    dimnames(num.measurement.per.patient)[[2]]=c("Number of measurements", "Number of subjects")
+    
+    cat("\nNumber of measurements per subject\n")
+    print(num.measurement.per.patient)
+    
+    cat("\nNumber of subjects with missing values (by measurement occasion, for the evaluated subjects) \n")
+    #gets a table with the number of missing values for each variable, at each occasion
+    num.missing.values.occ=addmargins((t(apply(dataFiltered()[,input$selectedSymptoms], 2, function(symptom) {tapply(symptom, INDEX=dataFiltered()[,input$measurementVar], FUN=function(x) sum(is.na(x)))}))))
+    
+    print(num.missing.values.occ)
+    
+    ######### summary for the grouping variable
+    summary.grouping.variable=table(dataFiltered()[,input$groupingVar])
+    cat("\nSummary of grouping variable data (all observations) \n")
+    print(summary.grouping.variable)
+      
+    #levels of the grouping variable
+    levels.grouping=levels(as.factor(dataFiltered()[,input$groupingVar]))
+    #number of levels
+    num.levels.grouping=length(levels.grouping)
+    
+    
+    summary.grouping.variable.occ=tapply(dataFiltered()[,input$groupingVar], INDEX=dataFiltered()[,input$measurementVar], FUN=function(x) table(x))
+    summary.grouping.variable.occ2=tapply(dataFiltered()[,input$groupingVar], INDEX=dataFiltered()[,input$measurementVar], FUN=function(x) 
+      {my.res=numeric(num.levels.grouping)
+       for(i in 1:num.levels.grouping) my.res[i]=sum(x==levels.grouping[i], na.rm=T)
+       return(my.res)
+       })
+    
+    summary.grouping.variable.occ2= matrix(unlist(summary.grouping.variable.occ2), ncol=num.levels.grouping, byrow=TRUE)
+    dimnames(summary.grouping.variable.occ2)[[2]]=levels.grouping
+    dimnames(summary.grouping.variable.occ2)[[1]]=sort(unique(dataFiltered()[,input$measurementVar]))
+    
+    cat("\nSummary of grouping variable data (per measurement occasion) \n")
+    print(addmargins(summary.grouping.variable.occ2))
+    
+  
+    
+    
+    
+   
+    })
   
   # TAB - Distributions of variables ####
   # ui - select measurement occasion ###
@@ -424,7 +499,7 @@ shinyServer(function(input, output, session) {
 certain group, interquantile range for of the variable 
 (25th to 75th percentile) and P value for the difference of medians. 
               Data with missing values for grouping variable 
-              are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
+              are removed from analysis.", br(), br() ))
     }
   })
   
