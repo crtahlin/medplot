@@ -56,14 +56,17 @@ shinyUI(pageWithSidebar(
   # Define the main panel ####
   mainPanel(
     tabsetPanel(
+      # TAB - summary of data ####
+      tabPanel(title="Data summary",
+               verbatimTextOutput("dataSummary")), 
+      
       # TAB - Timeline ####
       tabPanel(title="Timeline",
               # textOutput("messageSelectVars"),
                uiOutput("selectDisplayFormat"),
                plotOutput("plotTimeline", height="auto")              
               ),
-      
-      
+   
       # TAB - Distr. of the vars: over time ####
       tabPanel(title="Distribution of the variables: over time" ,
                uiOutput("selectGraphType"),

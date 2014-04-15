@@ -371,8 +371,20 @@ if(!is.null(dataFiltered())) {
                              measurementVar=input$measurementVar,
                              selectedSymptoms=input$selectedSymptoms)
   )
-}
+} else {return()}
 },height=numRowsTimelineBoxplots)
+
+  # TAB - Data summary ####
+output$dataSummary <- renderPrint({
+  if(!is.null(dataFiltered())) {
+  summarizeData(data=dataFiltered(),
+                personIDVar=input$patientIDVar,
+                measurementVar=input$measurementVar,
+                selectedSymptoms=input$selectedSymptoms,
+                groupingVar=input$groupingVar
+                )
+  }
+  })
 
   # TAB - Distributions of variables ####
   # ui - select measurement occasion ###
