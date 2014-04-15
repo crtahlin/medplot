@@ -64,7 +64,7 @@ shinyUI(pageWithSidebar(
               ),
       
       # TAB - Distribution of the variables ####
-      tabPanel(title="Distribution of the variables",
+      tabPanel(title="Distribution of the variables: by measurement occasion",
               # textOutput("messageSelectVars"),
                uiOutput("proportionUI"),
                plotOutput("plotProportion", height="auto"), 
@@ -92,7 +92,7 @@ shinyUI(pageWithSidebar(
       
       
       # TAB - Clustering ####
-      tabPanel("Clustering",
+      tabPanel("Clustering: by measurement occasion",
               # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram", height="auto"),
@@ -102,7 +102,7 @@ shinyUI(pageWithSidebar(
       
       
       # TAB - RCS ####
-      tabPanel(title="RCS",
+      tabPanel(title="RCS: by measurement occasion",
                #textOutput("messageSelectVars"),
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),
@@ -110,7 +110,7 @@ shinyUI(pageWithSidebar(
       ),
       
       # TAB - Logistf ####
-      tabPanel(title="Logistf",
+      tabPanel(title="Logistf: by measurement occasion",
               # textOutput("messageSelectVars"),
                uiOutput("logistfUI2"),
                uiOutput("logistfUI"),
