@@ -43,6 +43,24 @@ shinyServer(function(input, output, session) {
   } else {return(0)} # if there is no data, height of plot should be zero
   }
   
+  numRowsTimelineProfile <- function(){if(!is.null(input$selectedGraphType)){
+    if(input$selectedGraphType=="multipleGraphs") { # case of multiple graphs per one variable
+      uniqueSubjects <- unique(dataFiltered()[input$patientIDVar])
+      numSubjects <- dim(uniqueSubjects)[1]
+      numGroups <- ceiling(numSubjects/input$groupSize)
+      size <- (numGroups*length(input$selectedSymptoms)*300)
+      # Cairo graphics has some limit on the max. num of lines,
+      # apparently it is somewhere below 38000?)
+      return(min(size, 30000)) 
+    }
+    if(input$selectedGraphType=="oneGraph" || input$selectedGraphType=="randomSample") {
+    size <- max(ceiling(length(input$selectedSymptoms))*300, # so that legend is visible
+        (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
+        400) # at least this size
+    return(size)
+    }
+  } else {return(0)} # if there is no data, height of plot should be zero
+  }
   
   numRowsProportions <- function(){if(!is.null(dataFilteredwithThreshold())){
     max(ceiling(length(input$selectedSymptoms))*40,
@@ -283,6 +301,61 @@ shinyServer(function(input, output, session) {
       )} else {print("Please select some variables to plot.")}    
   }, height=numRowsTimeline)
   
+  # TAB - Distribution of the variables: over time ####
+  # ui - select type of graph
+  output$selectGraphType <- renderUI({
+    if(!is.null(dataFiltered())) {
+    selectInput(inputId="selectedGraphType",
+                label="Select type of graphs to plot:",
+                choices=c("All subjects on one graph"="oneGraph",
+                          "Random selection of subjects on one graph"="randomSample",
+                          "Multiple graphs per variable"="multipleGraphs"),
+                selected="randomSample",
+                multiple=FALSE
+      )
+    }
+    })
+
+output$selectRandomSampleSize <- renderUI({
+  if(!is.null(input$selectedGraphType)) {
+  if (input$selectedGraphType=="randomSample") {
+  numericInput(inputId="sampleSize",
+               label="Select number of randomly selected subjects:",
+               value=10,
+               min=1,
+               max=100,
+               step=5)
+  }}
+  })
+
+
+output$selectMaxGroupSize <- renderUI({
+  if(!is.null(input$selectedGraphType)) {
+  if (input$selectedGraphType=="multipleGraphs") {
+    numericInput(inputId="groupSize",
+                 label="Select the maximum number of subjects on one graph:",
+                 value=25,
+                 min=10,
+                 max=100,
+                 step=5)
+  }}
+})
+
+output$plotTimelineProfiles <- renderPlot({
+  if(!is.null(input$selectedGraphType)) {
+  if ( (input$selectedGraphType=="oneGraph") ||
+         (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
+         (input$selectedGraphType=="multipleGraphs" && !is.null(input$groupSize))) {
+    print(plotTimelineProfiles(data=dataFiltered(),
+                             plotType=input$selectedGraphType,
+                             personIDVar=input$patientIDVar,
+                             measurementVar=input$measurementVar,
+                             selectedSymptoms=input$selectedSymptoms,
+                             sizeofRandomSample=input$sampleSize,
+                             sizeofGroup=input$groupSize))
+  }}
+  }, height=numRowsTimelineProfile)
+
   # TAB - Distributions of variables ####
   # ui - select measurement occasion ###
   output$proportionUI = renderUI({
