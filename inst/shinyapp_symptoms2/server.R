@@ -62,6 +62,13 @@ shinyServer(function(input, output, session) {
   } else {return(0)} # if there is no data, height of plot should be zero
   }
   
+  numRowsTimelineBoxplots <- function(){if(!is.null(dataFilteredwithThreshold())){
+    max(ceiling(length(input$selectedSymptoms))*200,
+        300 # minumum reserved space
+    )}else{return(0)} # height of plot when no data available
+  }
+  
+  
   numRowsProportions <- function(){if(!is.null(dataFilteredwithThreshold())){
     max(ceiling(length(input$selectedSymptoms))*40,
         # if there are less than cca. 4 measurement occasions,
@@ -355,6 +362,17 @@ output$plotTimelineProfiles <- renderPlot({
                              sizeofGroup=input$groupSize))
   }}
   }, height=numRowsTimelineProfile)
+
+
+output$plotTimelineBoxplots <- renderPlot({
+if(!is.null(dataFiltered())) {
+  print(plotTimelineBoxplots(data=dataFiltered(),
+                             personIDVar=input$patientIDVar,
+                             measurementVar=input$measurementVar,
+                             selectedSymptoms=input$selectedSymptoms)
+  )
+}
+},height=numRowsTimelineBoxplots)
 
   # TAB - Distributions of variables ####
   # ui - select measurement occasion ###

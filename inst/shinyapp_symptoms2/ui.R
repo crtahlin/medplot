@@ -64,15 +64,18 @@ shinyUI(pageWithSidebar(
               ),
       
       
-      # TAB - Distr. of the vars: over time
+      # TAB - Distr. of the vars: over time ####
       tabPanel(title="Distribution of the variables: over time" ,
                uiOutput("selectGraphType"),
                uiOutput("selectRandomSampleSize"),
                uiOutput("selectMaxGroupSize"),
-               plotOutput("plotTimelineProfiles", height="auto")              
+               plotOutput("plotTimelineProfiles", height="auto")               
       ),
       
-      
+      # TAB - Distr. of the vars: over time w boxplots ####
+      tabPanel(title="?Variables: over time w boxplots?",
+               plotOutput("plotTimelineBoxplots", height="auto")
+               ),
       
       # TAB - Distribution of the variables ####
       tabPanel(title="Distribution of the variables: by measurement occasion",

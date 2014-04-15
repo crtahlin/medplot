@@ -97,37 +97,40 @@ plotTimelineProfiles <- function (data,
 
 }
 
-# # load libraries
-# library(ggplot2)
-# 
-# # load data - Crt
-# dataTest <- read.csv("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_shared_Crt/ForSymptoms/DataEM.txt",
-#          header=TRUE, sep="\t")
-# 
-# # load data - Lara
-# dataTest <- read.csv("C:/Users/lara/Dropbox/medplot/ForSymptoms/DataEM.txt",
-#                      header=TRUE, sep="\t")
-# 
-# # draw sample
-# sizeofSample <- 10
-# peopleInSample <- sample(unique(dataTest[,"PersonID"]), sizeofSample)
-# dataRandomSample <- dataTest[dataTest[, "PersonID"] %in% peopleInSample, ]
-# 
-# # prepare data
-# dataMelted <- melt(data=dataRandomSample, id.vars=c("Measurement", "PersonID"), measure.vars=c("Fatigue","Malaise","Headache", "Insomnia") )
-# 
-# # set some variables as factors
-# dataMelted[,"PersonID"] <- as.factor(dataMelted[,"PersonID"])
-# dataMelted[,"Measurement"] <- as.factor(dataMelted[,"Measurement"])
-# 
-# # code to draw graph
-# #   # define x, y axis, groups, coloring
-# p <- ggplot(data=data, aes(x=Measurement, y=value, group=PersonID, colour=PersonID)) +
-#   # draw points, draw lines, facet by symptom, use black & white theme
-#   geom_point() + geom_line() +  facet_grid(variable ~.) + theme_bw() +
-#   # add summary statistics at each point
-#   stat_summary(aes(group=1), geom="point", fun.y=median, shape=15, size=5, colour="red") 
-# # plot
-# print(p)  
-# head(data)
 
+#' @title Plot timeline boxplots
+#' 
+#' @description TODO
+#' 
+#' @param TODO
+#' 
+plotTimelineBoxplots <- function(data,
+                                 personIDVar,
+                                 measurementVar,
+                                 selectedSymptoms) {
+  # prepare data
+  dataMelted <- melt(data=data,
+                     id.vars=c(personIDVar, measurementVar),
+                     measure.vars=selectedSymptoms )
+  
+  # rename column names to make sure ggplot recognizes them
+  colnames(dataMelted)[which(colnames(dataMelted)==personIDVar)] <- "PersonID"
+  colnames(dataMelted)[which(colnames(dataMelted)==measurementVar)] <- "Measurement"
+  
+  # set some variables as factors
+  dataMelted[,"PersonID"] <- as.factor(dataMelted[,"PersonID"])
+  dataMelted[,"Measurement"] <- as.factor(dataMelted[,"Measurement"])
+
+# code to draw graph
+#   # define x, y axis, groups, coloring
+p <- ggplot(data=dataMelted, aes(x=Measurement, y=value)) +
+  # draw points, jitter points, draw boxplots, facet by variable, use black & white theme
+  geom_point() + 
+  geom_jitter() +
+  geom_boxplot(width=0.5) +
+  facet_grid(variable ~.) +
+  theme_bw() 
+
+# return ggplot
+return(p)
+}
