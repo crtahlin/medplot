@@ -25,6 +25,8 @@ library(lubridate)
 library(rms)
 # library for logistic regression modeling
 library(logistf)
+# library for permutation tests
+library(permute)
 
 # TEMP for debuging
 # source("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_package/R/TablePropWithSymptoms.r")

@@ -78,22 +78,24 @@ plotPropWithSymptoms <- function (data,
                 plot=FALSE)
     
     plot(1, xlim=c(-1, 1), ylim=c(0, max(tmp)), axes=FALSE, xlab="", ylab="", type="n")
+    axis(side=1, labels=c(1, 0.5, 0, 0.5, 1), at=c(-1, -0.5, 0, 0.5, 1))
     
     abline(v=seq(-1, 1, by=.1), lty=2, col="light gray")
-    
+
     tmp=barplot(prop.with.symptoms.1[num.times:1,my.order.symptoms],
                 beside=TRUE, hor=TRUE, xlim=c(0,1),
                 names.arg=names.symptoms[my.order.symptoms],
                 las=1, xlab="Proportion of subjects", add=TRUE, 
                 legend.text=c(paste0("T=", my.times[num.times:1])), 
                 args.legend=list(x=par("usr")[2],
-                                 y=par("usr")[3], yjust = 0 )
-    ) 
+                                 y=par("usr")[3], yjust = 0 ),
+                axes=FALSE) 
     
     tmp=barplot(-prop.with.symptoms.2[num.times:1,my.order.symptoms],
                 beside=TRUE, hor=TRUE,
                 names.arg=names.symptoms[my.order.symptoms],
-                las=1, xlab="Proportion of subjects", add=TRUE ) 
+                las=1, xlab="Proportion of subjects", add=TRUE,
+                axes=FALSE) 
     
     text(x=0, par("usr")[4],
          labels=paste(which.var, "=" , my.levels[1]), xpd=T, adj=c(0))
