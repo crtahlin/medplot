@@ -19,7 +19,7 @@ plotPropWithSymptoms <- function (data,
   ### EXISTING CODE ####
   
   ##################### which of the variables are symptoms
-    
+  
   #derive the matrix with the symptom intensity only
   my.data.symptoms=my.data.expanded.nNOIS[, which.symptoms, drop=FALSE]
   #derive the matrix with the symptom positivity/negativity only
@@ -134,18 +134,19 @@ tablePropWithSymptoms <- function (data,
   column6Name <- paste("95% CI for the difference")
   column7Name <- paste("cor. P value (Holm-Bonferroni)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
-
+  column9Name <- paste("Permutation based P value")
+  
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
   group2Data <- data[data[groupingVar]==groupingLevels[2],]
   group2Data[, symptomsNames] <- (group2Data[,symptomsNames]>thresholdValue)
-
+  
   for (symptom in symptomsNames) {
     group1Positive <- sum(group1Data[,symptom], na.rm=TRUE)
     group1Negative <- sum(!group1Data[,symptom], na.rm=TRUE)
     group2Positive <- sum(group2Data[,symptom], na.rm=TRUE)
     group2Negative <- sum(!group2Data[,symptom], na.rm=TRUE)
-
+    
     testMatrix <- matrix(c(group1Positive, group1Negative,
                            group2Positive, group2Negative),
                          byrow=TRUE, ncol=2)
@@ -164,12 +165,25 @@ tablePropWithSymptoms <- function (data,
     tableData[tableData["Variable"]==symptom, column6Name ] <- 
       paste(format(results$conf.int[[1]], digits=2),
             format(results$conf.int[[2]], digits=2), sep=" to ")
+   
   }
   
   # add a Holm-Bonferoni corrected P value column
   tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
   # add a Benjamini-Yekutieli Q-value - see ?p.adjust
   tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
+  
+  for (symptom in symptomsNames) {
+  # add a permutation calculated P value
+  tableData[tableData["Variable"]==symptom, column9Name ] <- 
+    format( .pvaluebyPermutation(data=na.omit(data[,c(symptom, groupingVar)]),
+                                 variableName=symptom,
+                                 groupName=groupingVar,
+                                 FUN=.propDif,
+                                 nPermutations=1000,
+                                 thresholdValue=thresholdValue)
+            , digits=2)
+  }
   
   return(tableData)
 }
@@ -181,30 +195,35 @@ tablePropWithSymptoms <- function (data,
 #' 
 #' @param TODO
 tableMediansWithSymptoms <- function (data,
-                                   groupingVar="Sex",
-                                   measurementVar,
-                                   forMeasurement,
-                                   symptomsNames,
-                                   thresholdValue=0) {
+                                      groupingVar="Sex",
+                                      measurementVar,
+                                      forMeasurement,
+                                      symptomsNames,
+                                      thresholdValue=0) {
   
   # removing entries with missing data for groupingVar
   data <- data[!is.na(data[groupingVar]),]
   
+  # list grouping levels
   groupingLevels <- as.character(unlist(unique(data[groupingVar])))
   
+  # only use data for a particular occasion
   data <- data[data[measurementVar]==forMeasurement,]
   
+  # construct table with solutions
   tableData <- data.frame("Variable"=symptomsNames)
   
+  # name columns of the table with solutions
   column1Name <- paste("Median of ", groupingLevels[1])
   column2Name <- paste("IQR for ", groupingLevels[1])
   column3Name <- paste("Median of ", groupingLevels[2])
   column4Name <- paste("IQR for ", groupingLevels[2])
-  column5Name <- paste("P value")
+  column5Name <- paste("P value ?CHECK?")
   # column6Name <- paste("Conf. int. for diff. of prop. ")
   column7Name <- paste("cor. P value (Holm-Bonferroni)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
-  
+  column9Name <- paste("Permutation based P value ?CHECK?")
+
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   # group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
   group2Data <- data[data[groupingVar]==groupingLevels[2],]
@@ -215,29 +234,99 @@ tableMediansWithSymptoms <- function (data,
     group1IQR <- quantile(group1Data[,symptom], c(0.25, 0.75), na.rm=TRUE)
     group2Median <- median(group2Data[,symptom], na.rm=TRUE)
     group2IQR <- quantile(group2Data[,symptom], c(0.25, 0.75), na.rm=TRUE)
-#     testMatrix <- matrix(c(group1Positive, group1Negative,
-#                            group2Positive, group2Negative),
-#                          byrow=TRUE, ncol=2)
-#     results <- prop.test(testMatrix)
-#     
-
-result <- wilcox.test(x=group1Data[,symptom], y=group2Data[,symptom])
-
-tableData[tableData["Variable"]==symptom, column1Name ] <- group1Median
-tableData[tableData["Variable"]==symptom, column2Name ] <- paste(group1IQR[1], " to ", group1IQR[2])
-tableData[tableData["Variable"]==symptom, column3Name ] <- group2Median
-tableData[tableData["Variable"]==symptom, column4Name ] <- paste(group2IQR[1], " to ", group2IQR[2])
-tableData[tableData["Variable"]==symptom, column5Name ] <- format(result$p.value, digits=2)
-# tableData[tableData["Variable"]==symptom, column6Name ] <- 
-#   paste(format(results$conf.int[[1]], digits=2),
-#         format(results$conf.int[[2]], digits=2), sep=";")
+    #     testMatrix <- matrix(c(group1Positive, group1Negative,
+    #                            group2Positive, group2Negative),
+    #                          byrow=TRUE, ncol=2)
+    #     results <- prop.test(testMatrix)
+    #     
+    
+    result <- wilcox.test(x=group1Data[,symptom], y=group2Data[,symptom])
+    
+    tableData[tableData["Variable"]==symptom, column1Name ] <- group1Median
+    tableData[tableData["Variable"]==symptom, column2Name ] <- paste(group1IQR[1], " to ", group1IQR[2])
+    tableData[tableData["Variable"]==symptom, column3Name ] <- group2Median
+    tableData[tableData["Variable"]==symptom, column4Name ] <- paste(group2IQR[1], " to ", group2IQR[2])
+    tableData[tableData["Variable"]==symptom, column5Name ] <- format(result$p.value, digits=2)
+    # tableData[tableData["Variable"]==symptom, column6Name ] <- 
+    #   paste(format(results$conf.int[[1]], digits=2),
+    #         format(results$conf.int[[2]], digits=2), sep=";")
+  
+    
   }
   
-# add a Holm-Bonferoni corrected P value column
-tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
-# add a Benjamini-Yekutieli Q-value - see ?p.adjust
-tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
-
+  # add a Holm-Bonferoni corrected P value column
+  tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
+  # add a Benjamini-Yekutieli Q-value - see ?p.adjust
+  tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
+  
+  for (symptom in symptomsNames) {
+    tableData[tableData["Variable"]==symptom, column9Name ] <- 
+      format( .pvaluebyPermutation(data=na.omit(data[,c(symptom, groupingVar)]),
+                                   variableName=symptom,
+                                   groupName=groupingVar,
+                                   FUN=.medianDif,
+                                   nPermutations=1000,
+                                   thresholdValue=thresholdValue)
+              , digits=2)
+  }
   return(tableData)
+}
+
+### Helper functions ####
+# calculate p value by permutation
+.pvaluebyPermutation <- function(data,
+                                 variableName,
+                                 groupName,
+                                FUN,
+                                nPermutations=1000,
+                                thresholdValue) {
+  
+  # based on function in 
+  # http://cran.r-project.org/web/packages/permute/vignettes/permutations.pdf
+  ## check x and group are of same length
+  stopifnot(all.equal(length(data[,variableName]), length(data[,groupName])))
+  ## number of observations
+  N <- nobs(data[,variableName])
+  ## generate the required set of permutations
+  pset <- shuffleSet(N, nset = nPermutations)
+  ## iterate over the set of permutations applying FUN
+  D <- apply(pset, 1, FUN, x = data[,variableName], grp = data[,groupName], thresholdValue=thresholdValue)
+  ## add on the observed mean difference
+  D <- c(FUN(seq_len(N), data[,variableName], data[,groupName], thresholdValue=thresholdValue), D)
+  ## compute & return the p-value
+  Ds <- sum(D >= D[1]) # how many >= to the observed diff?
+  # use inequality, since medians otherwise don't get a proper p value?
+  # Ds <- sum(D > D[1])
+  pValue <- (Ds / (nPermutations + 1)) # what proportion of perms is this (the pval)?
+  
+#   hist(D,breaks=20, main = paste("diff histogram; our value=",D[1],"; how many larger or same:", Ds ))
+#   rug(D[1], col = "red", lwd = 2)
+  
+  
+  return(pValue)
+}
+
+# difference of means between groups
+.meanDif <- function(i, x, grp, thresholdValue) {
+  grp <- grp[i]
+  # need to return abs() for two tailed test?
+  diff <- abs(mean(x[grp == "Female"]) - mean(x[grp == "Male"]))
+  return(diff)
+}
+
+# difference of proportions between groups
+.propDif <- function(i, x, grp, thresholdValue) {
+  grp <- grp[i]
+  # need to return abs() for two tailed test?
+  diff <- abs(mean(x[grp == "Female"]>thresholdValue) - mean(x[grp == "Male"]>thresholdValue))
+  return(diff)
+}
+
+# difference of medians between groups
+.medianDif <- function(i, x, grp, thresholdValue) {
+  grp <- grp[i]
+  # need to return abs() for two tailed test?
+  diff <- abs(median(x[grp == "Female"]) - median(x[grp == "Male"]))
+  return(diff)
 }
 

@@ -279,6 +279,18 @@ shinyServer(function(input, output, session) {
 {if(is.null(dataFiltered())) {h4("Please use the menus below to upload data, select parameters and one or more variables to analyse.")}
 })
 
+# TAB - Data summary ####
+output$dataSummary <- renderPrint({
+  if(!is.null(dataFiltered())) {
+    summarizeData(data=dataFiltered(),
+                  personIDVar=input$patientIDVar,
+                  measurementVar=input$measurementVar,
+                  selectedSymptoms=input$selectedSymptoms,
+                  groupingVar=input$groupingVar
+    )
+  }
+})
+
   # TAB - Timeline ####
   output$selectDisplayFormat <- renderUI({
     if(!is.null(dataFiltered())){
@@ -363,7 +375,7 @@ output$plotTimelineProfiles <- renderPlot({
   }}
   }, height=numRowsTimelineProfile)
 
-
+# TAB - Distr. of the vars.: over time - boxplots ####
 output$plotTimelineBoxplots <- renderPlot({
 if(!is.null(dataFiltered())) {
   print(plotTimelineBoxplots(data=dataFiltered(),
@@ -374,17 +386,7 @@ if(!is.null(dataFiltered())) {
 } else {return()}
 },height=numRowsTimelineBoxplots)
 
-  # TAB - Data summary ####
-output$dataSummary <- renderPrint({
-  if(!is.null(dataFiltered())) {
-  summarizeData(data=dataFiltered(),
-                personIDVar=input$patientIDVar,
-                measurementVar=input$measurementVar,
-                selectedSymptoms=input$selectedSymptoms,
-                groupingVar=input$groupingVar
-                )
-  }
-  })
+
 
   # TAB - Distributions of variables ####
   # ui - select measurement occasion ###
