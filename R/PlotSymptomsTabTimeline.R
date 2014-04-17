@@ -63,9 +63,22 @@ plotSymptomsTimeline <- function (data,
     
     data <- data[ , c(date, personID, measurement, symptoms)]
     data[ ,measurement] <- as.factor(data[ ,measurement])
+    
+    # calculate how many subject were measured on a occasion
+    peopleMeasured <- data.frame(horizontalAxisVariable=unique(data$Measurement), Number=NA)
+    for (i in (peopleMeasured[,"horizontalAxisVariable"])) {
+      dataForMeasurement <- data[data[measurement]==i,]
+      peopleMeasured[peopleMeasured["horizontalAxisVariable"]==i,"Number"] <-
+        (length(unique(dataForMeasurement[,"PersonID"])))
+    }
+    # Y coord for annotations above graph
+    yCoord <- 0.65
+
+    # melt the data
     data <- melt(data=data, id.vars = c(personID, date, measurement))
     #horizontalAxisVariable <- "Measurement"
     colnames(data)[which(colnames(data)==measurement)] <- "horizontalAxisVariable"
+ 
   }
   
   # Ploting function ####
@@ -93,6 +106,9 @@ plotSymptomsTimeline <- function (data,
   # if ploting measurement occasion on horizontal axis
   if (displayFormat == "measurementOccasions") { 
     plot <- plot + xlab("Measurement occasions") 
+    plot <- plot + annotate(geom="text", x=as.factor(peopleMeasured$horizontalAxisVariable),
+                 y=yCoord,
+                 label=paste("Measured:",peopleMeasured$Number))
   }
   
   return(plot)
