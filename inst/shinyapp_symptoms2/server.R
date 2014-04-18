@@ -83,6 +83,18 @@ shinyServer(function(input, output, session) {
     )}else{return(0)} # height of plot when no data available
   }
   
+  numRowsProportionsCI<- function(){if(!is.null(dataFilteredwithThreshold())){
+    max(ceiling(length(input$selectedSymptoms))*80,
+        # if there are less than cca. 4 measurement occasions,
+        # each symptom should get aprox. 40 lines
+        length(input$selectedSymptoms)*length(measurementLevels())*20,
+        # for more than 4 measurement occasions,
+        # this should give extra vertical space for 
+        # measurements to be visible
+        300 # minumum reserved space
+    )}else{return(0)} # height of plot when no data available
+  }
+  
   numRowsClustering <- function() {if(!is.null(dataFiltered())){
     max(ceiling(length(input$selectedSymptoms))*40,
         300)}else{return(0)}}
@@ -479,6 +491,22 @@ if(!is.null(dataFiltered())) {
     }
   } ,height=numRowsProportions)
   
+# plot - plot of proportions with conf. intervals
+output$plotPropCIs <- renderPlot ({
+  if(!is.null(dataFilteredwithThreshold())){
+    print(
+      plotPropWithSymptomsCI(data=dataFilteredwithThreshold(),
+                             groupingVar=input$groupingVar,
+                             measurementVar=input$measurementVar,
+                             selectedSymptoms=input$selectedSymptoms)
+      )
+  }
+} ,height=numRowsProportionsCI)
+  
+
+
+
+
   # ui - user interface to select which measurements to draw tables for ###
   output$UIpropTable = renderUI({
     if(!is.null(measurementLevels())){

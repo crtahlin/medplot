@@ -96,9 +96,11 @@ shinyUI(pageWithSidebar(
       # TAB - Distribution of the variables: by grouping variable ####
       tabPanel(title="Distribution of the variables: by grouping variable",
               # textOutput("messageSelectVars"),
-               plotOutput("plotPyramid", height="auto"),
+               plotOutput("plotPyramid", height="auto"),              
+              plotOutput("plotPropCIs", height="auto"),
+                          
                uiOutput("UIpropTable"),
-               
+              
                tableOutput("tablePropGroups"),
                uiOutput("textTablePropGroups"),
                

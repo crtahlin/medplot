@@ -81,7 +81,7 @@ plotPropWithSymptoms <- function (data,
     axis(side=1, labels=c(1, 0.5, 0, 0.5, 1), at=c(-1, -0.5, 0, 0.5, 1))
     
     abline(v=seq(-1, 1, by=.1), lty=2, col="light gray")
-
+    
     tmp=barplot(prop.with.symptoms.1[num.times:1,my.order.symptoms],
                 beside=TRUE, hor=TRUE, xlim=c(0,1),
                 names.arg=names.symptoms[my.order.symptoms],
@@ -167,7 +167,7 @@ tablePropWithSymptoms <- function (data,
     tableData[tableData["Variable"]==symptom, column6Name ] <- 
       paste(format(results$conf.int[[1]], digits=2),
             format(results$conf.int[[2]], digits=2), sep=" to ")
-   
+    
   }
   
   # add a Holm-Bonferoni corrected P value column
@@ -176,15 +176,15 @@ tablePropWithSymptoms <- function (data,
   tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
   
   for (symptom in symptomsNames) {
-  # add a permutation calculated P value
-  tableData[tableData["Variable"]==symptom, column9Name ] <- 
-    format( .pvaluebyPermutation(data=na.omit(data[,c(symptom, groupingVar)]),
-                                 variableName=symptom,
-                                 groupName=groupingVar,
-                                 FUN=.propDif,
-                                 nPermutations=1000,
-                                 thresholdValue=thresholdValue)
-            , digits=2)
+    # add a permutation calculated P value
+    tableData[tableData["Variable"]==symptom, column9Name ] <- 
+      format( .pvaluebyPermutation(data=na.omit(data[,c(symptom, groupingVar)]),
+                                   variableName=symptom,
+                                   groupName=groupingVar,
+                                   FUN=.propDif,
+                                   nPermutations=1000,
+                                   thresholdValue=thresholdValue)
+              , digits=2)
   }
   
   return(tableData)
@@ -225,7 +225,7 @@ tableMediansWithSymptoms <- function (data,
   column7Name <- paste("cor. P value (Holm-Bonferroni)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
   column9Name <- paste("Permutation based P value ?CHECK?")
-
+  
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   # group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
   group2Data <- data[data[groupingVar]==groupingLevels[2],]
@@ -252,7 +252,7 @@ tableMediansWithSymptoms <- function (data,
     # tableData[tableData["Variable"]==symptom, column6Name ] <- 
     #   paste(format(results$conf.int[[1]], digits=2),
     #         format(results$conf.int[[2]], digits=2), sep=";")
-  
+    
     
   }
   
@@ -274,14 +274,63 @@ tableMediansWithSymptoms <- function (data,
   return(tableData)
 }
 
+#' @title Plot of confidence intervals for proportions for groups an measurements.
+#' 
+#' @description TODO
+#' @param TODO 
+plotPropWithSymptomsCI <- function (data,
+                                    groupingVar,
+                                    measurementVar,
+                                    selectedSymptoms) {
+  
+  dataWithCIs <- .returnPropCIs(data=data,
+                                groupingVar=groupingVar,
+                                measurementVar=measurementVar,
+                                selectedSymptoms=selectedSymptoms)
+  
+  # dataTest[dataTest["group"]=="F", c("mean", "lower", "upper")] <-
+  #  - dataTest[dataTest["group"]=="F", c("mean", "lower", "upper")]
+  
+  # make values of CIs negative for first group
+  dataWithCIs[dataWithCIs["Group"]==as.character(unique(data[,groupingVar])[1]),
+              c("Mean","UpperCI","LowerCI")] <- 
+    - dataWithCIs[dataWithCIs["Group"]==as.character(unique(data[,groupingVar])[1])
+                  , c("Mean","UpperCI","LowerCI")]
+  
+  
+  plot <- ggplot() +
+    geom_errorbarh(data=dataWithCIs, 
+                   mapping=aes(y=Measurement, x=UpperCI, xmin=UpperCI, xmax=LowerCI,
+                               colour=Group),
+                   height=0.2, size=1) +
+    geom_point(data=dataWithCIs, 
+               mapping=aes(y=Measurement, x=Mean), size=4, shape=21, fill="white")  +
+    facet_grid(Variable~.) + 
+    scale_x_continuous(limits=c(-1,1),
+                       breaks=seq(-1,1,by=0.2),
+                       labels=abs(seq(-1,1,by=0.2)),
+                       minor_breaks=((seq(-1,1, by=0.1)))) +
+    geom_vline(xintercept=0)+
+    theme_bw() + labs(title="Proportions of positive variables (with confidence intervals)",
+                      x= "Proportions")
+  
+  
+  #   +
+  #     opts(title="geom_errorbarh", plot.title=theme_text(size=40, vjust=1.5)) 
+  
+  return(plot)
+  
+}
+
+
 ### Helper functions ####
 # calculate p value by permutation
 .pvaluebyPermutation <- function(data,
                                  variableName,
                                  groupName,
-                                FUN,
-                                nPermutations=1000,
-                                thresholdValue) {
+                                 FUN,
+                                 nPermutations=1000,
+                                 thresholdValue) {
   
   # based on function in 
   # http://cran.r-project.org/web/packages/permute/vignettes/permutations.pdf
@@ -301,8 +350,8 @@ tableMediansWithSymptoms <- function (data,
   # Ds <- sum(D > D[1])
   pValue <- (Ds / (nPermutations + 1)) # what proportion of perms is this (the pval)?
   
-#   hist(D,breaks=20, main = paste("diff histogram; our value=",D[1],"; how many larger or same:", Ds ))
-#   rug(D[1], col = "red", lwd = 2)
+  #   hist(D,breaks=20, main = paste("diff histogram; our value=",D[1],"; how many larger or same:", Ds ))
+  #   rug(D[1], col = "red", lwd = 2)
   
   
   return(pValue)
@@ -332,3 +381,38 @@ tableMediansWithSymptoms <- function (data,
   return(diff)
 }
 
+
+.returnPropCIs <- function(data,
+                           groupingVar,
+                           measurementVar,
+                           selectedSymptoms) {
+  
+  results <- data.frame(expand.grid(Group=unique(data[,groupingVar]),
+                                    Measurement=unique(data[,measurementVar]),
+                                    Variable=selectedSymptoms), Mean=NA, LowerCI=NA, UpperCI=NA)
+  for (i in unique(data[,groupingVar])) {
+    for(j in unique(data[,measurementVar])) {
+      for(k in selectedSymptoms) {
+        # omit missing values, create boolean vector
+        symptomData <- na.omit((data[(data[groupingVar]==i & data[measurementVar]==j), k])==1)
+        
+        testResults <- prop.test(x= sum(symptomData),  n= (sum(symptomData) + sum(!symptomData)))
+        
+        mean  <- testResults$estimate
+        lower <- testResults$conf.int[1]
+        upper <- testResults$conf.int[2]  
+        
+        results[(results["Group"]==i &
+                   results["Measurement"]==j &
+                   results["Variable"]==k), c("Mean","LowerCI","UpperCI")] <-
+          c(mean, lower, upper)
+      }
+    }
+  }
+  # make Measurement, Variable and Group a factor
+  results[, "Measurement"] <- as.factor(results[, "Measurement"])
+  results[, "Group"] <- as.factor(results[, "Group"])
+  results[, "Variable"] <- as.factor(results[, "Variable"])
+  
+  return(results) 
+}
