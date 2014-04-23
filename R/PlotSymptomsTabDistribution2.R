@@ -136,7 +136,7 @@ tablePropWithSymptoms <- function (data,
   column6Name <- paste("95% CI for the difference")
   column7Name <- paste("cor. P value (Holm-Bonferroni)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
-  column9Name <- paste("Permutation based P value")
+  column9Name <- paste("cor. P value (permutations)")
   
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
@@ -174,18 +174,39 @@ tablePropWithSymptoms <- function (data,
   tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
   # add a Benjamini-Yekutieli Q-value - see ?p.adjust
   tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
+
+  # OBSOLETE CODE FOR PERMUTATION CALCULATED P VALUES (WITHOUT CORRECTION)   
+#   for (symptom in symptomsNames) {
+#     # add a permutation calculated P value
+#     tableData[tableData["Variable"]==symptom, column9Name ] <- 
+#       format( .pvaluebyPermutation(data=na.omit(data[,c(symptom, groupingVar)]),
+#                                    variableName=symptom,
+#                                    groupName=groupingVar,
+#                                    FUN=.propDif,
+#                                    nPermutations=1000,
+#                                    thresholdValue=thresholdValue)
+#               , digits=2)
+#   }
+#   
+  # run a a multivariate permutation correcting P value
+  permutationCorectedPValue <- permCorrPValue(data=data, 
+                 nPermutations=999,
+                 selectedSymptoms=symptomsNames,
+                 groupingVar=groupingVar,
+                 measurementVar=measurementVar,
+                 measurementOccasion=forMeasurement,
+                 FUN=.propPValue, # function that returns a P value
+                 thresholdValue=0
+  )
   
-  for (symptom in symptomsNames) {
-    # add a permutation calculated P value
-    tableData[tableData["Variable"]==symptom, column9Name ] <- 
-      format( .pvaluebyPermutation(data=na.omit(data[,c(symptom, groupingVar)]),
-                                   variableName=symptom,
-                                   groupName=groupingVar,
-                                   FUN=.propDif,
-                                   nPermutations=1000,
-                                   thresholdValue=thresholdValue)
-              , digits=2)
-  }
+
+for (symptom in symptomsNames) {
+  # add a permutation calculated corrected P value
+  tableData[tableData["Variable"]==symptom, column9Name ] <- 
+    permutationCorectedPValue[symptom]
+}
+
+   
   
   return(tableData)
 }
@@ -322,6 +343,57 @@ plotPropWithSymptomsCI <- function (data,
   
 }
 
+#' @title Multivariate permutation test for correcting the P value
+#' 
+#' @description TODO
+#' 
+#' @param TODO
+permCorrPValue <- function(data, 
+                           nPermutations=999,
+                           selectedSymptoms, # vector of selected variables - defines order
+                           groupingVar,
+                           measurementVar,
+                           measurementOccasion,
+                           FUN, # function that return a P value,
+                           thresholdValue=0 # threshold for positivity
+) {
+  
+  data <- data[data[measurementVar]==measurementOccasion,]
+  
+  groupingLevels <- as.character(unique(data[,groupingVar]))
+  
+  # calculate the P value based on the sample
+  calculatedPValue <- numeric()
+  for (symptom in selectedSymptoms) {
+    calculatedPValue[symptom] <- FUN(
+      sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) >  thresholdValue),
+      sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) <= thresholdValue),
+      sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) >  thresholdValue),
+      sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) <= thresholdValue)
+    )
+  }  
+  
+  globalMinPValues <- numeric()
+  permutationPValues <- numeric()
+  for (permutation in 1:nPermutations) {
+    for (symptom in selectedSymptoms) {
+      data[,groupingVar] <- sample(data[,groupingVar]) # shuffle group membership
+      permutationPValues[symptom] <- FUN(
+        sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) >  thresholdValue),
+        sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) <= thresholdValue),
+        sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) >  thresholdValue),
+        sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) <= thresholdValue)
+      )
+    }
+    globalMinPValues[permutation] <- min(permutationPValues)
+  }
+  correctedPvalues <- numeric()
+  for (symptom in selectedSymptoms) {
+    correctedPvalues[symptom] <- sum(calculatedPValue[symptom]>globalMinPValues)/(nPermutations+1) 
+  }
+  return(correctedPvalues)
+}
+
 
 ### Helper functions ####
 # calculate p value by permutation
@@ -415,4 +487,17 @@ plotPropWithSymptomsCI <- function (data,
   results[, "Variable"] <- as.factor(results[, "Variable"])
   
   return(results) 
+}
+
+
+
+
+
+.propPValue <- function (successG1, failureG1, successG2, failureG2) {
+  result <- prop.test(matrix(data=c(successG1,
+                                    failureG1,
+                                    successG2,
+                                    failureG2),
+                             byrow=TRUE, nrow=2))
+  return(result$p.value)
 }

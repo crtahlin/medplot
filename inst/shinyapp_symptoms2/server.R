@@ -557,8 +557,9 @@ output$plotPropCIs <- renderPlot ({
     if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the median value for subjects in a
 certain group, interquantile range for of the variable 
-(25th to 75th percentile) and P value for the difference of medians. 
-              Data with missing values for grouping variable 
+(25th to 75th percentile)", 
+#and P value for the difference of medians. 
+"Data with missing values for grouping variable 
               are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
     }
   })

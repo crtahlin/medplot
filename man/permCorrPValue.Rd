@@ -1,0 +1,14 @@
+\name{permCorrPValue}
+\alias{permCorrPValue}
+\title{Multivariate permutation test for correcting the P value}
+\usage{
+permCorrPValue(data, nPermutations = 999, selectedSymptoms, groupingVar,
+  measurementVar, measurementOccasion, FUN, thresholdValue = 0)
+}
+\arguments{
+  \item{TODO}{}
+}
+\description{
+TODO
+}
+
