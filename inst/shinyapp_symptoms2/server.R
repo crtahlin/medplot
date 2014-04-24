@@ -39,6 +39,7 @@ shinyServer(function(input, output, session) {
   #how much space should be used for the graphical output of the Rcs estimates and others?  
   # TODO: could drawing graphs be done if(no graph){height=0)?
   numRowsTimeline <- function(){if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE) {return(0)} # no graph if not possible to draw
     max(ceiling(length(input$selectedSymptoms))*40, # so that legend is visible
         (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
         400) # at least this size
@@ -46,6 +47,7 @@ shinyServer(function(input, output, session) {
   }
   
   numRowsTimelineProfile <- function(){if(!is.null(input$selectedGraphType)){
+    if(input$treatasBinary==TRUE) {return(0)} # no graph if not possible to draw
     if(input$selectedGraphType=="multipleGraphs") { # case of multiple graphs per one variable
       uniqueSubjects <- unique(dataFiltered()[input$patientIDVar])
       numSubjects <- dim(uniqueSubjects)[1]
@@ -56,10 +58,10 @@ shinyServer(function(input, output, session) {
       return(min(size, 30000)) 
     }
     if(input$selectedGraphType=="oneGraph" || input$selectedGraphType=="randomSample") {
-    size <- max(ceiling(length(input$selectedSymptoms))*300, # so that legend is visible
-        (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
-        400) # at least this size
-    return(size)
+      size <- max(ceiling(length(input$selectedSymptoms))*300, # so that legend is visible
+                  (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
+                  400) # at least this size
+      return(size)
     }
   } else {return(0)} # if there is no data, height of plot should be zero
   }
@@ -275,27 +277,27 @@ shinyServer(function(input, output, session) {
                   selected="Measurement")
     }
   })
- 
+  
   # GUI - selecting use of thresholding ####
   output$selectTreatasBinary <- renderUI({
     if (!is.null(dataVariableNames())){
       checkboxInput(inputId="treatasBinary",
-                   label="Treat and analyse variables as binary?",
-                   value=FALSE)
+                    label="Treat and analyse variables as binary?",
+                    value=FALSE)
     }  
     
-    })
+  })
   
   # GUI - selecting treshold value ####
   output$selectThresholdValue <- renderUI({
     if (!is.null(dataVariableNames()) & !is.null(input$treatasBinary)){
       if(input$treatasBinary==TRUE) {
-      numericInput(inputId="thresholdValue",
-                   "Threshold for positivity of the variables:",
-                   value=0,
-                   min=0,
-                   max=10)
-          }
+        numericInput(inputId="thresholdValue",
+                     "Threshold for positivity of the variables:",
+                     value=0,
+                     min=0,
+                     max=10)
+      }
     }
   })
   
@@ -303,7 +305,7 @@ shinyServer(function(input, output, session) {
   observe({
     input$treatasBinary
     updateNumericInput(session, inputId="thresholdValue", value=0)
-    })
+  })
   
   # TABS ####
   # message - used on all tabs
@@ -323,9 +325,10 @@ output$dataSummary <- renderPrint({
   }
 })
 
-  # TAB - Timeline ####
-  output$selectDisplayFormat <- renderUI({
-    if(!is.null(dataFiltered())){
+# TAB - Timeline ####
+output$selectDisplayFormat <- renderUI({
+  if(!is.null(dataFiltered())){
+    if(input$treatasBinary==FALSE){
       selectInput(inputId="displayFormat",
                   label="Choose what to display on the horizontal axis:",
                   choices=c("Dates" = "dates",
@@ -334,11 +337,13 @@ output$dataSummary <- renderPrint({
                   selected="dates",
                   multiple=FALSE)
     }
-  })
-  
-  
-  output$plotTimeline <- renderPlot({
-    if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
+  }
+})
+
+
+output$plotTimeline <- renderPlot({
+  if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
+    if (input$treatasBinary==FALSE) { 
       data=dataFiltered()
       # observe({dataFiltered()})
       # if no symbols are selected, do not plot
@@ -349,166 +354,184 @@ output$dataSummary <- renderPrint({
                                  measurement=input$measurementVar,
                                  symptoms=input$selectedSymptoms,
                                  displayFormat = input$displayFormat)
-      )} else {print("Please select some variables to plot.")}    
-  }, height=numRowsTimeline)
-  
-  # TAB - Distribution of the variables: over time ####
-  # ui - select type of graph
-  output$selectGraphType <- renderUI({
-    if(!is.null(dataFiltered())) {
-    selectInput(inputId="selectedGraphType",
-                label="Select type of graphs to plot:",
-                choices=c("All subjects on one graph"="oneGraph",
-                          "Random selection of subjects on one graph"="randomSample",
-                          "Multiple graphs per variable"="multipleGraphs"),
-                selected="randomSample",
-                multiple=FALSE
-      )
-    }
-    })
+      )}}   
+}, height=numRowsTimeline)
 
-output$selectRandomSampleSize <- renderUI({
-  if(!is.null(input$selectedGraphType)) {
-  if (input$selectedGraphType=="randomSample") {
-  numericInput(inputId="sampleSize",
-               label="Select number of randomly selected subjects:",
-               value=10,
-               min=1,
-               max=100,
-               step=5)
-  }}
-  })
-
-
-output$selectMaxGroupSize <- renderUI({
-  if(!is.null(input$selectedGraphType)) {
-  if (input$selectedGraphType=="multipleGraphs") {
-    numericInput(inputId="groupSize",
-                 label="Select the maximum number of subjects on one graph:",
-                 value=25,
-                 min=10,
-                 max=100,
-                 step=5)
-  }}
+output$messageNotAppropriate <- renderText({
+  if (input$treatasBinary==TRUE) {
+    "This type of analysis is not appropriate for binary responses."
+  }
 })
 
-output$plotTimelineProfiles <- renderPlot({
-  if(!is.null(input$selectedGraphType)) {
-  if ( (input$selectedGraphType=="oneGraph") ||
-         (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
-         (input$selectedGraphType=="multipleGraphs" && !is.null(input$groupSize))) {
-    print(plotTimelineProfiles(data=dataFiltered(),
-                             plotType=input$selectedGraphType,
-                             personIDVar=input$patientIDVar,
-                             measurementVar=input$measurementVar,
-                             selectedSymptoms=input$selectedSymptoms,
-                             sizeofRandomSample=input$sampleSize,
-                             sizeofGroup=input$groupSize))
-  }}
-  }, height=numRowsTimelineProfile)
+# TAB - Distribution of the variables: over time ####
+# ui - select type of graph
+    output$selectGraphType <- renderUI({
+      if(!is.null(dataFiltered())) {
+        if(input$treatasBinary==FALSE){
+        selectInput(inputId="selectedGraphType",
+                    label="Select type of graphs to plot:",
+                    choices=c("All subjects on one graph"="oneGraph",
+                              "Random selection of subjects on one graph"="randomSample",
+                              "Multiple graphs per variable"="multipleGraphs"),
+                    selected="randomSample",
+                    multiple=FALSE)
+        }
+      }
+      })
+    
+    output$selectRandomSampleSize <- renderUI({
+      if(!is.null(input$selectedGraphType)) {
+        if (input$selectedGraphType=="randomSample") {
+          if(input$treatasBinary==FALSE){
+          numericInput(inputId="sampleSize",
+                       label="Select number of randomly selected subjects:",
+                       value=10,
+                       min=1,
+                       max=100,
+                       step=5)
+          }
+        }}
+    })
+    
+    
+    output$selectMaxGroupSize <- renderUI({
+      if(!is.null(input$selectedGraphType)) {
+        if (input$selectedGraphType=="multipleGraphs") {
+          if(input$treatasBinary==FALSE){
+          numericInput(inputId="groupSize",
+                       label="Select the maximum number of subjects on one graph:",
+                       value=25,
+                       min=10,
+                       max=100,
+                       step=5)
+          }
+        }}
+      })
+    output$plotTimelineProfiles <- renderPlot({
+      if(!is.null(input$selectedGraphType)) {
+        if ( (input$selectedGraphType=="oneGraph") ||
+               (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
+               (input$selectedGraphType=="multipleGraphs" && !is.null(input$groupSize))) {
+          if(input$treatasBinary==FALSE){
+          print(plotTimelineProfiles(data=dataFiltered(),
+                                     plotType=input$selectedGraphType,
+                                     personIDVar=input$patientIDVar,
+                                     measurementVar=input$measurementVar,
+                                     selectedSymptoms=input$selectedSymptoms,
+                                     sizeofRandomSample=input$sampleSize,
+                                     sizeofGroup=input$groupSize))
+          }
+        }}
+      }, height=numRowsTimelineProfile)
+
+output$messageNotAppropriate2 <- renderText({
+  if (input$treatasBinary==TRUE) {
+    "This type of analysis is not appropriate for binary responses."
+  }
+})
 
 # TAB - Distr. of the vars.: over time - boxplots ####
 output$plotTimelineBoxplots <- renderPlot({
-if(!is.null(dataFiltered())) {
-  print(plotTimelineBoxplots(data=dataFiltered(),
-                             personIDVar=input$patientIDVar,
-                             measurementVar=input$measurementVar,
-                             selectedSymptoms=input$selectedSymptoms)
-  )
-} else {return()}
+  if(!is.null(dataFiltered())) {
+    print(plotTimelineBoxplots(data=dataFiltered(),
+                               personIDVar=input$patientIDVar,
+                               measurementVar=input$measurementVar,
+                               selectedSymptoms=input$selectedSymptoms)
+    )
+  } else {return()}
 },height=numRowsTimelineBoxplots)
 
 
 
-  # TAB - Distributions of variables ####
-  # ui - select measurement occasion ###
-  output$proportionUI = renderUI({
-    if(!is.null(measurementLevels())){ 
-      selectInput(inputId="measurementSelectedProportion",
-                  label="Select the measurement occasion (time):", 
-                  choices=measurementLevels(), selected=measurementLevels()[1])
-    }
-  })
-  
-  # ui - select distribution only for patients above a threshold
-  output$selectPosOnly <- renderUI({
-    if(!is.null(dataFiltered())){
-      tagList(
+# TAB - Distributions of variables ####
+# ui - select measurement occasion ###
+output$proportionUI = renderUI({
+  if(!is.null(measurementLevels())){ 
+    selectInput(inputId="measurementSelectedProportion",
+                label="Select the measurement occasion (time):", 
+                choices=measurementLevels(), selected=measurementLevels()[1])
+  }
+})
+
+# ui - select distribution only for patients above a threshold
+output$selectPosOnly <- renderUI({
+  if(!is.null(dataFiltered())){
+    tagList(
       checkboxInput(inputId="posOnly",
                     "Display the distribution only for patients with variable values
                   above the selected threshold of positivity?",
                     value = FALSE),
       br(), br()
-      )
-    }
-  })
-  
-  # plot - proportions ###
-  output$plotProportion=renderPlot({
-    if(!is.null(dataFiltered.yn())){
-      plotDistribution(data=dataFiltered.yn(),
-                       selectedSymptoms=input$selectedSymptoms,
-                       selectedProportion=input$measurementSelectedProportion,
-                       measurements=Measurement())
-    }
-  }, height=numRowsDistributions)
-  
-  # plot - boxplots ###
-  output$plotBoxplot=renderPlot({
-    if(!is.null(dataFiltered())){
-      plotDistributionBoxplot(data=dataFiltered(),
-                              data.yn=dataFiltered.yn(),
-                              selectedSymptoms=input$selectedSymptoms,
-                              selectedProportion=input$measurementSelectedProportion,
-                              measurements=Measurement(),
-                              posOnly=input$posOnly,
-                              threshold=input$thresholdValue)
-    }
-  }, height=numRowsDistributions)
-  
-  # plot - CI ###
-  output$plotCI <- renderPlot({
-    if(!is.null(dataFiltered.yn())){
-      plotCI(data.yn=dataFiltered.yn(),
-             measurements=Measurement(),
-             selectedSymptoms=input$selectedSymptoms,
-             selectedProportion=input$measurementSelectedProportion)
-    }
-  }, height=numRowsDistributions)
-  
-  # table - for all patients - proportions and medians
-  output$tablePropMedian <- renderTable({ 
-    if(!is.null(dataFiltered())){
-      tableAllWithSymptoms(data=dataFiltered(),
-                           measurementVar=input$measurementVar,
-                           forMeasurement=input$measurementSelectedProportion,
-                           symptomsNames=input$selectedSymptoms,
-                           thresholdValue=input$thresholdValue)
-    }
-  })
-  
-  # text - explainig tableMedianGroups
-  output$textTablePropMedian <- renderUI({
-    if(!is.null(dataFiltered())){
+    )
+  }
+})
+
+# plot - proportions ###
+output$plotProportion=renderPlot({
+  if(!is.null(dataFiltered.yn())){
+    plotDistribution(data=dataFiltered.yn(),
+                     selectedSymptoms=input$selectedSymptoms,
+                     selectedProportion=input$measurementSelectedProportion,
+                     measurements=Measurement())
+  }
+}, height=numRowsDistributions)
+
+# plot - boxplots ###
+output$plotBoxplot=renderPlot({
+  if(!is.null(dataFiltered())){
+    plotDistributionBoxplot(data=dataFiltered(),
+                            data.yn=dataFiltered.yn(),
+                            selectedSymptoms=input$selectedSymptoms,
+                            selectedProportion=input$measurementSelectedProportion,
+                            measurements=Measurement(),
+                            posOnly=input$posOnly,
+                            threshold=input$thresholdValue)
+  }
+}, height=numRowsDistributions)
+
+# plot - CI ###
+output$plotCI <- renderPlot({
+  if(!is.null(dataFiltered.yn())){
+    plotCI(data.yn=dataFiltered.yn(),
+           measurements=Measurement(),
+           selectedSymptoms=input$selectedSymptoms,
+           selectedProportion=input$measurementSelectedProportion)
+  }
+}, height=numRowsDistributions)
+
+# table - for all patients - proportions and medians
+output$tablePropMedian <- renderTable({ 
+  if(!is.null(dataFiltered())){
+    tableAllWithSymptoms(data=dataFiltered(),
+                         measurementVar=input$measurementVar,
+                         forMeasurement=input$measurementSelectedProportion,
+                         symptomsNames=input$selectedSymptoms,
+                         thresholdValue=input$thresholdValue)
+  }
+})
+
+# text - explainig tableMedianGroups
+output$textTablePropMedian <- renderUI({
+  if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the proportion of subject with
             positive values of a variable,  median value and interquantile
             range for of the variable (25th to 75th percentile).", br(), br() ))
-    }
-  })
-  
-  
-  
-  # TAB - Distribution of the variables: by grouping variable ####
-  # plot - pyramid plot of proportions ###
-  output$plotPyramid <- renderPlot ({
-    if(!is.null(dataFilteredwithThreshold())){
-      plotPropWithSymptoms(data=dataFilteredwithThreshold(),
-                           grouping=input$groupingVar,
-                           measurements=input$measurementVar,
-                           symptomsNames=input$selectedSymptoms)
-    }
-  } ,height=numRowsProportions)
-  
+  }
+})
+
+
+
+# TAB - Distribution of the variables: by grouping variable ####
+# plot - pyramid plot of proportions ###
+output$plotPyramid <- renderPlot ({
+  if(!is.null(dataFilteredwithThreshold())){
+    plotPropWithSymptoms(data=dataFilteredwithThreshold(),
+                         grouping=input$groupingVar,
+                         measurements=input$measurementVar,
+                         symptomsNames=input$selectedSymptoms)
+  }
+} ,height=numRowsProportions)
+
 # plot - plot of proportions with conf. intervals
 output$plotPropCIs <- renderPlot ({
   if(!is.null(dataFilteredwithThreshold())){
@@ -517,230 +540,230 @@ output$plotPropCIs <- renderPlot ({
                              groupingVar=input$groupingVar,
                              measurementVar=input$measurementVar,
                              selectedSymptoms=input$selectedSymptoms)
-      )
+    )
   }
 } ,height=numRowsProportionsCI)
-  
 
 
 
 
-  # ui - user interface to select which measurements to draw tables for ###
-  output$UIpropTable = renderUI({
-    if(!is.null(measurementLevels())){
-      #select the measurement
-      selectInput(inputId="measurementSelectedprop",
-                  label="Select the measurement occasion (time):", 
-                  choices=measurementLevels(), selected=measurementLevels()[1])
-    }
-  })
-  
-  # table - of proportions of patients in a group with a symptom
-  output$tablePropGroups <- renderTable ({
-    if(!is.null(dataFiltered())){
+
+# ui - user interface to select which measurements to draw tables for ###
+output$UIpropTable = renderUI({
+  if(!is.null(measurementLevels())){
+    #select the measurement
+    selectInput(inputId="measurementSelectedprop",
+                label="Select the measurement occasion (time):", 
+                choices=measurementLevels(), selected=measurementLevels()[1])
+  }
+})
+
+# table - of proportions of patients in a group with a symptom
+output$tablePropGroups <- renderTable ({
+  if(!is.null(dataFiltered())){
     tablePropWithSymptoms(data=dataFiltered(),
                           groupingVar=input$groupingVar,
                           measurementVar=input$measurementVar,
                           forMeasurement=input$measurementSelectedprop,
                           symptomsNames=input$selectedSymptoms,
                           thresholdValue=input$thresholdValue)
-    }
-  })
-  
-  # text - explainig tablePropGroups
-  output$textTablePropGroups <- renderUI({
-    if(!is.null(dataFiltered())){
+  }
+})
+
+# text - explainig tablePropGroups
+output$textTablePropGroups <- renderUI({
+  if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the proportion of subjects in a
   certain group, P value for the difference of proportions and the 
   95% confidence interval for the difference of proportions. 
               Data with missing values for grouping variable 
               are removed from analysis.", br(), br()))
-    }
-  })
-  
-  # table - with medians of symptoms values in a group
-  output$tableMedianGroups <- renderTable ({
-    if(!is.null(dataFiltered())){
-      tableMediansWithSymptoms(data=dataFiltered(),
-                               groupingVar=input$groupingVar,
-                               measurementVar=input$measurementVar,
-                               forMeasurement=input$measurementSelectedprop,
-                               symptomsNames=input$selectedSymptoms,
-                               thresholdValue=input$thresholdValue)
-    }
-  })
-  
-  # text - explainig tableMedianGroups
-  output$textTableMedianGroups <- renderUI({
-    if(!is.null(dataFiltered())){
+  }
+})
+
+# table - with medians of symptoms values in a group
+output$tableMedianGroups <- renderTable ({
+  if(!is.null(dataFiltered())){
+    tableMediansWithSymptoms(data=dataFiltered(),
+                             groupingVar=input$groupingVar,
+                             measurementVar=input$measurementVar,
+                             forMeasurement=input$measurementSelectedprop,
+                             symptomsNames=input$selectedSymptoms,
+                             thresholdValue=input$thresholdValue)
+  }
+})
+
+# text - explainig tableMedianGroups
+output$textTableMedianGroups <- renderUI({
+  if(!is.null(dataFiltered())){
     tagList(p("Table displays for each variable the median value for subjects in a
 certain group, interquantile range for of the variable 
 (25th to 75th percentile)", 
-#and P value for the difference of medians. 
-"Data with missing values for grouping variable 
+              #and P value for the difference of medians. 
+              "Data with missing values for grouping variable 
               are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
-    }
-  })
-  
-  
-  
-  # TAB - Clustering ####
-  # ui - selection of measurement occasions  ###
-  output$clusteringUI = renderUI({
-    if(!is.null(measurementLevels())){
-      #select the measurement
-      selectInput(inputId="selectedMeasurementValue",
-                  label="Select the measurement occasion (time):", 
-                  choices=measurementLevels(), selected=measurementLevels()[1])
-    }
-  })
-  
-  # plot - dendrogram plot on the Clustering tab ###
-  output$plotClusterDendrogram=renderPlot({
-    if(!is.null(dataFiltered())){
-      plotClusterDendrogram(data=dataFiltered(),
-                            variableName=input$measurementVar,
-                            variableValue=input$selectedMeasurementValue,
-                            selectedSymptoms=input$selectedSymptoms)
-    }
-  },height=numRowsClustering)
-  
-  
-  # ui - selection of annotation variables
-  output$selectClusterAnnotations <- renderUI({
-    if(!is.null(dataFiltered())){
-      selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
-      selectInput(inputId="selectedClusterAnnotations",
-                  label="Select variables for annotating graph:",
-                  # TODO: remove some variables from selection
-                  choices=dataVariableNames()[-selectedSymptoms],
-                  selected=c(input$groupingVar),
-                  multiple=TRUE)
-    }
-  })
-  
-  
-  
-  # plot - heatmap plot on the Clustering tab ###
-  output$plotClusterHeatmap=renderPlot({
-    if(!is.null(dataExtended())){
-      plotClusterHeatmap(data=dataExtended(),
-                         #TODO: make dependent on selection
-                         variableName=input$measurementVar,
-                         variableValue=input$selectedMeasurementValue,
-                         selectedSymptoms=input$selectedSymptoms,
-                         annotationVars=input$selectedClusterAnnotations) 
-    }
-  },height=numRowsClustering2)
-  
-  
-  
-  # TAB - RCS ####
-  # ui - user interface to select a numerical variable to associate with the presence of symptom ###
-  output$rcsUI= renderUI({
-    if(!is.null(dataFiltered())){
-      selectInput(inputId="rcsIDVar",
-                  label="Numerical variable:", 
-                  choices=dataVariableNames(),
-                  multiple=FALSE,
-                  if (input$dataFileType=="Demo"){selected=c("Age")})   
-    }
-  })
-  
-  # ui - user interface to select which measurments to cluster ###
-  output$rcsUI2 = renderUI({
-    if(!is.null(measurementLevels())){
-      #select the measurement
-      selectInput(inputId="measurementSelectedrcs",
-                  label="Select the measurement occasion (time):", 
-                  choices=measurementLevels(), selected=measurementLevels()[1])
-    }
-  })
-  
-  # plot - RCS plot ###
-  output$plotRCS=renderPlot({
-    if(!is.null(dataFiltered())){
+  }
+})
+
+
+
+# TAB - Clustering ####
+# ui - selection of measurement occasions  ###
+output$clusteringUI = renderUI({
+  if(!is.null(measurementLevels())){
+    #select the measurement
+    selectInput(inputId="selectedMeasurementValue",
+                label="Select the measurement occasion (time):", 
+                choices=measurementLevels(), selected=measurementLevels()[1])
+  }
+})
+
+# plot - dendrogram plot on the Clustering tab ###
+output$plotClusterDendrogram=renderPlot({
+  if(!is.null(dataFiltered())){
+    plotClusterDendrogram(data=dataFiltered(),
+                          variableName=input$measurementVar,
+                          variableValue=input$selectedMeasurementValue,
+                          selectedSymptoms=input$selectedSymptoms)
+  }
+},height=numRowsClustering)
+
+
+# ui - selection of annotation variables
+output$selectClusterAnnotations <- renderUI({
+  if(!is.null(dataFiltered())){
+    selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
+    selectInput(inputId="selectedClusterAnnotations",
+                label="Select variables for annotating graph:",
+                # TODO: remove some variables from selection
+                choices=dataVariableNames()[-selectedSymptoms],
+                selected=c(input$groupingVar),
+                multiple=TRUE)
+  }
+})
+
+
+
+# plot - heatmap plot on the Clustering tab ###
+output$plotClusterHeatmap=renderPlot({
+  if(!is.null(dataExtended())){
+    plotClusterHeatmap(data=dataExtended(),
+                       #TODO: make dependent on selection
+                       variableName=input$measurementVar,
+                       variableValue=input$selectedMeasurementValue,
+                       selectedSymptoms=input$selectedSymptoms,
+                       annotationVars=input$selectedClusterAnnotations) 
+  }
+},height=numRowsClustering2)
+
+
+
+# TAB - RCS ####
+# ui - user interface to select a numerical variable to associate with the presence of symptom ###
+output$rcsUI= renderUI({
+  if(!is.null(dataFiltered())){
+    selectInput(inputId="rcsIDVar",
+                label="Numerical variable:", 
+                choices=dataVariableNames(),
+                multiple=FALSE,
+                if (input$dataFileType=="Demo"){selected=c("Age")})   
+  }
+})
+
+# ui - user interface to select which measurments to cluster ###
+output$rcsUI2 = renderUI({
+  if(!is.null(measurementLevels())){
+    #select the measurement
+    selectInput(inputId="measurementSelectedrcs",
+                label="Select the measurement occasion (time):", 
+                choices=measurementLevels(), selected=measurementLevels()[1])
+  }
+})
+
+# plot - RCS plot ###
+output$plotRCS=renderPlot({
+  if(!is.null(dataFiltered())){
     plotRCS(data.all=dataExtended(),
             data.yn=dataFiltered.yn(),
             measurement=Measurement(),
             selectedSymptoms=input$selectedSymptoms,
             measurementSelectedrcs=input$measurementSelectedrcs,
             rcsIDVar=input$rcsIDVar)   
-    }
-  }, height=NumRows)
-  
-  ################ association of variables with the outcome using logistic regression with Firth correction
-  
-  # TAB - Logistf ####
-  # ui - user interface to select which measurments to cluster ###
-  output$logistfUI = renderUI({
-    if(!is.null(measurementLevels())){
-      #select the measurement
-      selectInput(inputId="measurementSelectedlogistf",
-                  label="Select the measurement occasion (time):", 
-                  choices=measurementLevels(), selected=measurementLevels()[1])
-    }
-  })
-  
-  
-  # ui - user interface to select a numerical variable to associate with the presence of symptom ###
-  output$logistfUI2= renderUI({
-    if(!is.null(dataFiltered())){
-      selectInput(inputId="logistfIDVar",
-                  label="Select a numeric variable to associate with presence of symptoms:", 
-                  choices=dataVariableNames(),
-                  if (input$dataFileType=="Demo"){selected=c("Age")})
-    }
-  })
-  
-  # plot - logistf ###
-  output$plotLogistf <- renderPlot({
-    if(!is.null(Measurement())){
-      plotLogistf(data=dataExtended(),
-                  data.yn=dataFiltered.yn(),
-                  measurement=Measurement(),
-                  measurementSelectedlogistf=input$measurementSelectedlogistf,
-                  logistfIDVar=input$logistfIDVar,
-                  selectedSymptoms=input$selectedSymptoms,
-                  numSymptoms=length(input$selectedSymptoms))
-    }
-  }, height=numRowsLogistf)
-  
-  # TAB - Selected transformed data ####
-  # table - list the subseted data in an output slot ###
-  output$data <- renderTable({
-    if(!is.null(dataFiltered())){
-      data <- dataFiltered()
-      # TODO: We could render a renderDataTable(), but how to display dates in 
-      # format 1.12.2014 and still sort them correctly?
-      # Sys.setlocale("LC_TIME", "Slovenian")
-      #data[,input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")
-      data[,input$dateVar] <- as.character(as.Date(data[,input$dateVar], format="%d.%m.%Y"),
-                                           format="%d.%m.%Y")
-      
-      #data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
-      
-      save(data, file="dataFiltered.Rdata")
-      
-      return(data)
-      # NOTE: if we want to render the table of data, we have to convert the dates into 
-      # characters, since renderTable seems to use xtable, which seems to not handle
-      # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
-    }
-  })
-  
-  # TAB - Debug ####
-  # table - debuging information ###
-  output$debug <- renderPrint(paste(str(dataExtended())))
-  
-  
-  ### TEMP CODE ####
-  #  
-  #
-  
- 
+  }
+}, height=NumRows)
 
-  
+################ association of variables with the outcome using logistic regression with Firth correction
+
+# TAB - Logistf ####
+# ui - user interface to select which measurments to cluster ###
+output$logistfUI = renderUI({
+  if(!is.null(measurementLevels())){
+    #select the measurement
+    selectInput(inputId="measurementSelectedlogistf",
+                label="Select the measurement occasion (time):", 
+                choices=measurementLevels(), selected=measurementLevels()[1])
+  }
+})
+
+
+# ui - user interface to select a numerical variable to associate with the presence of symptom ###
+output$logistfUI2= renderUI({
+  if(!is.null(dataFiltered())){
+    selectInput(inputId="logistfIDVar",
+                label="Select a numeric variable to associate with presence of symptoms:", 
+                choices=dataVariableNames(),
+                if (input$dataFileType=="Demo"){selected=c("Age")})
+  }
+})
+
+# plot - logistf ###
+output$plotLogistf <- renderPlot({
+  if(!is.null(Measurement())){
+    plotLogistf(data=dataExtended(),
+                data.yn=dataFiltered.yn(),
+                measurement=Measurement(),
+                measurementSelectedlogistf=input$measurementSelectedlogistf,
+                logistfIDVar=input$logistfIDVar,
+                selectedSymptoms=input$selectedSymptoms,
+                numSymptoms=length(input$selectedSymptoms))
+  }
+}, height=numRowsLogistf)
+
+# TAB - Selected transformed data ####
+# table - list the subseted data in an output slot ###
+output$data <- renderTable({
+  if(!is.null(dataFiltered())){
+    data <- dataFiltered()
+    # TODO: We could render a renderDataTable(), but how to display dates in 
+    # format 1.12.2014 and still sort them correctly?
+    # Sys.setlocale("LC_TIME", "Slovenian")
+    #data[,input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")
+    data[,input$dateVar] <- as.character(as.Date(data[,input$dateVar], format="%d.%m.%Y"),
+                                         format="%d.%m.%Y")
+    
+    #data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
+    
+    save(data, file="dataFiltered.Rdata")
+    
+    return(data)
+    # NOTE: if we want to render the table of data, we have to convert the dates into 
+    # characters, since renderTable seems to use xtable, which seems to not handle
+    # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
+  }
+})
+
+# TAB - Debug ####
+# table - debuging information ###
+output$debug <- renderPrint(paste(str(dataExtended())))
+
+
+### TEMP CODE ####
+#  
+#
+
+
+
+
 })
 
 

@@ -64,13 +64,15 @@ shinyUI(pageWithSidebar(
       
       # TAB - Timeline ####
       tabPanel(title="Timeline",
-              # textOutput("messageSelectVars"),
-               uiOutput("selectDisplayFormat"),
-               plotOutput("plotTimeline", height="auto")              
-              ),
+               textOutput("messageNotAppropriate"),  
+               # textOutput("messageSelectVars"),
+                 uiOutput("selectDisplayFormat"),
+                 plotOutput("plotTimeline", height="auto")
+               ),
    
       # TAB - Distr. of the vars: over time ####
       tabPanel(title="Distribution of the variables: over time - profile plots" ,
+               textOutput("messageNotAppropriate2"),
                uiOutput("selectGraphType"),
                uiOutput("selectRandomSampleSize"),
                uiOutput("selectMaxGroupSize"),
