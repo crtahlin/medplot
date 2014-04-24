@@ -81,12 +81,14 @@ shinyUI(pageWithSidebar(
       
       # TAB - Distr. of the vars: over time w boxplots ####
       tabPanel(title="Distribution of the variables: over time - boxplots",
+               textOutput("messageNotAppropriate3"),
                plotOutput("plotTimelineBoxplots", height="auto")
                ),
       
       # TAB - Distribution of the variables ####
       tabPanel(title="Distribution of the variables: by measurement occasion",
-              # textOutput("messageSelectVars"),
+              textOutput("messageNotAppropriate4"),
+               # textOutput("messageSelectVars"),
                uiOutput("proportionUI"),
                plotOutput("plotProportion", height="auto"), 
                plotOutput("plotCI", height="auto"), 
@@ -99,9 +101,10 @@ shinyUI(pageWithSidebar(
       
       # TAB - Distribution of the variables: by grouping variable ####
       tabPanel(title="Distribution of the variables: by grouping variable",
-              # textOutput("messageSelectVars"),
+               textOutput("messageNotAppropriate5"),
+               # textOutput("messageSelectVars"),
                plotOutput("plotPyramid", height="auto"),              
-              plotOutput("plotPropCIs", height="auto"),
+               plotOutput("plotPropCIs", height="auto"),
                           
                uiOutput("UIpropTable"),
               

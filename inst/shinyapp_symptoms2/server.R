@@ -66,14 +66,18 @@ shinyServer(function(input, output, session) {
   } else {return(0)} # if there is no data, height of plot should be zero
   }
   
-  numRowsTimelineBoxplots <- function(){if(!is.null(dataFilteredwithThreshold())){
-    max(ceiling(length(input$selectedSymptoms))*200,
-        300 # minumum reserved space
-    )}else{return(0)} # height of plot when no data available
+  numRowsTimelineBoxplots <- function(){if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE) {return(0)} 
+    tmp <- max(ceiling(length(input$selectedSymptoms))*200,
+               300) # minumum reserved space
+    return(tmp)
+    }else{return(0)} # height of plot when no data available
   }
   
   
-  numRowsProportions <- function(){if(!is.null(dataFilteredwithThreshold())){
+  numRowsProportions <- function(){
+    if(!is.null(dataFilteredwithThreshold())){
+    if(input$treatasBinary==FALSE) {return(0)} 
     max(ceiling(length(input$selectedSymptoms))*40,
         # if there are less than cca. 4 measurement occasions,
         # each symptom should get aprox. 40 lines
@@ -83,9 +87,14 @@ shinyServer(function(input, output, session) {
         # measurements to be visible
         300 # minumum reserved space
     )}else{return(0)} # height of plot when no data available
+    
+    
   }
   
-  numRowsProportionsCI<- function(){if(!is.null(dataFilteredwithThreshold())){
+  numRowsProportionsCI<- function(){
+    try({
+    if(!is.null(dataFilteredwithThreshold())){
+    if(input$treatasBinary==FALSE) {return(0)} 
     max(ceiling(length(input$selectedSymptoms))*80,
         # if there are less than cca. 4 measurement occasions,
         # each symptom should get aprox. 40 lines
@@ -95,6 +104,7 @@ shinyServer(function(input, output, session) {
         # measurements to be visible
         300 # minumum reserved space
     )}else{return(0)} # height of plot when no data available
+    }, silent=TRUE)
   }
   
   numRowsClustering <- function() {if(!is.null(dataFiltered())){
@@ -104,7 +114,8 @@ shinyServer(function(input, output, session) {
     max(ceiling(length(input$selectedSymptoms))*40,
         300)}else{return(0)}}
   
-  numRowsDistributions <- function() {if(!is.null(dataFiltered())){
+  numRowsDistributions <- function() {if(!(is.null(dataFiltered()) || is.null(input$posOnly)) ){
+    if(input$treatasBinary==FALSE){return(0)}
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
@@ -181,7 +192,7 @@ shinyServer(function(input, output, session) {
   # dataFilteredwithThreshold() - filtered data set with threshold value honored #### 
   # sets all symptom values below threshold value to zero
   dataFilteredwithThreshold <- reactive ({
-    if(!is.null(dataFiltered())){
+    if(!(is.null(dataFiltered()) || is.null(input$thresholdValue)  )){
       data <- dataFiltered()
       data[,input$selectedSymptoms] <- 
         ifelse(data[, input$selectedSymptoms]>input$thresholdValue, 1, 0)
@@ -357,10 +368,12 @@ output$plotTimeline <- renderPlot({
       )}}   
 }, height=numRowsTimeline)
 
+
 output$messageNotAppropriate <- renderText({
+  if(!is.null(input$treatasBinary)){
   if (input$treatasBinary==TRUE) {
     "This type of analysis is not appropriate for binary responses."
-  }
+  }}
 })
 
 # TAB - Distribution of the variables: over time ####
@@ -425,37 +438,48 @@ output$messageNotAppropriate <- renderText({
       }, height=numRowsTimelineProfile)
 
 output$messageNotAppropriate2 <- renderText({
-  if (input$treatasBinary==TRUE) {
-    "This type of analysis is not appropriate for binary responses."
-  }
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==TRUE) {
+      "This type of analysis is not appropriate for binary responses."
+    }}
 })
 
 # TAB - Distr. of the vars.: over time - boxplots ####
 output$plotTimelineBoxplots <- renderPlot({
   if(!is.null(dataFiltered())) {
+    if(input$treatasBinary==FALSE){
     print(plotTimelineBoxplots(data=dataFiltered(),
                                personIDVar=input$patientIDVar,
                                measurementVar=input$measurementVar,
                                selectedSymptoms=input$selectedSymptoms)
     )
+    }
   } else {return()}
 },height=numRowsTimelineBoxplots)
 
-
+output$messageNotAppropriate3 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==TRUE) {
+      "This type of analysis is not appropriate for binary responses."
+    }}
+})
 
 # TAB - Distributions of variables ####
 # ui - select measurement occasion ###
 output$proportionUI = renderUI({
-  if(!is.null(measurementLevels())){ 
+  if(!(is.null(measurementLevels()) || is.null(measurementLevels())  )){ 
+    if(input$treatasBinary==TRUE){
     selectInput(inputId="measurementSelectedProportion",
                 label="Select the measurement occasion (time):", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   }
 })
 
 # ui - select distribution only for patients above a threshold
 output$selectPosOnly <- renderUI({
   if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE){
     tagList(
       checkboxInput(inputId="posOnly",
                     "Display the distribution only for patients with variable values
@@ -463,22 +487,27 @@ output$selectPosOnly <- renderUI({
                     value = FALSE),
       br(), br()
     )
+    }
   }
 })
 
 # plot - proportions ###
 output$plotProportion=renderPlot({
-  if(!is.null(dataFiltered.yn())){
-    plotDistribution(data=dataFiltered.yn(),
+  if(!(is.null(dataFiltered.yn()) || is.null(input$measurementSelectedProportion) )){
+    if(input$treatasBinary==TRUE){
+          plotDistribution(data=dataFiltered.yn(),
                      selectedSymptoms=input$selectedSymptoms,
                      selectedProportion=input$measurementSelectedProportion,
                      measurements=Measurement())
+    }
   }
 }, height=numRowsDistributions)
 
 # plot - boxplots ###
 output$plotBoxplot=renderPlot({
-  if(!is.null(dataFiltered())){
+  if(!(is.null(dataFiltered()) || is.null(input$posOnly)  )){
+    if(input$treatasBinary==TRUE){
+      
     plotDistributionBoxplot(data=dataFiltered(),
                             data.yn=dataFiltered.yn(),
                             selectedSymptoms=input$selectedSymptoms,
@@ -486,126 +515,169 @@ output$plotBoxplot=renderPlot({
                             measurements=Measurement(),
                             posOnly=input$posOnly,
                             threshold=input$thresholdValue)
+    }
   }
 }, height=numRowsDistributions)
 
 # plot - CI ###
 output$plotCI <- renderPlot({
-  if(!is.null(dataFiltered.yn())){
+  if(!(is.null(dataFiltered.yn()) ||
+         is.null(input$measurementSelectedProportion) ||
+         is.null(Measurement()) ||
+         is.null(input$selectedSymptoms) )){
+    if(input$treatasBinary==TRUE){
+      
     plotCI(data.yn=dataFiltered.yn(),
            measurements=Measurement(),
            selectedSymptoms=input$selectedSymptoms,
            selectedProportion=input$measurementSelectedProportion)
+    }
   }
 }, height=numRowsDistributions)
 
 # table - for all patients - proportions and medians
 output$tablePropMedian <- renderTable({ 
-  if(!is.null(dataFiltered())){
+  if(!( is.null(dataFiltered()) || is.null(input$measurementSelectedProportion) )){
+    if(input$treatasBinary==TRUE){
+      
     tableAllWithSymptoms(data=dataFiltered(),
                          measurementVar=input$measurementVar,
                          forMeasurement=input$measurementSelectedProportion,
                          symptomsNames=input$selectedSymptoms,
                          thresholdValue=input$thresholdValue)
+    }
   }
 })
 
 # text - explainig tableMedianGroups
 output$textTablePropMedian <- renderUI({
   if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE){
+      
     tagList(p("Table displays for each variable the proportion of subject with
             positive values of a variable,  median value and interquantile
             range for of the variable (25th to 75th percentile).", br(), br() ))
+    }
   }
 })
 
+output$messageNotAppropriate4 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==FALSE) {
+      "This type of analysis is not appropriate for numerical responses."
+    }}
+})
 
 
 # TAB - Distribution of the variables: by grouping variable ####
 # plot - pyramid plot of proportions ###
 output$plotPyramid <- renderPlot ({
-  if(!is.null(dataFilteredwithThreshold())){
-    plotPropWithSymptoms(data=dataFilteredwithThreshold(),
+  try({
+  if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
+    if(input$treatasBinary==TRUE){
+    
+      plotPropWithSymptoms(data=dataFilteredwithThreshold(),
                          grouping=input$groupingVar,
                          measurements=input$measurementVar,
                          symptomsNames=input$selectedSymptoms)
+    
+    }
   }
+  }, silent=TRUE)
 } ,height=numRowsProportions)
 
 # plot - plot of proportions with conf. intervals
 output$plotPropCIs <- renderPlot ({
+  try({
   if(!is.null(dataFilteredwithThreshold())){
+    if(input$treatasBinary==TRUE){
     print(
       plotPropWithSymptomsCI(data=dataFilteredwithThreshold(),
                              groupingVar=input$groupingVar,
                              measurementVar=input$measurementVar,
                              selectedSymptoms=input$selectedSymptoms)
     )
+    }
   }
+  }, silent=TRUE)
 } ,height=numRowsProportionsCI)
-
-
-
 
 
 # ui - user interface to select which measurements to draw tables for ###
 output$UIpropTable = renderUI({
   if(!is.null(measurementLevels())){
+    if(input$treatasBinary==TRUE){
     #select the measurement
     selectInput(inputId="measurementSelectedprop",
                 label="Select the measurement occasion (time):", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   }
 })
 
 # table - of proportions of patients in a group with a symptom
 output$tablePropGroups <- renderTable ({
-  if(!is.null(dataFiltered())){
+  
+  if(!(is.null(dataFiltered()) || is.null(input$thresholdValue)  )){
+    if(input$treatasBinary==TRUE){
     tablePropWithSymptoms(data=dataFiltered(),
                           groupingVar=input$groupingVar,
                           measurementVar=input$measurementVar,
                           forMeasurement=input$measurementSelectedprop,
                           symptomsNames=input$selectedSymptoms,
                           thresholdValue=input$thresholdValue)
+    }
   }
+  
 })
 
 # text - explainig tablePropGroups
 output$textTablePropGroups <- renderUI({
   if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE){
     tagList(p("Table displays for each variable the proportion of subjects in a
   certain group, P value for the difference of proportions and the 
   95% confidence interval for the difference of proportions. 
               Data with missing values for grouping variable 
               are removed from analysis.", br(), br()))
+    }
   }
 })
 
 # table - with medians of symptoms values in a group
 output$tableMedianGroups <- renderTable ({
-  if(!is.null(dataFiltered())){
+  if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedprop) )){
+    if(input$treatasBinary==TRUE){
     tableMediansWithSymptoms(data=dataFiltered(),
                              groupingVar=input$groupingVar,
                              measurementVar=input$measurementVar,
                              forMeasurement=input$measurementSelectedprop,
                              symptomsNames=input$selectedSymptoms,
                              thresholdValue=input$thresholdValue)
+    }
   }
 })
 
 # text - explainig tableMedianGroups
 output$textTableMedianGroups <- renderUI({
   if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE){
     tagList(p("Table displays for each variable the median value for subjects in a
 certain group, interquantile range for of the variable 
 (25th to 75th percentile)", 
               #and P value for the difference of medians. 
               "Data with missing values for grouping variable 
               are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
+    }
   }
 })
 
-
+output$messageNotAppropriate5 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==FALSE) {
+      "This type of analysis is not appropriate for numerical responses."
+    }}
+})
 
 # TAB - Clustering ####
 # ui - selection of measurement occasions  ###
