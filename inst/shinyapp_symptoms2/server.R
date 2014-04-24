@@ -266,7 +266,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  # GUI - selecting measurements variable
+  # GUI - selecting measurements variable ####
   output$selectMeasurementVar <- renderUI({
     if (!is.null(dataVariableNames())) {
       selectInput(inputId="measurementVar",
@@ -275,17 +275,35 @@ shinyServer(function(input, output, session) {
                   selected="Measurement")
     }
   })
-  
-  # GUI - selecting treshold value
-  output$selectThresholdValue <- renderUI({
+ 
+  # GUI - selecting use of thresholding ####
+  output$selectTreatasBinary <- renderUI({
     if (!is.null(dataVariableNames())){
+      checkboxInput(inputId="treatasBinary",
+                   label="Treat and analyse variables as binary?",
+                   value=FALSE)
+    }  
+    
+    })
+  
+  # GUI - selecting treshold value ####
+  output$selectThresholdValue <- renderUI({
+    if (!is.null(dataVariableNames()) & !is.null(input$treatasBinary)){
+      if(input$treatasBinary==TRUE) {
       numericInput(inputId="thresholdValue",
                    "Threshold for positivity of the variables:",
                    value=0,
                    min=0,
                    max=10)
+          }
     }
   })
+  
+  # GUI - reseting threshold value
+  observe({
+    input$treatasBinary
+    updateNumericInput(session, inputId="thresholdValue", value=0)
+    })
   
   # TABS ####
   # message - used on all tabs

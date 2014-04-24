@@ -50,6 +50,8 @@ shinyUI(pageWithSidebar(
       
       uiOutput("selectSymptoms"),
       
+      uiOutput("selectTreatasBinary"),
+      
       uiOutput("selectThresholdValue")
     )),
   
