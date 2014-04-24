@@ -123,6 +123,7 @@ shinyServer(function(input, output, session) {
         300)}else{return(0)}}
   
   numRowsLogistf <- function() {if(!is.null(dataFiltered())){
+    if(input$treatasBinary==FALSE){return(0)}
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
@@ -801,10 +802,12 @@ output$messageNotAppropriate7 <- renderText({
 # ui - user interface to select which measurments to cluster ###
 output$logistfUI = renderUI({
   if(!is.null(measurementLevels())){
+    if (input$treatasBinary==TRUE) {
     #select the measurement
     selectInput(inputId="measurementSelectedlogistf",
                 label="Select the measurement occasion (time):", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   }
 })
 
@@ -812,16 +815,19 @@ output$logistfUI = renderUI({
 # ui - user interface to select a numerical variable to associate with the presence of symptom ###
 output$logistfUI2= renderUI({
   if(!is.null(dataFiltered())){
+    if (input$treatasBinary==TRUE) {
     selectInput(inputId="logistfIDVar",
                 label="Select a numeric variable to associate with presence of symptoms:", 
                 choices=dataVariableNames(),
                 if (input$dataFileType=="Demo"){selected=c("Age")})
+    }
   }
 })
 
 # plot - logistf ###
 output$plotLogistf <- renderPlot({
-  if(!is.null(Measurement())){
+  if(!(is.null(Measurement()) || is.null(input$measurementSelectedlogistf) )){
+    if (input$treatasBinary==TRUE) {
     plotLogistf(data=dataExtended(),
                 data.yn=dataFiltered.yn(),
                 measurement=Measurement(),
@@ -829,8 +835,17 @@ output$plotLogistf <- renderPlot({
                 logistfIDVar=input$logistfIDVar,
                 selectedSymptoms=input$selectedSymptoms,
                 numSymptoms=length(input$selectedSymptoms))
+    }
   }
 }, height=numRowsLogistf)
+
+
+output$messageNotAppropriate8 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==FALSE) {
+      "This type of analysis is not appropriate for numerical responses."
+    }}
+})
 
 # TAB - Selected transformed data ####
 # table - list the subseted data in an output slot ###

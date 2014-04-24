@@ -139,7 +139,8 @@ shinyUI(pageWithSidebar(
       
       # TAB - Logistf ####
       tabPanel(title="Logistf: by measurement occasion",
-              # textOutput("messageSelectVars"),
+               textOutput("messageNotAppropriate8"),
+               # textOutput("messageSelectVars"),
                uiOutput("logistfUI2"),
                uiOutput("logistfUI"),
                plotOutput("plotLogistf", height="auto")
