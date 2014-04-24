@@ -119,7 +119,8 @@ shinyUI(pageWithSidebar(
       
       # TAB - Clustering ####
       tabPanel("Clustering: by measurement occasion",
-              # textOutput("messageSelectVars"),
+               textOutput("messageNotAppropriate6"),
+               # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram", height="auto"),
                uiOutput("selectClusterAnnotations"),
@@ -129,6 +130,7 @@ shinyUI(pageWithSidebar(
       
       # TAB - RCS ####
       tabPanel(title="RCS: by measurement occasion",
+               textOutput("messageNotAppropriate7"),
                #textOutput("messageSelectVars"),
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),

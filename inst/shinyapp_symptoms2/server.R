@@ -108,9 +108,12 @@ shinyServer(function(input, output, session) {
   }
   
   numRowsClustering <- function() {if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE) {return(0)}
     max(ceiling(length(input$selectedSymptoms))*40,
         300)}else{return(0)}}
+  
   numRowsClustering2 <- function() {if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE) {return(0)}
     max(ceiling(length(input$selectedSymptoms))*40,
         300)}else{return(0)}}
   
@@ -123,7 +126,9 @@ shinyServer(function(input, output, session) {
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
-  NumRows <- function(){ceiling(length(input$selectedSymptoms)/3)*300  }
+  NumRows <- function(){if(!is.null(dataFiltered())){
+    if(input$treatasBinary==FALSE){return(0)}
+    ceiling(length(input$selectedSymptoms)/3)*300  }else{return(0)} }
   
   # REACTIVE FUNCTIONS ####
   # Measurement() - values of variable selected as measurement occasion variable ####
@@ -682,21 +687,25 @@ output$messageNotAppropriate5 <- renderText({
 # TAB - Clustering ####
 # ui - selection of measurement occasions  ###
 output$clusteringUI = renderUI({
-  if(!is.null(measurementLevels())){
+  if(!(is.null(measurementLevels()) || is.null(measurementLevels()) )){
+    if(input$treatasBinary==FALSE){
     #select the measurement
     selectInput(inputId="selectedMeasurementValue",
                 label="Select the measurement occasion (time):", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   }
 })
 
 # plot - dendrogram plot on the Clustering tab ###
 output$plotClusterDendrogram=renderPlot({
-  if(!is.null(dataFiltered())){
+  if(!(is.null(dataFiltered()) || is.null(input$selectedMeasurementValue) )){
+    if(input$treatasBinary==FALSE){
     plotClusterDendrogram(data=dataFiltered(),
                           variableName=input$measurementVar,
                           variableValue=input$selectedMeasurementValue,
                           selectedSymptoms=input$selectedSymptoms)
+    }
   }
 },height=numRowsClustering)
 
@@ -704,6 +713,7 @@ output$plotClusterDendrogram=renderPlot({
 # ui - selection of annotation variables
 output$selectClusterAnnotations <- renderUI({
   if(!is.null(dataFiltered())){
+    if(input$treatasBinary==FALSE){
     selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
     selectInput(inputId="selectedClusterAnnotations",
                 label="Select variables for annotating graph:",
@@ -711,6 +721,7 @@ output$selectClusterAnnotations <- renderUI({
                 choices=dataVariableNames()[-selectedSymptoms],
                 selected=c(input$groupingVar),
                 multiple=TRUE)
+    }
   }
 })
 
@@ -719,42 +730,54 @@ output$selectClusterAnnotations <- renderUI({
 # plot - heatmap plot on the Clustering tab ###
 output$plotClusterHeatmap=renderPlot({
   if(!is.null(dataExtended())){
+    if(input$treatasBinary==FALSE){
     plotClusterHeatmap(data=dataExtended(),
                        #TODO: make dependent on selection
                        variableName=input$measurementVar,
                        variableValue=input$selectedMeasurementValue,
                        selectedSymptoms=input$selectedSymptoms,
                        annotationVars=input$selectedClusterAnnotations) 
+    }
   }
 },height=numRowsClustering2)
 
-
+output$messageNotAppropriate6 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==TRUE) {
+      "This type of analysis is not appropriate for binary responses."
+    }}
+})
 
 # TAB - RCS ####
 # ui - user interface to select a numerical variable to associate with the presence of symptom ###
 output$rcsUI= renderUI({
   if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE){
     selectInput(inputId="rcsIDVar",
                 label="Numerical variable:", 
                 choices=dataVariableNames(),
                 multiple=FALSE,
-                if (input$dataFileType=="Demo"){selected=c("Age")})   
+                if (input$dataFileType=="Demo"){selected=c("Age")}) 
+    }
   }
 })
 
 # ui - user interface to select which measurments to cluster ###
 output$rcsUI2 = renderUI({
   if(!is.null(measurementLevels())){
+    if(input$treatasBinary==TRUE){
     #select the measurement
     selectInput(inputId="measurementSelectedrcs",
                 label="Select the measurement occasion (time):", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
+    }
   }
 })
 
 # plot - RCS plot ###
 output$plotRCS=renderPlot({
-  if(!is.null(dataFiltered())){
+  if(input$treatasBinary==TRUE){
+  if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedrcs) )){
     plotRCS(data.all=dataExtended(),
             data.yn=dataFiltered.yn(),
             measurement=Measurement(),
@@ -762,7 +785,15 @@ output$plotRCS=renderPlot({
             measurementSelectedrcs=input$measurementSelectedrcs,
             rcsIDVar=input$rcsIDVar)   
   }
+  }
 }, height=NumRows)
+
+output$messageNotAppropriate7 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==FALSE) {
+      "This type of analysis is not appropriate for numerical responses."
+    }}
+})
 
 ################ association of variables with the outcome using logistic regression with Firth correction
 
