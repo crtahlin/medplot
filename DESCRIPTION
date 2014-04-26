@@ -9,12 +9,12 @@ Description: Collection of plotting functions to be used by healthcare workers. 
 License: GPL-3
 Depends:
   Cairo,
-	gplots,
-	RColorBrewer,
-	shiny,
-	scales,
-	reshape2,
-	ggplot2,
+  gplots,
+  RColorBrewer,
+  shiny,
+  scales,
+  reshape2,
+  ggplot2,
   seriation,
   XML,
   plyr,
