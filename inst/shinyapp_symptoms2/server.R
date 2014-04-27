@@ -463,6 +463,16 @@ output$plotTimelineBoxplots <- renderPlot({
   } else {return()}
 },height=numRowsTimelineBoxplots)
 
+output$tableforBoxplots <- renderUI({
+  out <- tabelizeBoxplots(measurements=Measurement(),
+                          measurementVar=input$measurementVar,
+                          data=dataFiltered(),
+                          selectedSymptoms=input$selectedSymptoms) 
+  
+  return(div(HTML(out),class="shiny-html-output"))
+  
+  })
+
 output$messageNotAppropriate3 <- renderText({
   if(!is.null(input$treatasBinary)){
     if (input$treatasBinary==TRUE) {

@@ -82,7 +82,8 @@ shinyUI(pageWithSidebar(
       # TAB - Distr. of the vars: over time w boxplots ####
       tabPanel(title="Distribution of the variables: over time - boxplots",
                textOutput("messageNotAppropriate3"),
-               plotOutput("plotTimelineBoxplots", height="auto")
+               plotOutput("plotTimelineBoxplots", height="auto"),
+               uiOutput("tableforBoxplots")
                ),
       
       # TAB - Distribution of the variables ####
@@ -145,6 +146,12 @@ shinyUI(pageWithSidebar(
                uiOutput("logistfUI"),
                plotOutput("plotLogistf", height="auto")
                ),
+      
+#       # TAB - Mixed model ####
+#       tabPanel(title="Mixed model",
+#                uiOutput("selectResponse"),
+#                uiOutput("")
+#                ),
       
       # TAB - Selected data ####
       tabPanel(title="Selected data", 

@@ -134,3 +134,51 @@ p <- ggplot(data=dataMelted, aes(x=Measurement, y=value)) +
 # return ggplot
 return(p)
 }
+
+#' @title Boxplots data in form of a table
+#' 
+#' @description TODO
+#' 
+#' @param TODO
+tabelizeBoxplots <- function(measurements,
+                             measurementVar,
+                             data,
+                             selectedSymptoms  ) {
+  
+  tables <- list()
+  
+  for (measurement in measurements) {
+    table <- .tabelizeBoxplotsforMeasurement(measurement=measurement,
+                                             measurementVar=measurementVar,
+                                             data=data,
+                                             selectedSymptoms=selectedSymptoms)
+    tables[[as.character(measurement)]] <- 
+      print(xtable(table, caption=paste("Measurement occasion:", measurement)),
+            type="html",
+            html.table.attributes='class="data table table-bordered table-condensed"',
+            caption.placement="top")
+  }
+  return(lapply(tables, paste))
+}
+
+# helper function for tabelizeBoxplots
+.tabelizeBoxplotsforMeasurement <- function(measurement,
+                                            measurementVar,
+                                            data,
+                                            selectedSymptoms) {
+  
+  result <- data.frame("Variables"=selectedSymptoms, "Median"=NA)
+  data <- data[data[,measurementVar]==measurement, ]
+  
+  for (symptom in selectedSymptoms) {
+    result[result[,"Variables"]==symptom,"Median"] <-
+      median(na.omit(data[ ,symptom]))
+    result[result[,"Variables"]==symptom,"IQR"] <-
+      IQR(na.omit(data[ ,symptom]))
+    result[result[,"Variables"]==symptom,"25th perc."] <-
+      quantile(na.omit(data[ ,symptom]), 0.25)
+    result[result[,"Variables"]==symptom,"75th perc."] <-
+      quantile(na.omit(data[ ,symptom]), 0.75)
+      }
+  return(result)  
+}
