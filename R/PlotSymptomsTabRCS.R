@@ -23,8 +23,8 @@ plotRCS <- function (data.all,
     my.mod=glm(my.data.symptoms.yn[,i]~rcs(my.var), family="binomial", x=T, y=T)
     plotRCSmod(my.mod,
                  my.mod$x[,2],
-                 my.ylab="Probability of reporting the symptom",
-                 my.xlab="Age",
+                 my.ylab="Probability of positive variable",
+                 my.xlab=rcsIDVar,
                  my.title=selectedSymptoms[i])
     my.p=ifelse(anova(my.mod, test="Chi")[2,5]<0.001,
                 "P<0.001", 
