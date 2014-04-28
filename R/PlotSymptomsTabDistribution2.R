@@ -188,17 +188,18 @@ tablePropWithSymptoms <- function (data,
 #               , digits=2)
 #   }
 #   
-  # run a a multivariate permutation correcting P value
-  permutationCorectedPValue <- permCorrPValue(data=data, 
-                 nPermutations=999,
-                 selectedSymptoms=symptomsNames,
-                 groupingVar=groupingVar,
-                 measurementVar=measurementVar,
-                 measurementOccasion=forMeasurement,
-                 FUN=.propPValue, # function that returns a P value
-                 thresholdValue=0
-  )
-  
+
+# run a a multivariate permutation correcting P value
+permutationCorectedPValue <- permCorrPValue(data=data, 
+                                            nPermutations=999,
+                                            selectedSymptoms=symptomsNames,
+                                            groupingVar=groupingVar,
+                                            measurementVar=measurementVar,
+                                            measurementOccasion=forMeasurement,
+                                            FUN="propPValue", # function that returns a P value
+                                            thresholdValue=0
+)
+
 
 for (symptom in symptomsNames) {
   # add a permutation calculated corrected P value
@@ -206,9 +207,9 @@ for (symptom in symptomsNames) {
     permutationCorectedPValue[symptom]
 }
 
-   
-  
-  return(tableData)
+
+
+return(tableData)
 }
 
 
@@ -241,11 +242,11 @@ tableMediansWithSymptoms <- function (data,
   column2Name <- paste("IQR for ", groupingLevels[1])
   column3Name <- paste("Median of ", groupingLevels[2])
   column4Name <- paste("IQR for ", groupingLevels[2])
-  column5Name <- paste("P value ?CHECK?")
+  column5Name <- paste("P value")
   # column6Name <- paste("Conf. int. for diff. of prop. ")
   column7Name <- paste("cor. P value (Holm-Bonferroni)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
-  column9Name <- paste("Permutation based P value ?CHECK?")
+  column9Name <- paste("Permutation based P value")
   
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   # group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
@@ -282,16 +283,36 @@ tableMediansWithSymptoms <- function (data,
   # add a Benjamini-Yekutieli Q-value - see ?p.adjust
   tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
   
-  for (symptom in symptomsNames) {
-    tableData[tableData["Variable"]==symptom, column9Name ] <- 
-      format( .pvaluebyPermutation(data=na.omit(data[,c(symptom, groupingVar)]),
-                                   variableName=symptom,
-                                   groupName=groupingVar,
-                                   FUN=.medianDif,
-                                   nPermutations=1000,
-                                   thresholdValue=thresholdValue)
-              , digits=2)
-  }
+#   for (symptom in symptomsNames) {
+#     tableData[tableData["Variable"]==symptom, column9Name ] <- 
+#       format( .pvaluebyPermutation(data=na.omit(data[,c(symptom, groupingVar)]),
+#                                    variableName=symptom,
+#                                    groupName=groupingVar,
+#                                    FUN=.medianDif,
+#                                    nPermutations=1000,
+#                                    thresholdValue=thresholdValue)
+#               , digits=2)
+#   }
+
+# run a a multivariate permutation correcting P value
+permutationCorectedPValue <- permCorrPValue(data=data, 
+                                            nPermutations=999,
+                                            selectedSymptoms=symptomsNames,
+                                            groupingVar=groupingVar,
+                                            measurementVar=measurementVar,
+                                            measurementOccasion=forMeasurement,
+                                            FUN="MannWhitneyPValue", # function that returns a P value
+                                            thresholdValue=0
+                                            )
+
+
+for (symptom in symptomsNames) {
+  # add a permutation calculated corrected P value
+  tableData[tableData["Variable"]==symptom, column9Name ] <- 
+    permutationCorectedPValue[symptom]
+}
+
+
   return(tableData)
 }
 
@@ -364,26 +385,51 @@ permCorrPValue <- function(data,
   
   # calculate the P value based on the sample
   calculatedPValue <- numeric()
+  
+  # if calculating proportions
+  if (FUN=="propPValue") {
   for (symptom in selectedSymptoms) {
-    calculatedPValue[symptom] <- FUN(
-      sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) >  thresholdValue),
-      sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) <= thresholdValue),
-      sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) >  thresholdValue),
-      sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) <= thresholdValue)
+    calculatedPValue[symptom] <- .propPValue(
+      successG1=sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) >  thresholdValue),
+      failureG1=sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) <= thresholdValue),
+      successG2=sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) >  thresholdValue),
+      failureG2=sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) <= thresholdValue)
     )
-  }  
+  }}  
+  
+  # if calculating difference of samples (Mann-Whitney)
+  if (FUN=="MannWhitneyPValue") {
+    for (symptom in selectedSymptoms) {
+      calculatedPValue[symptom] <- .MannWhitneyPValue(
+        na.omit(data[data[groupingVar]==groupingLevels[1],symptom]),
+        na.omit(data[data[groupingVar]==groupingLevels[2],symptom])
+    )  
+    }}
   
   globalMinPValues <- numeric()
   permutationPValues <- numeric()
   for (permutation in 1:nPermutations) {
     for (symptom in selectedSymptoms) {
       data[,groupingVar] <- sample(data[,groupingVar]) # shuffle group membership
-      permutationPValues[symptom] <- FUN(
-        sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) >  thresholdValue),
-        sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) <= thresholdValue),
-        sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) >  thresholdValue),
-        sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) <= thresholdValue)
-      )
+      
+        
+          # if calculating proportions
+          if (FUN=="propPValue") {
+            permutationPValues[symptom] <- .propPValue(
+              sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) >  thresholdValue),
+              sum(na.omit(data[data[groupingVar]==groupingLevels[1],symptom]) <= thresholdValue),
+              sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) >  thresholdValue),
+              sum(na.omit(data[data[groupingVar]==groupingLevels[2],symptom]) <= thresholdValue)
+            )} 
+          
+          # if calculating difference of samples (Mann-Whitney)
+          if (FUN=="MannWhitneyPValue") {
+            permutationPValues[symptom] <- .MannWhitneyPValue(
+              na.omit(data[data[groupingVar]==groupingLevels[1],symptom]),
+              na.omit(data[data[groupingVar]==groupingLevels[2],symptom])
+              )
+          }
+        
     }
     globalMinPValues[permutation] <- min(permutationPValues)
   }
@@ -396,7 +442,7 @@ permCorrPValue <- function(data,
 
 
 ### Helper functions ####
-# calculate p value by permutation
+# calculate p value by permutation - OBSOLETE, not multivariate
 .pvaluebyPermutation <- function(data,
                                  variableName,
                                  groupName,
@@ -490,9 +536,6 @@ permCorrPValue <- function(data,
 }
 
 
-
-
-
 .propPValue <- function (successG1, failureG1, successG2, failureG2) {
   result <- prop.test(matrix(data=c(successG1,
                                     failureG1,
@@ -500,4 +543,9 @@ permCorrPValue <- function(data,
                                     failureG2),
                              byrow=TRUE, nrow=2))
   return(result$p.value)
+}
+
+.MannWhitneyPValue <- function (group1, group2) {
+result <- wilcox.test(x=group1, y=group2)
+return(format(result$p.value, digits=2))
 }
