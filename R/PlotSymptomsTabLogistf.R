@@ -90,9 +90,9 @@ tabelizeLogistf <- function (data,
   table[table["Variable"]==symptom, "Odds ratio"] <- 
     exp(model$coef[2])
   table[table["Variable"]==symptom, "95% conf. interval"] <- 
-    paste(format(exp(model$ci.lower[2]), digits=2),
+    paste(format(exp(model$ci.lower[2]), nsmall=2, digits=2),
           " to ",
-          format(exp(model$ci.upper[2]), digits=2))
+          format(exp(model$ci.upper[2]), nsmall=2, digits=2))
   }
   return(table)
 }
