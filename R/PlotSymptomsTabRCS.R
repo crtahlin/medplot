@@ -82,3 +82,30 @@ plotRCSmod <- function(My.mod,
   if(!is.null(hlines) | !is.null(vlines)) abline(h=hlines, v= vlines  , lty=3, col="light grey") else grid()
   if(!is.null(my.knots)) axis(1, at=my.knots, line=2, cex.axis=.65)
 }
+
+#' @title Restricted cubic spline P values in tabular form
+#' 
+#' @description TODO
+#' 
+#' @param TODO
+tabelizeRCS <- function(data.all,
+                        data.yn,
+                        measurement,
+                        selectedSymptoms,
+                        measurementSelectedrcs,
+                        rcsIDVar) {
+  
+  data     <- data.yn[measurement==measurementSelectedrcs,]
+  variable <- data.all[measurement==measurementSelectedrcs,rcsIDVar]  
+  
+  table <- data.frame("Variable"=selectedSymptoms)
+  
+  for (symptom in selectedSymptoms) {
+    model <- glm(data[,symptom]~rcs(variable), family="binomial", x=T, y=T)
+    table[table[,"Variable"]==symptom, "P value"] <- 
+      ifelse(anova(model, test="Chi")[2,5]<0.001,
+             "P<0.001", 
+             paste(round(anova(model, test="Chi")[2,5],4)))
+  }
+  return(table)
+}

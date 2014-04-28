@@ -464,13 +464,16 @@ output$plotTimelineBoxplots <- renderPlot({
 },height=numRowsTimelineBoxplots)
 
 output$tableforBoxplots <- renderUI({
+  if(!is.null(dataFiltered())) {
+    if(input$treatasBinary==FALSE){
+  
   out <- tabelizeBoxplots(measurements=Measurement(),
                           measurementVar=input$measurementVar,
                           data=dataFiltered(),
                           selectedSymptoms=input$selectedSymptoms) 
   
   return(div(HTML(out),class="shiny-html-output"))
-  
+}}
   })
 
 output$messageNotAppropriate3 <- renderText({
@@ -803,6 +806,20 @@ output$messageNotAppropriate7 <- renderText({
   if(!is.null(input$treatasBinary)){
     if (input$treatasBinary==FALSE) {
       "This type of analysis is not appropriate for numerical responses."
+    }}
+})
+
+# table - RCS table ###
+output$tableRCS <- renderTable({
+  
+  if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedrcs) )){
+    if(input$treatasBinary==TRUE){
+      tabelizeRCS(data.all=dataExtended(),
+                  data.yn=dataFiltered.yn(),
+                  measurement=Measurement(),
+                  selectedSymptoms=input$selectedSymptoms,
+                  measurementSelectedrcs=input$measurementSelectedrcs,
+                  rcsIDVar=input$rcsIDVar)
     }}
 })
 

@@ -135,7 +135,8 @@ shinyUI(pageWithSidebar(
                #textOutput("messageSelectVars"),
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),
-               plotOutput("plotRCS", height="100%")
+               plotOutput("plotRCS", height="100%"),
+               tableOutput("tableRCS")
       ),
       
       # TAB - Logistf ####
