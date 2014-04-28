@@ -145,7 +145,8 @@ shinyUI(pageWithSidebar(
                # textOutput("messageSelectVars"),
                uiOutput("logistfUI2"),
                uiOutput("logistfUI"),
-               plotOutput("plotLogistf", height="auto")
+               plotOutput("plotLogistf", height="auto"),
+               tableOutput("tableLogistf")
                ),
       
 #       # TAB - Mixed model ####

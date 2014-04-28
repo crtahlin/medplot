@@ -844,9 +844,9 @@ output$logistfUI2= renderUI({
   if(!is.null(dataFiltered())){
     if (input$treatasBinary==TRUE) {
     selectInput(inputId="logistfIDVar",
-                label="Select a numeric variable to associate with presence of symptoms:", 
+                label="Select a variable to associate with presence of symptoms:", 
                 choices=dataVariableNames(),
-                if (input$dataFileType=="Demo"){selected=c("Age")})
+                if (input$dataFileType=="Demo"){selected=c("Sex")})
     }
   }
 })
@@ -866,6 +866,19 @@ output$plotLogistf <- renderPlot({
   }
 }, height=numRowsLogistf)
 
+
+# table - logistf ###
+output$tableLogistf <- renderTable({
+  if(!(is.null(Measurement()) || is.null(input$measurementSelectedlogistf) )){
+    if (input$treatasBinary==TRUE) {
+  tabelizeLogistf(data=dataExtended(),
+                  data.yn=dataFiltered.yn(),
+                  measurement=Measurement(),
+                  measurementSelectedlogistf=input$measurementSelectedlogistf,
+                  logistfIDVar=input$logistfIDVar,
+                  selectedSymptoms=input$selectedSymptoms)
+    }}
+  })
 
 output$messageNotAppropriate8 <- renderText({
   if(!is.null(input$treatasBinary)){

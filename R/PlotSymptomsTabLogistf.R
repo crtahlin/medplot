@@ -67,3 +67,32 @@ plotLogistf <- function (data,
     ##### fix the title, to express what the OR represents - in case of categorical variables or more than 1 level
   }
 }
+
+#' @title Logistf data in tabular format
+#' 
+#' @description TODO
+#' 
+#' @param TODO
+tabelizeLogistf <- function (data,
+                             data.yn,
+                             measurement,
+                             measurementSelectedlogistf,
+                             logistfIDVar,
+                             selectedSymptoms) {
+
+
+  dataSubset <- data.yn[measurement==measurementSelectedlogistf,]
+  variable <- data[measurement==measurementSelectedlogistf, logistfIDVar]
+  
+  table <- data.frame("Variable"=selectedSymptoms)
+  for (symptom in selectedSymptoms) {
+  model <- logistf(dataSubset[,symptom] ~ variable, family="binomial")
+  table[table["Variable"]==symptom, "Odds ratio"] <- 
+    exp(model$coef[2])
+  table[table["Variable"]==symptom, "95% conf. interval"] <- 
+    paste(format(exp(model$ci.lower[2]), digits=2),
+          " to ",
+          format(exp(model$ci.upper[2]), digits=2))
+  }
+  return(table)
+}
