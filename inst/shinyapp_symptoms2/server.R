@@ -128,7 +128,7 @@ shinyServer(function(input, output, session) {
         300)}else{return(0)}}
   
   NumRows <- function(){if(!is.null(dataFiltered())){
-    if(input$treatasBinary==FALSE){return(0)}
+    #if(input$treatasBinary==FALSE){return(0)}
     ceiling(length(input$selectedSymptoms)/3)*300  }else{return(0)} }
   
   # REACTIVE FUNCTIONS ####
@@ -215,11 +215,11 @@ shinyServer(function(input, output, session) {
   
   # dataFiltered.yn() - dataset with the positive/negative values for the selected symptoms ####
   dataFiltered.yn=reactive({
-    if(!is.null(dataFiltered())){
+    if( !( is.null(dataFiltered()) | is.null(input$thresholdValue) )) {
       #apply(symptomsData()[, -c(1:3)], 1, function(x) ifelse(x>input$threshold, 1, 0))
       data=ifelse(dataFiltered()[, input$selectedSymptoms, drop=FALSE]>input$thresholdValue, 1, 0)
       return(data)
-    }
+    } else {return(NULL)}
   })
   
   
@@ -573,9 +573,11 @@ output$textTablePropMedian <- renderUI({
   if(!is.null(dataFiltered())){
     if(input$treatasBinary==TRUE){
       
-    tagList(p("Table displays for each variable the proportion of subject with
-            positive values of a variable,  median value and interquantile
-            range for of the variable (25th to 75th percentile).", br(), br() ))
+    tagList(p("The table displays for each variable the proportion and number of subject with
+            positive values for each variable, and the 95% confidence interval for the proportion (based on binomial distribution).  
+            For numerical variables: the table displays the median value and interquantile
+            range for of the variable (25th to 75th percentile) and the 95% confidence interval for the median (evaluated using 
+              the bootstrap percentile method based on 2000 bootstrap iterations).", br(), br() ))
     }
   }
 })
@@ -765,40 +767,40 @@ output$messageNotAppropriate6 <- renderText({
 # ui - user interface to select a numerical variable to associate with the presence of symptom ###
 output$rcsUI= renderUI({
   if(!is.null(dataFiltered())){
-    if(input$treatasBinary==TRUE){
+   
     selectInput(inputId="rcsIDVar",
                 label="Numerical variable:", 
                 choices=dataVariableNames(),
                 multiple=FALSE,
                 if (input$dataFileType=="Demo"){selected=c("Age")}) 
-    }
+    
   }
 })
 
 # ui - user interface to select which measurments to cluster ###
 output$rcsUI2 = renderUI({
   if(!is.null(measurementLevels())){
-    if(input$treatasBinary==TRUE){
+   
     #select the measurement
     selectInput(inputId="measurementSelectedrcs",
                 label="Select the measurement occasion (time):", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
-    }
+   
   }
 })
 
 # plot - RCS plot ###
 output$plotRCS=renderPlot({
-  if(input$treatasBinary==TRUE){
+ 
   if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedrcs) )){
     plotRCS(data.all=dataExtended(),
             data.yn=dataFiltered.yn(),
             measurement=Measurement(),
             selectedSymptoms=input$selectedSymptoms,
             measurementSelectedrcs=input$measurementSelectedrcs,
-            rcsIDVar=input$rcsIDVar)   
-  }
-  }
+            rcsIDVar=input$rcsIDVar,
+            binaryVar=input$treatasBinary)   
+   }
 }, height=NumRows)
 
 output$messageNotAppropriate7 <- renderText({
@@ -812,14 +814,17 @@ output$messageNotAppropriate7 <- renderText({
 output$tableRCS <- renderTable({
   
   if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedrcs) )){
-    if(input$treatasBinary==TRUE){
+    #if(input$treatasBinary==TRUE){
       tabelizeRCS(data.all=dataExtended(),
                   data.yn=dataFiltered.yn(),
                   measurement=Measurement(),
                   selectedSymptoms=input$selectedSymptoms,
                   measurementSelectedrcs=input$measurementSelectedrcs,
-                  rcsIDVar=input$rcsIDVar)
-    }}
+                  rcsIDVar=input$rcsIDVar, 
+				  binaryVar=input$treatasBinary
+				  )
+    #}
+	}
 })
 
 ################ association of variables with the outcome using logistic regression with Firth correction

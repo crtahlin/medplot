@@ -131,7 +131,7 @@ shinyUI(pageWithSidebar(
       
       # TAB - RCS ####
       tabPanel(title="RCS: by measurement occasion",
-               textOutput("messageNotAppropriate7"),
+               #textOutput("messageNotAppropriate7"),
                #textOutput("messageSelectVars"),
                uiOutput("rcsUI"),
                uiOutput("rcsUI2"),
