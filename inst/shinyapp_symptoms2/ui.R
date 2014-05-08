@@ -149,11 +149,12 @@ shinyUI(pageWithSidebar(
                tableOutput("tableLogistf")
                ),
       
-#       # TAB - Mixed model ####
-#       tabPanel(title="Mixed model",
-#                uiOutput("selectResponse"),
-#                uiOutput("")
-#                ),
+      # TAB - Mixed model ####
+      tabPanel(title="Mixed model",
+               uiOutput("selectMixedModelType"),
+               plotOutput("Graph"),
+               tableOutput("Table")
+               ),
       
       # TAB - Selected data ####
       tabPanel(title="Selected data", 
