@@ -27,6 +27,8 @@ library(rms)
 library(logistf)
 # library for permutation tests
 library(permute)
+# library for mixed models
+library(lme4)
 
 # TEMP for debuging
 # source("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_package/R/TablePropWithSymptoms.r")
@@ -890,6 +892,23 @@ output$messageNotAppropriate8 <- renderText({
       "This type of analysis is not appropriate for numerical responses."
     }}
 })
+
+
+# TAB - Mixed model ####
+output$selectMixedModelType <- renderUI({
+  selectInput(inputId="selectedMixedModelType",
+              label="Select a mixed model type:",
+choices=c("Model response with fixed effect of grouping variable and
+          random intercept for every subject"="MMsimple",
+          "Model response with fixed effects of grouping variable,
+          measurement occasion and random intercept for every subject"="MMmeasurement",
+          "Model response with fixed effect of grouping variable,
+          time from inclusion in study and 
+          random intercept for every subject"="MMtimeSinceInclusion"),
+              selected="MMsimple")
+  
+  })
+
 
 # TAB - Selected transformed data ####
 # table - list the subseted data in an output slot ###
