@@ -27,8 +27,9 @@ library(rms)
 library(logistf)
 # library for permutation tests
 library(permute)
-# library for mixed models
+# libraries for mixed models
 library(lme4)
+library(lmerTest)
 
 # TEMP for debuging
 # source("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_package/R/TablePropWithSymptoms.r")
@@ -906,6 +907,19 @@ choices=c("Model response with fixed effect of grouping variable and
           time from inclusion in study and 
           random intercept for every subject"="MMtimeSinceInclusion"),
               selected="MMsimple")
+  
+  })
+
+output$mixedModelTables <- renderTable({
+  .mixedModel(data=dataFiltered(),
+              selectedSymptoms=input$selectedSymptoms,
+              groupingVar=input$groupingVar,
+              subjectIDVar=input$patientIDVar,
+              measurementVar=input$measurementVar,
+              dateVar=input$dateVar,
+              thresholdValue=input$thresholdValue,
+              treatasBinary=input$treatasBinary,
+              selectedModel=input$selectedMixedModelType)
   
   })
 

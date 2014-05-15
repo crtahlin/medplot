@@ -19,6 +19,7 @@ plotSymptomsTimeline <- function (data,
   
   # Scenario - timeFromInclusion
   # add info about days since inclusion in the study in a column if needed for ploting
+  # TODO: I will rewrite this as .calculateTimeSinceInclusion(); use this function here instead
   if (displayFormat == "timeFromInclusion") {
     # find the day of inclusion in the study for each person
     uniquePeople <- as.data.frame(unique(data[personID]))
