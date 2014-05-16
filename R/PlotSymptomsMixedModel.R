@@ -8,19 +8,38 @@
                         treatasBinary,       # input$treatasBinary
                         selectedModel){      # input$selectedMixedModelType
   
+  # make groupingVar bniary variable
+  data[, groupingVar] <- as.factor(data[, groupingVar])
+  
+  # name of the binary grouping variable coeficient assigned by R
+  groupingVarCoefName <- paste0(groupingVar,levels(data[,groupingVar])[2])
   # if response variable is binary, do a data transformation based on the thresholdvalue
   if (treatasBinary==TRUE) {data[, selectedSymptoms] <- 
-                              ifelse(data[,selectedSymptoms]>thresholdValue, 1, 0)}
+                              ifelse(data[,selectedSymptoms]>thresholdValue, 1, 0)                            
+  }
+  
+  if (selectedModel=="MMtimeSinceInclusion") {
   # if the model includes days since inclusion, add this info to the data (column "daysSinceInclusion")
-  data <- .calculateTimeSinceInclusion(data, subjectIDVar, dateVar)
+  data <- .calculateDaysSinceInclusion(data, subjectIDVar, dateVar)
   time <- "daysSinceInclusion"
+  }
   
   # prepare data frame for the results, depending on what kind of response variable we have
   if (treatasBinary==TRUE) {
-    results <- data.frame(expand.grid(Variable=selectedSymptoms), OR=NA, ORCILower=NA, ORCIUpper=NA, ORPValue=NA)
+    resultsGroupingVar <- 
+      data.frame(expand.grid(Variable=selectedSymptoms), OR=NA, ORCILower=NA, ORCIUpper=NA, ORPValue=NA)
+    resultsMeasurementVar <- 
+      data.frame(expand.grid(Variable=selectedSymptoms), OR=NA, ORCILower=NA, ORCIUpper=NA, ORPValue=NA)
+    resultsDaysSinceInclusion <- 
+      data.frame(expand.grid(Variable=selectedSymptoms), OR=NA, ORCILower=NA, ORCIUpper=NA, ORPValue=NA)
   }
   if (treatasBinary==FALSE) {
-    results <- data.frame(expand.grid(Variable=selectedSymptoms), beta=NA, betaCILower=NA, betaCIUpper=NA, betaPValue=NA)
+    resultsGroupingVar <- 
+      data.frame(expand.grid(Variable=selectedSymptoms), beta=NA, betaCILower=NA, betaCIUpper=NA, betaPValue=NA)
+    resultsMeasurementVar <- 
+      data.frame(expand.grid(Variable=selectedSymptoms), beta=NA, betaCILower=NA, betaCIUpper=NA, betaPValue=NA)
+    resultsDaysSinceInclusion <- 
+      data.frame(expand.grid(Variable=selectedSymptoms), beta=NA, betaCILower=NA, betaCIUpper=NA, betaPValue=NA)
   }
   
   # cycle through response variables
@@ -38,38 +57,102 @@
       formula <- as.formula(paste(symptom, "~", time,"+", groupingVar, "+(1|", subjectIDVar, ")"))
     }
     
+        
     # build the model depending on whether the response is binary or not
     if (treatasBinary==TRUE) {
       model <- glmer(formula, family=binomial,  na.action=na.omit, data=data)
-      results[results["Variable"]==symptom, "OR"] <- exp(summary(model)$coef[2,1])
-      results[results["Variable"]==symptom, "ORCILower"] <- 
-        exp(summary(model)$coef[2,1] - qnorm(.975)*summary(model)$coef[2,2])
-      results[results["Variable"]==symptom, "ORCIUpper"] <- 
-        exp(summary(model)$coef[2,1] + qnorm(.975)*summary(model)$coef[2,2])
-      results[results["Variable"]==symptom, "ORPValue"] <- 
-        summary(model)$coef[2,4]
       
+      # results for the grouping variable
+      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "OR"] <- 
+        exp(summary(model)$coef[groupingVarCoefName, "Estimate"])
+      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "ORCILower"] <- 
+        exp(summary(model)$coef[groupingVarCoefName, "Estimate"] - 
+              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "ORCIUpper"] <- 
+        exp(summary(model)$coef[groupingVarCoefName, "Estimate"] +
+              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "ORPValue"] <- 
+        summary(model)$coef[groupingVarCoefName, "Pr(>|z|)"]
+    
+      if (selectedModel=="MMmeasurement") {
+      # results for the measurement variable
+      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "OR"] <- 
+        exp(summary(model)$coef[measurementVar, "Estimate"])
+      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORCILower"] <- 
+        exp(summary(model)$coef[measurementVar, "Estimate"] - 
+              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORCIUpper"] <- 
+        exp(summary(model)$coef[measurementVar, "Estimate"] +
+              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORPValue"] <- 
+        summary(model)$coef[measurementVar, "Pr(>|z|)"]
+      }
+      
+      if (selectedModel=="MMtimeSinceInclusion") {
+      # results for the days since inclusion variable
+      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "OR"] <- 
+        exp(summary(model)$coef[time, "Estimate"])
+      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCILower"] <- 
+        exp(summary(model)$coef[time, "Estimate"] - 
+              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCIUpper"] <- 
+        exp(summary(model)$coef[time, "Estimate"] +
+              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORPValue"] <- 
+        summary(model)$coef[time, "Pr(>|z|)"]
+      }
       
     }
+    
+    
     if(treatasBinary==FALSE) {
       model <- lmer(formula, na.action=na.omit, data=data)
-      results[results["Variable"]==symptom, "beta"] <-
-        summary(model)$coef[2,1]
-      results[results["Variable"]==symptom, "betaCILower"] <-
-        confint(model)[4,1]
-      results[results["Variable"]==symptom, "betaCIUpper"] <-
-        confint(model)[4,2]
-      results[results["Variable"]==symptom, "betaPValue"] <-
-        summary(model)$coef[2,5]
+      
+      # results for the grouping variable
+      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "beta"] <-
+        summary(model)$coef[groupingVarCoefName, "Estimate"]
+      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "betaCILower"] <-
+        confint(model)[groupingVarCoefName, "2.5 %"]
+      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "betaCIUpper"] <-
+        confint(model)[groupingVarCoefName, "97.5 %"]
+      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "betaPValue"] <-
+        summary(model)$coef[groupingVarCoefName, "Pr(>|t|)"]
+      
+      if (selectedModel=="MMmeasurement") {
+      # results for the measurement variable
+      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "beta"] <-
+        summary(model)$coef[measurementVar, "Estimate"]
+      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaCILower"] <-
+        confint(model)[measurementVar, "2.5 %"]
+      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaCIUpper"] <-
+        confint(model)[measurementVar, "97.5 %"]
+      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaPValue"] <-
+        summary(model)$coef[measurementVar, "Pr(>|t|)"]
+      }
+     
+      if (selectedModel=="MMtimeSinceInclusion") {
+      # results for the days since inclusion variable
+      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "beta"] <-
+        summary(model)$coef[time, "Estimate"]
+      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCILower"] <-
+        confint(model)[time, "2.5 %"]
+      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCIUpper"] <-
+        confint(model)[time, "97.5 %"]
+      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaPValue"] <-
+        summary(model)$coef[time, "Pr(>|t|)"]
+      }
+      
+      
     }
   }
-  return(results)
+  return(list(groupingVar=resultsGroupingVar,
+              measurementVar=resultsMeasurementVar,
+              daysSinceInclusion=resultsDaysSinceInclusion ))
 }
 
 .calculateDaysSinceInclusion <- function (data,
                                           subjectIDVar,
                                           dateVar) {
-  
   
   # find the day of inclusion in the study for each person
   uniquePeople <- as.data.frame(unique(data[subjectIDVar]))

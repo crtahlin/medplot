@@ -910,7 +910,8 @@ choices=c("Model response with fixed effect of grouping variable and
   
   })
 
-output$mixedModelTables <- renderTable({
+
+mixedModelResults <- reactive({
   .mixedModel(data=dataFiltered(),
               selectedSymptoms=input$selectedSymptoms,
               groupingVar=input$groupingVar,
@@ -920,9 +921,42 @@ output$mixedModelTables <- renderTable({
               thresholdValue=input$thresholdValue,
               treatasBinary=input$treatasBinary,
               selectedModel=input$selectedMixedModelType)
+  })
+
+output$mixedModelTable1 <- renderUI({
+  results <- mixedModelResults()[[1]] 
+  
+  out <- print(xtable(results, caption=paste("Fixed effects of", input$groupingVar)),
+        type="html",
+        html.table.attributes='class="data table table-bordered table-condensed"',
+        caption.placement="top")
+  return(div(HTML(out),class="shiny-html-output"))
   
   })
 
+output$mixedModelTable2 <- renderUI({
+  if (input$selectedMixedModelType=="MMmeasurement") {
+  results <- mixedModelResults()[[2]] 
+  
+  out <- print(xtable(results, caption=paste("Fixed effects of", input$measurementVar)),
+               type="html",
+               html.table.attributes='class="data table table-bordered table-condensed"',
+               caption.placement="top")
+  return(div(HTML(out),class="shiny-html-output"))
+  }
+})
+
+output$mixedModelTable3 <- renderUI({
+  if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+  results <- mixedModelResults()[[3]] 
+  
+  out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
+               type="html",
+               html.table.attributes='class="data table table-bordered table-condensed"',
+               caption.placement="top")
+  return(div(HTML(out),class="shiny-html-output"))
+  }
+})
 
 # TAB - Selected transformed data ####
 # table - list the subseted data in an output slot ###
