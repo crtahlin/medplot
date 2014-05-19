@@ -130,6 +130,10 @@ shinyServer(function(input, output, session) {
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
+  numRowsMixedModels <- function(){if(!is.null(dataFiltered())){
+    #if(input$treatasBinary==FALSE){return(0)}
+    ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
+  
   NumRows <- function(){if(!is.null(dataFiltered())){
     #if(input$treatasBinary==FALSE){return(0)}
     ceiling(length(input$selectedSymptoms)/3)*300  }else{return(0)} }
@@ -922,6 +926,16 @@ mixedModelResults <- reactive({
               treatasBinary=input$treatasBinary,
               selectedModel=input$selectedMixedModelType)
   })
+
+
+output$mixedModelGraph1 <- renderPlot({
+  print(.plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
+                                 groupingVar=input$groupingVar,
+                                 groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
+                                 treatasBinary=input$treatasBinary) 
+  )
+  
+  }, height=numRowsMixedModels)
 
 output$mixedModelTable1 <- renderUI({
   results <- mixedModelResults()[[1]] 

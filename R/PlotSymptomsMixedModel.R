@@ -13,6 +13,8 @@
   
   # name of the binary grouping variable coeficient assigned by R
   groupingVarCoefName <- paste0(groupingVar,levels(data[,groupingVar])[2])
+  # reference value is?
+  referenceValue <- levels(data[,groupingVar])[2]
   # if response variable is binary, do a data transformation based on the thresholdvalue
   if (treatasBinary==TRUE) {data[, selectedSymptoms] <- 
                               ifelse(data[,selectedSymptoms]>thresholdValue, 1, 0)                            
@@ -146,6 +148,7 @@
     }
   }
   return(list(groupingVar=resultsGroupingVar,
+              groupingVarReferenceValue=referenceValue,
               measurementVar=resultsMeasurementVar,
               daysSinceInclusion=resultsDaysSinceInclusion ))
 }
@@ -167,4 +170,35 @@
   data$daysSinceInclusion <- as.numeric(data[,dateVar] - data$minDate) # save as numeric for melt()to work
   
   return(data)
+}
+
+.plotFixedEffectsofGroupingVar <- function (calculatedStatistics,
+                                            groupingVar,
+                                            groupingVarReferenceValue,
+                                            treatasBinary) {
+  
+  graphTitle <- paste("Fixed effects of", groupingVar)
+  if (treatasBinary==TRUE) {xlabLabel <- "Odds ratios"} else {
+    xlabLabel <- "Slope coefficients"}
+  
+  # for binary response variable
+  if (treatasBinary==TRUE) {
+  plot <- ggplot() +
+    geom_errorbarh(data=calculatedStatistics, 
+                   mapping=aes(y=Variable, x=ORCIUpper, xmin=ORCIUpper, xmax=ORCILower),
+                   height=0.2, size=1) +
+    geom_point(data=calculatedStatistics, 
+               mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  +
+    #facet_grid(Variable~.) + 
+    #scale_x_continuous(limits=c(0,1),
+    #                   breaks=seq(0,1,by=0.2),
+    #                   labels=abs(seq(0,1,by=0.2)),
+    #                   minor_breaks=((seq(0,1, by=0.1)))) +
+    # geom_vline(xintercept=0)+
+    theme_bw() + labs(title=graphTitle,
+                      x= xlabLabel)
+}
+
+return(plot)
+
 }

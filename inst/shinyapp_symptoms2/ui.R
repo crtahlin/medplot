@@ -152,8 +152,9 @@ shinyUI(pageWithSidebar(
       # TAB - Mixed model ####
       tabPanel(title="Mixed model",
                uiOutput("selectMixedModelType"),
-               plotOutput("Graph"),
+               
                tableOutput("mixedModelTable1"),
+               plotOutput("mixedModelGraph1", height="auto"),
                tableOutput("mixedModelTable2"),
                tableOutput("mixedModelTable3")
                ),
