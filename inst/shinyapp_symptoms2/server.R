@@ -923,7 +923,7 @@ choices=c("Model response with fixed effect of grouping variable and
 
 
 mixedModelResults <- reactive({
-  .mixedModel(data=dataFiltered(),
+  mixedModel(data=dataFiltered(),
               selectedSymptoms=input$selectedSymptoms,
               groupingVar=input$groupingVar,
               subjectIDVar=input$patientIDVar,
@@ -949,7 +949,7 @@ output$mixedModelTable1 <- renderUI({
 
 output$mixedModelGraph1 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
-  print(.plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
+  print(plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
                                        groupingVar=input$groupingVar,
                                        groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
                                        treatasBinary=input$treatasBinary) 
@@ -975,7 +975,7 @@ output$mixedModelTable2 <- renderUI({
 output$mixedModelGraph2 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
-  print(.plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
+  print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
                                        measurementVar=input$measurementVar,
                                        treatasBinary=input$treatasBinary) 
   )
@@ -999,7 +999,7 @@ output$mixedModelTable3 <- renderUI({
 output$mixedModelGraph3 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
-  print(.plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+  print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
                                        treatasBinary=input$treatasBinary) 
   )
   }}

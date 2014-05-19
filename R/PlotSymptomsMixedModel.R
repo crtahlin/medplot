@@ -1,4 +1,4 @@
-.mixedModel <- function(data,               # dataFiltered()
+mixedModel <- function(data,               # dataFiltered()
                         selectedSymptoms,    # input$selectedSymptoms
                         groupingVar,         # input$groupingVar
                         subjectIDVar,        # input$patientIDVar
@@ -22,7 +22,7 @@
   
   if (selectedModel=="MMtimeSinceInclusion") {
   # if the model includes days since inclusion, add this info to the data (column "daysSinceInclusion")
-  data <- .calculateDaysSinceInclusion(data, subjectIDVar, dateVar)
+  data <- calculateDaysSinceInclusion(data, subjectIDVar, dateVar)
   time <- "daysSinceInclusion"
   }
   
@@ -153,7 +153,7 @@
               daysSinceInclusion=resultsDaysSinceInclusion ))
 }
 
-.calculateDaysSinceInclusion <- function (data,
+calculateDaysSinceInclusion <- function (data,
                                           subjectIDVar,
                                           dateVar) {
   
@@ -172,7 +172,7 @@
   return(data)
 }
 
-.plotFixedEffectsofGroupingVar <- function (calculatedStatistics,
+plotFixedEffectsofGroupingVar <- function (calculatedStatistics,
                                             groupingVar,
                                             groupingVarReferenceValue,
                                             treatasBinary) {
@@ -210,7 +210,7 @@ return(plot)
 }
 
 
-.plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
+plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
                                                measurementVar,
                                                treatasBinary) {
   
@@ -248,7 +248,7 @@ return(plot)
 # .plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
 #                                       treatasBinary=input$treatasBinary) 
 
-.plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
+plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
                                                    treatasBinary) {
   
   graphTitle <- paste("Fixed effects of days since inclusion in the study")
