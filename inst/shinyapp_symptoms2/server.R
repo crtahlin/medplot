@@ -130,9 +130,17 @@ shinyServer(function(input, output, session) {
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
-  numRowsMixedModels <- function(){if(!is.null(dataFiltered())){
-    #if(input$treatasBinary==FALSE){return(0)}
+  numRowsMixedModels1 <- function(){if(!is.null(dataFiltered()) &
+                                         !is.null(input$selectedMixedModelType)){
     ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
+  
+  numRowsMixedModels2 <- function(){if(!is.null(dataFiltered()) &
+                                                  !is.null(input$selectedMixedModelType)){
+    (input$selectedMixedModelType=="MMmeasurement")*ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
+  
+  numRowsMixedModels3 <- function(){if(!is.null(dataFiltered()) &
+                                                  !is.null(input$selectedMixedModelType)){
+    (input$selectedMixedModelType=="MMtimeSinceInclusion")*ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
   
   NumRows <- function(){if(!is.null(dataFiltered())){
     #if(input$treatasBinary==FALSE){return(0)}
@@ -911,8 +919,7 @@ choices=c("Model response with fixed effect of grouping variable and
           time from inclusion in study and 
           random intercept for every subject"="MMtimeSinceInclusion"),
               selected="MMsimple")
-  
-  })
+})
 
 
 mixedModelResults <- reactive({
@@ -927,10 +934,8 @@ mixedModelResults <- reactive({
               selectedModel=input$selectedMixedModelType)
   })
 
-
-
-
 output$mixedModelTable1 <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
   results <- mixedModelResults()[["groupingVar"]] 
   
   out <- print(xtable(results, caption=paste("Fixed effects of", input$groupingVar)),
@@ -938,20 +943,23 @@ output$mixedModelTable1 <- renderUI({
         html.table.attributes='class="data table table-bordered table-condensed"',
         caption.placement="top")
   return(div(HTML(out),class="shiny-html-output"))
+  }
   
   })
 
 output$mixedModelGraph1 <- renderPlot({
+  if(!is.null(input$selectedMixedModelType)) {
   print(.plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
                                        groupingVar=input$groupingVar,
                                        groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
                                        treatasBinary=input$treatasBinary) 
   )
-  
-}, height=numRowsMixedModels)
+  }
+}, height=numRowsMixedModels1)
 
 
 output$mixedModelTable2 <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
   if (input$selectedMixedModelType=="MMmeasurement") {
   results <- mixedModelResults()[["measurementVar"]] 
   
@@ -961,17 +969,21 @@ output$mixedModelTable2 <- renderUI({
                caption.placement="top")
   return(div(HTML(out),class="shiny-html-output"))
   }
+  }
 })
 
 output$mixedModelGraph2 <- renderPlot({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMmeasurement") {
   print(.plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
                                        measurementVar=input$measurementVar,
                                        treatasBinary=input$treatasBinary) 
   )
-  
-}, height=numRowsMixedModels)
+  }}
+}, height=numRowsMixedModels2)
 
 output$mixedModelTable3 <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
   if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
   results <- mixedModelResults()[["daysSinceInclusion"]] 
   
@@ -981,14 +993,17 @@ output$mixedModelTable3 <- renderUI({
                caption.placement="top")
   return(div(HTML(out),class="shiny-html-output"))
   }
+  }
 })
 
 output$mixedModelGraph3 <- renderPlot({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
   print(.plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
                                        treatasBinary=input$treatasBinary) 
   )
-  
-}, height=numRowsMixedModels)
+  }}
+}, height=numRowsMixedModels3)
 
 # TAB - Selected transformed data ####
 # table - list the subseted data in an output slot ###
