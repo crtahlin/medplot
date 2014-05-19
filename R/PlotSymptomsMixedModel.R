@@ -20,6 +20,7 @@ mixedModel <- function(data,               # dataFiltered()
                               ifelse(data[,selectedSymptoms]>thresholdValue, 1, 0)                            
   }
   
+  
   if (selectedModel=="MMtimeSinceInclusion") {
   # if the model includes days since inclusion, add this info to the data (column "daysSinceInclusion")
   data <- calculateDaysSinceInclusion(data, subjectIDVar, dateVar)
@@ -108,7 +109,8 @@ mixedModel <- function(data,               # dataFiltered()
     
     
     if(treatasBinary==FALSE) {
-      model <- lmer(formula, na.action=na.omit, data=data)
+      model <- lmerTest::lmer(formula, na.action=na.omit, data=data)
+      browser()
       
       # results for the grouping variable
       resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "beta"] <-
@@ -118,7 +120,7 @@ mixedModel <- function(data,               # dataFiltered()
       resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "betaCIUpper"] <-
         confint(model)[groupingVarCoefName, "97.5 %"]
       resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "betaPValue"] <-
-        summary(model)$coef[groupingVarCoefName, "Pr(>|t|)"]
+        lmerTest::summary(model)$coef[groupingVarCoefName, "Pr(>|t|)"]
       
       if (selectedModel=="MMmeasurement") {
       # results for the measurement variable
@@ -129,7 +131,7 @@ mixedModel <- function(data,               # dataFiltered()
       resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaCIUpper"] <-
         confint(model)[measurementVar, "97.5 %"]
       resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaPValue"] <-
-        summary(model)$coef[measurementVar, "Pr(>|t|)"]
+        lmerTest::summary(model)$coef[measurementVar, "Pr(>|t|)"]
       }
      
       if (selectedModel=="MMtimeSinceInclusion") {
@@ -141,7 +143,7 @@ mixedModel <- function(data,               # dataFiltered()
       resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCIUpper"] <-
         confint(model)[time, "97.5 %"]
       resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaPValue"] <-
-        summary(model)$coef[time, "Pr(>|t|)"]
+        lmerTest::summary(model)$coef[time, "Pr(>|t|)"]
       }
       
       
