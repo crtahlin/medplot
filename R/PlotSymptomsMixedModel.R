@@ -110,7 +110,6 @@ mixedModel <- function(data,               # dataFiltered()
     
     if(treatasBinary==FALSE) {
       model <- lmerTest::lmer(formula, na.action=na.omit, data=data)
-      browser()
       
       # results for the grouping variable
       resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "beta"] <-
