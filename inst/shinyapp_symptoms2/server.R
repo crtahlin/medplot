@@ -928,17 +928,10 @@ mixedModelResults <- reactive({
   })
 
 
-output$mixedModelGraph1 <- renderPlot({
-  print(.plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
-                                 groupingVar=input$groupingVar,
-                                 groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
-                                 treatasBinary=input$treatasBinary) 
-  )
-  
-  }, height=numRowsMixedModels)
+
 
 output$mixedModelTable1 <- renderUI({
-  results <- mixedModelResults()[[1]] 
+  results <- mixedModelResults()[["groupingVar"]] 
   
   out <- print(xtable(results, caption=paste("Fixed effects of", input$groupingVar)),
         type="html",
@@ -948,9 +941,19 @@ output$mixedModelTable1 <- renderUI({
   
   })
 
+output$mixedModelGraph1 <- renderPlot({
+  print(.plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
+                                       groupingVar=input$groupingVar,
+                                       groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
+                                       treatasBinary=input$treatasBinary) 
+  )
+  
+}, height=numRowsMixedModels)
+
+
 output$mixedModelTable2 <- renderUI({
   if (input$selectedMixedModelType=="MMmeasurement") {
-  results <- mixedModelResults()[[2]] 
+  results <- mixedModelResults()[["measurementVar"]] 
   
   out <- print(xtable(results, caption=paste("Fixed effects of", input$measurementVar)),
                type="html",
@@ -960,9 +963,17 @@ output$mixedModelTable2 <- renderUI({
   }
 })
 
+output$mixedModelGraph2 <- renderPlot({
+  print(.plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
+                                       measurementVar=input$measurementVar,
+                                       treatasBinary=input$treatasBinary) 
+  )
+  
+}, height=numRowsMixedModels)
+
 output$mixedModelTable3 <- renderUI({
   if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
-  results <- mixedModelResults()[[3]] 
+  results <- mixedModelResults()[["daysSinceInclusion"]] 
   
   out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
                type="html",
@@ -971,6 +982,13 @@ output$mixedModelTable3 <- renderUI({
   return(div(HTML(out),class="shiny-html-output"))
   }
 })
+
+output$mixedModelGraph3 <- renderPlot({
+  print(.plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+                                       treatasBinary=input$treatasBinary) 
+  )
+  
+}, height=numRowsMixedModels)
 
 # TAB - Selected transformed data ####
 # table - list the subseted data in an output slot ###

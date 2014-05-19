@@ -178,27 +178,105 @@
                                             treatasBinary) {
   
   graphTitle <- paste("Fixed effects of", groupingVar)
-  if (treatasBinary==TRUE) {xlabLabel <- "Odds ratios"} else {
-    xlabLabel <- "Slope coefficients"}
+  
+    
   
   # for binary response variable
   if (treatasBinary==TRUE) {
+    xlabLabel <- "Odds ratios"
   plot <- ggplot() +
     geom_errorbarh(data=calculatedStatistics, 
                    mapping=aes(y=Variable, x=ORCIUpper, xmin=ORCIUpper, xmax=ORCILower),
                    height=0.2, size=1) +
     geom_point(data=calculatedStatistics, 
-               mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  +
-    #facet_grid(Variable~.) + 
-    #scale_x_continuous(limits=c(0,1),
-    #                   breaks=seq(0,1,by=0.2),
-    #                   labels=abs(seq(0,1,by=0.2)),
-    #                   minor_breaks=((seq(0,1, by=0.1)))) +
-    # geom_vline(xintercept=0)+
-    theme_bw() + labs(title=graphTitle,
-                      x= xlabLabel)
-}
+               mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  
+    }
 
+# for continious response variable
+if (treatasBinary==FALSE) {
+  xlabLabel <- "Slope coefficients"
+  plot <- ggplot() +
+    geom_errorbarh(data=calculatedStatistics, 
+                   mapping=aes(y=Variable, x=betaCIUpper, xmin=betaCIUpper, xmax=betaCILower),
+                   height=0.2, size=1) +
+    geom_point(data=calculatedStatistics, 
+               mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white")  
+    }
+
+plot <- plot + theme_bw() + labs(title=graphTitle,
+                                 x= xlabLabel)
 return(plot)
 
+}
+
+
+.plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
+                                               measurementVar,
+                                               treatasBinary) {
+  
+  graphTitle <- paste("Fixed effects of", measurementVar)
+    
+  # for binary response variable
+  if (treatasBinary==TRUE) {
+    xlabLabel <- "Odds ratios"
+    plot <- ggplot() +
+      geom_errorbarh(data=calculatedStatistics, 
+                     mapping=aes(y=Variable, x=ORCIUpper, xmin=ORCIUpper, xmax=ORCILower),
+                     height=0.2, size=1) +
+      geom_point(data=calculatedStatistics, 
+                 mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  
+  }
+  
+  # for continious response variable
+  if (treatasBinary==FALSE) {
+    xlabLabel <- "Slope coefficients"
+    plot <- ggplot() +
+      geom_errorbarh(data=calculatedStatistics, 
+                     mapping=aes(y=Variable, x=betaCIUpper, xmin=betaCIUpper, xmax=betaCILower),
+                     height=0.2, size=1) +
+      geom_point(data=calculatedStatistics, 
+                 mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white")  
+  }
+  
+  plot <- plot + theme_bw() + labs(title=graphTitle,
+                                   x= xlabLabel)
+  return(plot)
+  
+}
+
+
+# .plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+#                                       treatasBinary=input$treatasBinary) 
+
+.plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
+                                                   treatasBinary) {
+  
+  graphTitle <- paste("Fixed effects of days since inclusion in the study")
+  
+  # for binary response variable
+  if (treatasBinary==TRUE) {
+    xlabLabel <- "Odds ratios"
+    plot <- ggplot() +
+      geom_errorbarh(data=calculatedStatistics, 
+                     mapping=aes(y=Variable, x=ORCIUpper, xmin=ORCIUpper, xmax=ORCILower),
+                     height=0.2, size=1) +
+      geom_point(data=calculatedStatistics, 
+                 mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  
+  }
+  
+  # for continious response variable
+  if (treatasBinary==FALSE) {
+    xlabLabel <- "Slope coefficients"
+    plot <- ggplot() +
+      geom_errorbarh(data=calculatedStatistics, 
+                     mapping=aes(y=Variable, x=betaCIUpper, xmin=betaCIUpper, xmax=betaCILower),
+                     height=0.2, size=1) +
+      geom_point(data=calculatedStatistics, 
+                 mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white")  
+  }
+  
+  plot <- plot + theme_bw() + labs(title=graphTitle,
+                                   x= xlabLabel)
+  return(plot)
+  
 }
