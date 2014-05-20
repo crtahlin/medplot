@@ -339,7 +339,6 @@ plotPropWithSymptomsCI <- function (data,
     - dataWithCIs[dataWithCIs["Group"]==as.character(unique(data[,groupingVar])[1])
                   , c("Mean","UpperCI","LowerCI")]
   
-  
   plot <- ggplot() +
     geom_errorbarh(data=dataWithCIs, 
                    mapping=aes(y=Measurement, x=UpperCI, xmin=UpperCI, xmax=LowerCI,
@@ -505,11 +504,15 @@ permCorrPValue <- function(data,
                            measurementVar,
                            selectedSymptoms) {
   
-  results <- data.frame(expand.grid(Group=unique(data[,groupingVar]),
-                                    Measurement=unique(data[,measurementVar]),
+  # define levels for covariates
+  group <- unique(na.omit(data[,groupingVar]))
+  measurement <- unique(na.omit(data[,measurementVar]))
+  
+    results <- data.frame(expand.grid(Group=group,
+                                    Measurement=measurement,
                                     Variable=selectedSymptoms), Mean=NA, LowerCI=NA, UpperCI=NA)
-  for (i in unique(data[,groupingVar])) {
-    for(j in unique(data[,measurementVar])) {
+  for (i in group) {
+    for(j in measurement) {
       for(k in selectedSymptoms) {
         # omit missing values, create boolean vector
         symptomData <- na.omit((data[(data[groupingVar]==i & data[measurementVar]==j), k])==1)
