@@ -59,26 +59,74 @@ shinyUI(pageWithSidebar(
   mainPanel(
     tabsetPanel(
       # TAB - summary of data ####
-      tabPanel(title="Data summary",
+      tabPanel(title="Data overview",
                verbatimTextOutput("dataSummary")), 
       
-      # TAB - Timeline ####
-      tabPanel(title="Timeline",
-               textOutput("messageNotAppropriate"),  
-               # textOutput("messageSelectVars"),
-                 uiOutput("selectDisplayFormat"),
-                 plotOutput("plotTimeline", height="auto")
-               ),
-   
-      # TAB - Distr. of the vars: over time ####
-      tabPanel(title="Distribution of the variables: over time - profile plots" ,
-               textOutput("messageNotAppropriate2"),
+      # TAB - Graphical exploration over time ####
+      tabPanel(title="Graphical exploration : time",
+               uiOutput("selectGraphOverTime"),
+               
+               # Profile plots
                uiOutput("selectGraphType"),
                uiOutput("selectRandomSampleSize"),
                uiOutput("selectMaxGroupSize"),
-               plotOutput("plotTimelineProfiles", height="auto")               
+               plotOutput("plotTimelineProfiles", height="auto"),
+               
+               # Timeline graph
+               uiOutput("selectDisplayFormat"),
+               plotOutput("plotTimeline", height="auto")
+               
+      ),
+     
+      # TAB - Summary tables over time ####
+      tabPanel(title="Summary tables : time"
       ),
       
+      # TAB - Graphical exploration : grouping variable ####
+      tabPanel(title="Graphical exploration : grouping variable"
+               
+                 ),
+      
+      # TAB - Summary tables : grouping variable ####
+      tabPanel(title="Summary tables : grouping variable"
+               ),
+      
+      
+        
+      # TAB - Clustering ####
+      tabPanel(title="Clustering",
+               textOutput("messageNotAppropriate6"),
+               # textOutput("messageSelectVars"),
+               uiOutput("clusteringUI"),
+               plotOutput("plotClusterDendrogram", height="auto"),
+               uiOutput("selectClusterAnnotations"),
+               plotOutput("plotClusterHeatmap"), height="auto"),
+    
+      # TAB - Regression model : one evaluation time ####
+      tabPanel(title="Regression model : one evaluation time"
+        ),
+      
+      # TAB - Regression model : all evaluation times ####
+      tabPanel(title="Regression model : all evaluation times"
+      ),
+      
+#       # TAB - Timeline ####
+#       tabPanel(title="Timeline",
+#                textOutput("messageNotAppropriate"),  
+#                # textOutput("messageSelectVars"),
+#                  uiOutput("selectDisplayFormat"),
+#                  plotOutput("plotTimeline", height="auto")
+#                ),
+   
+#       # TAB - Distr. of the vars: over time ####
+#       tabPanel(title="Distribution of the variables: over time - profile plots" ,
+#                textOutput("messageNotAppropriate2"),
+#                uiOutput("selectGraphType"),
+#                uiOutput("selectRandomSampleSize"),
+#                uiOutput("selectMaxGroupSize"),
+#                plotOutput("plotTimelineProfiles", height="auto")               
+#       ),
+#       
       # TAB - Distr. of the vars: over time w boxplots ####
       tabPanel(title="Distribution of the variables: over time - boxplots",
                textOutput("messageNotAppropriate3"),
@@ -118,14 +166,7 @@ shinyUI(pageWithSidebar(
                ),
       
       
-      # TAB - Clustering ####
-      tabPanel("Clustering: by measurement occasion",
-               textOutput("messageNotAppropriate6"),
-               # textOutput("messageSelectVars"),
-               uiOutput("clusteringUI"),
-               plotOutput("plotClusterDendrogram", height="auto"),
-               uiOutput("selectClusterAnnotations"),
-               plotOutput("plotClusterHeatmap"), height="auto"),
+     
       
       
       

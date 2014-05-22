@@ -345,7 +345,7 @@ shinyServer(function(input, output, session) {
 {if(is.null(dataFiltered())) {h4("Please use the menus below to upload data, select parameters and one or more variables to analyse.")}
 })
 
-# TAB - Data summary ####
+# TAB - Data overview ####
 output$dataSummary <- renderPrint({
   if(!is.null(dataFiltered())) {
     summarizeData(data=dataFiltered(),
@@ -357,22 +357,106 @@ output$dataSummary <- renderPrint({
   }
 })
 
-# TAB - Timeline ####
-output$selectDisplayFormat <- renderUI({
-  if(!is.null(dataFiltered())){
+# TAB - Graphical exploration over time ####
+output$selectGraphOverTime <- renderUI({
+  selectInput(inputId="selectedGraphOverTime",
+              label="Select type of graph:",
+              choices=c("Profile plots"="profilePlot",
+                        "Lasagna plots"="lasagnaPlot",
+                        "Boxplots"="boxPlot",
+                        "Timeline"="timelinePlot",
+                        "Presence of symptoms"="presencePlot",
+                        "Presence of symptoms with CIs"="presenceCIPlot"),
+              selected=NULL,
+              multiple=FALSE)
+  
+})
+
+# Profile plots
+# Menus
+# ui - select type of graph
+output$selectGraphType <- renderUI({
+  if(!is.null(dataFiltered())) {
+    if (input$selectedGraphOverTime=="profilePlot") {
     if(input$treatasBinary==FALSE){
-      selectInput(inputId="displayFormat",
-                  label="Choose what to display on the horizontal axis:",
-                  choices=c("Dates" = "dates",
-                            "Time from inclusion" ="timeFromInclusion",
-                            "Measurement occasions" = "measurementOccasions"),
-                  selected="dates",
+      selectInput(inputId="selectedGraphType",
+                  label="Select type of graphs to plot:",
+                  choices=c("All subjects on one graph"="oneGraph",
+                            "Random selection of subjects on one graph"="randomSample",
+                            "Multiple graphs per variable"="multipleGraphs"),
+                  selected="randomSample",
                   multiple=FALSE)
+    }
     }
   }
 })
 
+output$selectRandomSampleSize <- renderUI({
+  if(!is.null(input$selectedGraphType)) {
+    if (input$selectedGraphType=="randomSample") {
+      if(input$treatasBinary==FALSE){
+        numericInput(inputId="sampleSize",
+                     label="Select number of randomly selected subjects:",
+                     value=10,
+                     min=1,
+                     max=100,
+                     step=5)
+      }
+    }}
+})
 
+
+output$selectMaxGroupSize <- renderUI({
+  if(!is.null(input$selectedGraphType)) {
+    if (input$selectedGraphType=="multipleGraphs") {
+      if(input$treatasBinary==FALSE){
+        numericInput(inputId="groupSize",
+                     label="Select the maximum number of subjects on one graph:",
+                     value=25,
+                     min=10,
+                     max=100,
+                     step=5)
+      }
+    }}
+})
+
+# Graph
+output$plotTimelineProfiles <- renderPlot({
+  if(!is.null(input$selectedGraphType)) {
+    if ( (input$selectedGraphType=="oneGraph") ||
+           (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
+           (input$selectedGraphType=="multipleGraphs" && !is.null(input$groupSize))) {
+      if(input$treatasBinary==FALSE){
+        print(plotTimelineProfiles(data=dataFiltered(),
+                                   plotType=input$selectedGraphType,
+                                   personIDVar=input$patientIDVar,
+                                   measurementVar=input$measurementVar,
+                                   selectedSymptoms=input$selectedSymptoms,
+                                   sizeofRandomSample=input$sampleSize,
+                                   sizeofGroup=input$groupSize))
+      }
+    }}
+}, height=numRowsTimelineProfile)
+
+# Timeline graph
+# Menu
+output$selectDisplayFormat <- renderUI({
+  if(!is.null(dataFiltered())){
+    if(input$selectedGraphOverTime=="timelinePlot") {
+      if(input$treatasBinary==FALSE){
+        selectInput(inputId="displayFormat",
+                    label="Choose what to display on the horizontal axis:",
+                    choices=c("Dates" = "dates",
+                              "Time from inclusion" ="timeFromInclusion",
+                              "Measurement occasions" = "measurementOccasions"),
+                    selected="dates",
+                    multiple=FALSE)
+      }
+    }
+  }
+})
+
+# Graph
 output$plotTimeline <- renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
     if (input$treatasBinary==FALSE) { 
@@ -390,80 +474,116 @@ output$plotTimeline <- renderPlot({
 }, height=numRowsTimeline)
 
 
-output$messageNotAppropriate <- renderText({
-  if(!is.null(input$treatasBinary)){
-  if (input$treatasBinary==TRUE) {
-    "This type of analysis is not appropriate for binary responses."
-  }}
-})
+
+# TAB - Timeline ####
+# output$selectDisplayFormat <- renderUI({
+#   if(!is.null(dataFiltered())){
+#     if(input$selectedGraphOverTime=="timelinePlot") {
+#     if(input$treatasBinary==FALSE){
+#       selectInput(inputId="displayFormat",
+#                   label="Choose what to display on the horizontal axis:",
+#                   choices=c("Dates" = "dates",
+#                             "Time from inclusion" ="timeFromInclusion",
+#                             "Measurement occasions" = "measurementOccasions"),
+#                   selected="dates",
+#                   multiple=FALSE)
+#     }
+#     }
+#   }
+# })
+# 
+# 
+# output$plotTimeline <- renderPlot({
+#   if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
+#     if (input$treatasBinary==FALSE) { 
+#       data=dataFiltered()
+#       # observe({dataFiltered()})
+#       # if no symbols are selected, do not plot
+#       #if (dim(dataFiltered())[1]>0) {
+#       print(plotSymptomsTimeline(data=data,
+#                                  date=input$dateVar,
+#                                  personID=input$patientIDVar,
+#                                  measurement=input$measurementVar,
+#                                  symptoms=input$selectedSymptoms,
+#                                  displayFormat = input$displayFormat)
+#       )}}   
+# }, height=numRowsTimeline)
+# 
+# 
+# output$messageNotAppropriate <- renderText({
+#   if(!is.null(input$treatasBinary)){
+#   if (input$treatasBinary==TRUE) {
+#     "This type of analysis is not appropriate for binary responses."
+#   }}
+# })
 
 # TAB - Distribution of the variables: over time ####
-# ui - select type of graph
-    output$selectGraphType <- renderUI({
-      if(!is.null(dataFiltered())) {
-        if(input$treatasBinary==FALSE){
-        selectInput(inputId="selectedGraphType",
-                    label="Select type of graphs to plot:",
-                    choices=c("All subjects on one graph"="oneGraph",
-                              "Random selection of subjects on one graph"="randomSample",
-                              "Multiple graphs per variable"="multipleGraphs"),
-                    selected="randomSample",
-                    multiple=FALSE)
-        }
-      }
-      })
-    
-    output$selectRandomSampleSize <- renderUI({
-      if(!is.null(input$selectedGraphType)) {
-        if (input$selectedGraphType=="randomSample") {
-          if(input$treatasBinary==FALSE){
-          numericInput(inputId="sampleSize",
-                       label="Select number of randomly selected subjects:",
-                       value=10,
-                       min=1,
-                       max=100,
-                       step=5)
-          }
-        }}
-    })
-    
-    
-    output$selectMaxGroupSize <- renderUI({
-      if(!is.null(input$selectedGraphType)) {
-        if (input$selectedGraphType=="multipleGraphs") {
-          if(input$treatasBinary==FALSE){
-          numericInput(inputId="groupSize",
-                       label="Select the maximum number of subjects on one graph:",
-                       value=25,
-                       min=10,
-                       max=100,
-                       step=5)
-          }
-        }}
-      })
-    output$plotTimelineProfiles <- renderPlot({
-      if(!is.null(input$selectedGraphType)) {
-        if ( (input$selectedGraphType=="oneGraph") ||
-               (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
-               (input$selectedGraphType=="multipleGraphs" && !is.null(input$groupSize))) {
-          if(input$treatasBinary==FALSE){
-          print(plotTimelineProfiles(data=dataFiltered(),
-                                     plotType=input$selectedGraphType,
-                                     personIDVar=input$patientIDVar,
-                                     measurementVar=input$measurementVar,
-                                     selectedSymptoms=input$selectedSymptoms,
-                                     sizeofRandomSample=input$sampleSize,
-                                     sizeofGroup=input$groupSize))
-          }
-        }}
-      }, height=numRowsTimelineProfile)
-
-output$messageNotAppropriate2 <- renderText({
-  if(!is.null(input$treatasBinary)){
-    if (input$treatasBinary==TRUE) {
-      "This type of analysis is not appropriate for binary responses."
-    }}
-})
+# # ui - select type of graph
+#     output$selectGraphType <- renderUI({
+#       if(!is.null(dataFiltered())) {
+#         if(input$treatasBinary==FALSE){
+#         selectInput(inputId="selectedGraphType",
+#                     label="Select type of graphs to plot:",
+#                     choices=c("All subjects on one graph"="oneGraph",
+#                               "Random selection of subjects on one graph"="randomSample",
+#                               "Multiple graphs per variable"="multipleGraphs"),
+#                     selected="randomSample",
+#                     multiple=FALSE)
+#         }
+#       }
+#       })
+#     
+#     output$selectRandomSampleSize <- renderUI({
+#       if(!is.null(input$selectedGraphType)) {
+#         if (input$selectedGraphType=="randomSample") {
+#           if(input$treatasBinary==FALSE){
+#           numericInput(inputId="sampleSize",
+#                        label="Select number of randomly selected subjects:",
+#                        value=10,
+#                        min=1,
+#                        max=100,
+#                        step=5)
+#           }
+#         }}
+#     })
+#     
+#     
+#     output$selectMaxGroupSize <- renderUI({
+#       if(!is.null(input$selectedGraphType)) {
+#         if (input$selectedGraphType=="multipleGraphs") {
+#           if(input$treatasBinary==FALSE){
+#           numericInput(inputId="groupSize",
+#                        label="Select the maximum number of subjects on one graph:",
+#                        value=25,
+#                        min=10,
+#                        max=100,
+#                        step=5)
+#           }
+#         }}
+#       })
+#     output$plotTimelineProfiles <- renderPlot({
+#       if(!is.null(input$selectedGraphType)) {
+#         if ( (input$selectedGraphType=="oneGraph") ||
+#                (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
+#                (input$selectedGraphType=="multipleGraphs" && !is.null(input$groupSize))) {
+#           if(input$treatasBinary==FALSE){
+#           print(plotTimelineProfiles(data=dataFiltered(),
+#                                      plotType=input$selectedGraphType,
+#                                      personIDVar=input$patientIDVar,
+#                                      measurementVar=input$measurementVar,
+#                                      selectedSymptoms=input$selectedSymptoms,
+#                                      sizeofRandomSample=input$sampleSize,
+#                                      sizeofGroup=input$groupSize))
+#           }
+#         }}
+#       }, height=numRowsTimelineProfile)
+# 
+# output$messageNotAppropriate2 <- renderText({
+#   if(!is.null(input$treatasBinary)){
+#     if (input$treatasBinary==TRUE) {
+#       "This type of analysis is not appropriate for binary responses."
+#     }}
+# })
 
 # TAB - Distr. of the vars.: over time - boxplots ####
 output$plotTimelineBoxplots <- renderPlot({
