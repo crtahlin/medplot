@@ -450,7 +450,6 @@ output$plotLasagna <- renderUI({
   # generate as many files as there are plots
   for (symptom in input$selectedSymptoms) {
   filenames[symptom] <- paste0("Lasagna",symptom,".png")
-    #paste0(getwd(),"/www/Lasagna",symptom,".png")
   }
   
   # plot graph for each symptom
@@ -471,24 +470,9 @@ output$plotLasagna <- renderUI({
 
 out <- pastePlotFilenames(filenames)
   
-  #img(src="C://Users//CRTAHL~1//AppData//Local//Temp//RtmpopQotV//file7384c273eb4.png")
-
 return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
 
-
-# return(div(id="plotLasagna", class="shiny-plot-output shiny-bound-output",
-#                img(src="C:\\Users\\CRTAHL~1\\AppData\\Local\\Temp\\RtmpopQotV\\file7384c273eb4.png"), 
-#                img(src="C:\\Users\\CRTAHL~1\\AppData\\Local\\Temp\\RtmpopQotV\\file7384c273eb4.png"), 
-#                img(src="C:\\Users\\CRTAHL~1\\AppData\\Local\\Temp\\RtmpopQotV\\file7384c273eb4.png")
-#              )
-#          )
 })
-
-# output$plotLasagna <- renderUI({
-#   observe(dataFiltered())
-#   return(constructPlotHTMLList(filenames))
-#   
-#   })
 
 # Boxplots ####
 # Graph
