@@ -30,6 +30,8 @@ library(permute)
 # libraries for mixed models
 library(lme4)
 library(lmerTest)
+# library for reading png files
+library(png)
 
 # TEMP for debuging
 # source("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_package/R/TablePropWithSymptoms.r")
@@ -42,6 +44,7 @@ shinyServer(function(input, output, session) {
   #how much space should be used for the graphical output of the Rcs estimates and others?  
   # TODO: could drawing graphs be done if(no graph){height=0)?
   numRowsTimeline <- function(){if(!is.null(dataFiltered())){
+    if(input$selectedGraphOverTime!="timelinePlot") {return(0)} # no space reserved
     if(input$treatasBinary==TRUE) {return(0)} # no graph if not possible to draw
     max(ceiling(length(input$selectedSymptoms))*40, # so that legend is visible
         (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
@@ -50,6 +53,7 @@ shinyServer(function(input, output, session) {
   }
   
   numRowsTimelineProfile <- function(){if(!is.null(input$selectedGraphType)){
+    if(input$selectedGraphOverTime!="profilePlot") {return(0)}
     if(input$treatasBinary==TRUE) {return(0)} # no graph if not possible to draw
     if(input$selectedGraphType=="multipleGraphs") { # case of multiple graphs per one variable
       uniqueSubjects <- unique(dataFiltered()[input$patientIDVar])
@@ -70,6 +74,7 @@ shinyServer(function(input, output, session) {
   }
   
   numRowsTimelineBoxplots <- function(){if(!is.null(dataFiltered())){
+    if(input$selectedGraphOverTime!="boxPlot") {return(0)}
     if(input$treatasBinary==TRUE) {return(0)} 
     tmp <- max(ceiling(length(input$selectedSymptoms))*200,
                300) # minumum reserved space
@@ -372,7 +377,7 @@ output$selectGraphOverTime <- renderUI({
   
 })
 
-# Profile plots
+# Profile plots ####
 # Menus
 # ui - select type of graph
 output$selectGraphType <- renderUI({
@@ -438,7 +443,70 @@ output$plotTimelineProfiles <- renderPlot({
     }}
 }, height=numRowsTimelineProfile)
 
-# Timeline graph
+# Lasagna plots ####
+# Graph
+output$plotLasagna <- renderUI({
+  filenames <- vector()
+  # generate as many files as there are plots
+  for (symptom in input$selectedSymptoms) {
+  filenames[symptom] <- paste0("Lasagna",symptom,".png")
+    #paste0(getwd(),"/www/Lasagna",symptom,".png")
+  }
+  
+  # plot graph for each symptom
+  for(symptom in input$selectedSymptoms) {
+        
+    png(filename=paste0(getwd(),"/www/",filenames[symptom]))
+    plotLasagna(data=dataFiltered(), 
+                  treatasBinary=FALSE, #input$treatasBinary,
+                  symptom=symptom,
+                  dateVar="Date", #input$dateVar,
+                  personIDVar="PersonID",#input$patientIDVar, 
+                  measurementVar="Measurement",#input$measurementVar,
+                  groupingVar="Sex", #input$groupingVar, 
+                  thresholdValue=0) #input$thresholdValue)
+    dev.off()
+  }
+  
+
+out <- pastePlotFilenames(filenames)
+  
+  #img(src="C://Users//CRTAHL~1//AppData//Local//Temp//RtmpopQotV//file7384c273eb4.png")
+
+return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
+
+
+# return(div(id="plotLasagna", class="shiny-plot-output shiny-bound-output",
+#                img(src="C:\\Users\\CRTAHL~1\\AppData\\Local\\Temp\\RtmpopQotV\\file7384c273eb4.png"), 
+#                img(src="C:\\Users\\CRTAHL~1\\AppData\\Local\\Temp\\RtmpopQotV\\file7384c273eb4.png"), 
+#                img(src="C:\\Users\\CRTAHL~1\\AppData\\Local\\Temp\\RtmpopQotV\\file7384c273eb4.png")
+#              )
+#          )
+})
+
+# output$plotLasagna <- renderUI({
+#   observe(dataFiltered())
+#   return(constructPlotHTMLList(filenames))
+#   
+#   })
+
+# Boxplots ####
+# Graph
+output$plotTimelineBoxplots <- renderPlot({
+  if(!is.null(dataFiltered())) {
+    if(input$selectedGraphOverTime=="boxPlot") {
+      
+    if(input$treatasBinary==FALSE){
+      print(plotTimelineBoxplots(data=dataFiltered(),
+                                 personIDVar=input$patientIDVar,
+                                 measurementVar=input$measurementVar,
+                                 selectedSymptoms=input$selectedSymptoms)
+      )
+    }}
+  } else {return()}
+},height=numRowsTimelineBoxplots)
+
+# Timeline graph ####
 # Menu
 output$selectDisplayFormat <- renderUI({
   if(!is.null(dataFiltered())){
@@ -459,6 +527,7 @@ output$selectDisplayFormat <- renderUI({
 # Graph
 output$plotTimeline <- renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
+    if(input$selectedGraphOverTime=="timelinePlot") {
     if (input$treatasBinary==FALSE) { 
       data=dataFiltered()
       # observe({dataFiltered()})
@@ -470,9 +539,23 @@ output$plotTimeline <- renderPlot({
                                  measurement=input$measurementVar,
                                  symptoms=input$selectedSymptoms,
                                  displayFormat = input$displayFormat)
-      )}}   
+      )}} }  
 }, height=numRowsTimeline)
 
+# TAB - Summary tables : time ####
+# Boxplot tables
+output$tableforBoxplots <- renderUI({
+  if(!is.null(dataFiltered())) {
+    if(input$treatasBinary==FALSE){
+      
+      out <- tabelizeBoxplots(measurements=Measurement(),
+                              measurementVar=input$measurementVar,
+                              data=dataFiltered(),
+                              selectedSymptoms=input$selectedSymptoms) 
+      
+      return(div(HTML(out),class="shiny-html-output"))
+    }}
+})
 
 
 # TAB - Timeline ####
@@ -586,37 +669,37 @@ output$plotTimeline <- renderPlot({
 # })
 
 # TAB - Distr. of the vars.: over time - boxplots ####
-output$plotTimelineBoxplots <- renderPlot({
-  if(!is.null(dataFiltered())) {
-    if(input$treatasBinary==FALSE){
-    print(plotTimelineBoxplots(data=dataFiltered(),
-                               personIDVar=input$patientIDVar,
-                               measurementVar=input$measurementVar,
-                               selectedSymptoms=input$selectedSymptoms)
-    )
-    }
-  } else {return()}
-},height=numRowsTimelineBoxplots)
-
-output$tableforBoxplots <- renderUI({
-  if(!is.null(dataFiltered())) {
-    if(input$treatasBinary==FALSE){
-  
-  out <- tabelizeBoxplots(measurements=Measurement(),
-                          measurementVar=input$measurementVar,
-                          data=dataFiltered(),
-                          selectedSymptoms=input$selectedSymptoms) 
-  
-  return(div(HTML(out),class="shiny-html-output"))
-}}
-  })
-
-output$messageNotAppropriate3 <- renderText({
-  if(!is.null(input$treatasBinary)){
-    if (input$treatasBinary==TRUE) {
-      "This type of analysis is not appropriate for binary responses."
-    }}
-})
+# output$plotTimelineBoxplots <- renderPlot({
+#   if(!is.null(dataFiltered())) {
+#     if(input$treatasBinary==FALSE){
+#     print(plotTimelineBoxplots(data=dataFiltered(),
+#                                personIDVar=input$patientIDVar,
+#                                measurementVar=input$measurementVar,
+#                                selectedSymptoms=input$selectedSymptoms)
+#     )
+#     }
+#   } else {return()}
+# },height=numRowsTimelineBoxplots)
+#
+# output$tableforBoxplots <- renderUI({
+#   if(!is.null(dataFiltered())) {
+#     if(input$treatasBinary==FALSE){
+#   
+#   out <- tabelizeBoxplots(measurements=Measurement(),
+#                           measurementVar=input$measurementVar,
+#                           data=dataFiltered(),
+#                           selectedSymptoms=input$selectedSymptoms) 
+#   
+#   return(div(HTML(out),class="shiny-html-output"))
+# }}
+#   })
+# 
+# output$messageNotAppropriate3 <- renderText({
+#   if(!is.null(input$treatasBinary)){
+#     if (input$treatasBinary==TRUE) {
+#       "This type of analysis is not appropriate for binary responses."
+#     }}
+# })
 
 # TAB - Distributions of variables ####
 # ui - select measurement occasion ###

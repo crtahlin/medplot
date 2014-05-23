@@ -72,6 +72,12 @@ shinyUI(pageWithSidebar(
                uiOutput("selectMaxGroupSize"),
                plotOutput("plotTimelineProfiles", height="auto"),
                
+               # Lasagna plot
+               uiOutput("plotLasagna"), #, height="700px"),
+               
+               # Boxplots
+               plotOutput("plotTimelineBoxplots", height="auto"),
+               
                # Timeline graph
                uiOutput("selectDisplayFormat"),
                plotOutput("plotTimeline", height="auto")
@@ -79,7 +85,8 @@ shinyUI(pageWithSidebar(
       ),
      
       # TAB - Summary tables over time ####
-      tabPanel(title="Summary tables : time"
+      tabPanel(title="Summary tables : time",
+               uiOutput("tableforBoxplots")
       ),
       
       # TAB - Graphical exploration : grouping variable ####
@@ -127,13 +134,13 @@ shinyUI(pageWithSidebar(
 #                plotOutput("plotTimelineProfiles", height="auto")               
 #       ),
 #       
-      # TAB - Distr. of the vars: over time w boxplots ####
-      tabPanel(title="Distribution of the variables: over time - boxplots",
-               textOutput("messageNotAppropriate3"),
-               plotOutput("plotTimelineBoxplots", height="auto"),
-               uiOutput("tableforBoxplots")
-               ),
-      
+#       # TAB - Distr. of the vars: over time w boxplots ####
+#       tabPanel(title="Distribution of the variables: over time - boxplots",
+#                textOutput("messageNotAppropriate3"),
+#                #plotOutput("plotTimelineBoxplots", height="auto"),
+#                uiOutput("tableforBoxplots")
+#                ),
+#       
       # TAB - Distribution of the variables ####
       tabPanel(title="Distribution of the variables: by measurement occasion",
               textOutput("messageNotAppropriate4"),
