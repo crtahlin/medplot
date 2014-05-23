@@ -28,7 +28,6 @@ Depends:
   lmerTest,
   pheatmap,
   logistf,
-  permute,
-  png
+  permute
 Suggests:  
   SVGAnnotation

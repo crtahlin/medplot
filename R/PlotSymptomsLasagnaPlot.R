@@ -10,10 +10,10 @@ plotLasagna <- function(data, # dataFiltered()
   
   if (treatasBinary==TRUE) {
     # make values binary
-    dataFiltered.yn=ifelse(dataFiltered[ ,selectedSymptoms] > thresholdValue, 1, 0)
+    dataFiltered.yn=ifelse(data[ ,selectedSymptoms] > thresholdValue, 1, 0)
     
-    time=tapply(dataFiltered[,measurementVar], INDEX=dataFiltered[,1], FUN=function(x) x )
-    res=tapply(dataFiltered.yn[,symptom], INDEX=dataFiltered[,1], FUN=function(x) x )
+    time=tapply(data[,measurementVar], INDEX=data[,1], FUN=function(x) x )
+    res=tapply(data.yn[,symptom], INDEX=data[,1], FUN=function(x) x )
     
     my.levels.m=unique(unlist(time))
     
@@ -44,8 +44,8 @@ plotLasagna <- function(data, # dataFiltered()
     #class(a)
     #png("./test.png")
     
-    time=tapply(dataFiltered[,measurementVar], INDEX=dataFiltered[,1], FUN=function(x) x )
-    res=tapply(dataFiltered[,symptom], INDEX=dataFiltered[,1], FUN=function(x) x )
+    time=tapply(data[,measurementVar], INDEX=data[,1], FUN=function(x) x )
+    res=tapply(data[,symptom], INDEX=data[,1], FUN=function(x) x )
     
     my.levels.m=unique(unlist(time))
     

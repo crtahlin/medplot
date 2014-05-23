@@ -30,8 +30,6 @@ library(permute)
 # libraries for mixed models
 library(lme4)
 library(lmerTest)
-# library for reading png files
-library(png)
 
 # TEMP for debuging
 # source("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_package/R/TablePropWithSymptoms.r")
