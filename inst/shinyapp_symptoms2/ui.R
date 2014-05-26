@@ -80,7 +80,11 @@ shinyUI(pageWithSidebar(
                
                # Timeline graph
                uiOutput("selectDisplayFormat"),
-               plotOutput("plotTimeline", height="auto")
+               plotOutput("plotTimeline", height="auto"),
+               
+               # Presence of symptoms graph
+               uiOutput("selectMeasurementForPresencePlot"),
+               plotOutput("plotPresence")
                
       ),
      

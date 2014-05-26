@@ -113,6 +113,17 @@ shinyServer(function(input, output, session) {
     }, silent=TRUE)
   }
   
+  numRowsPresencePlot <- function(){
+    try({
+      if(!is.null(input$selectedMeasurementForPresencePlot)){
+        if(input$selectedGraphOverTime=="presencePlot") {
+        max(ceiling(length(input$selectedSymptoms))*30,
+            300 # minumum reserved space
+        )}}else{return(0)} # height of plot when no data available
+    }, silent=TRUE)
+  }
+  
+  
   numRowsClustering <- function() {if(!is.null(dataFiltered())){
     if(input$treatasBinary==TRUE) {return(0)}
     max(ceiling(length(input$selectedSymptoms))*40,
@@ -369,10 +380,10 @@ output$selectGraphOverTime <- renderUI({
                         "Lasagna plots"="lasagnaPlot",
                         "Boxplots"="boxPlot",
                         "Timeline"="timelinePlot",
-                        "Presence of symptoms"="presencePlot",
-                        "Presence of symptoms with CIs"="presenceCIPlot"),
+                        "Presence of symptoms"="presencePlot"),
               selected=NULL,
-              multiple=FALSE)
+              multiple=FALSE,
+              selectize=TRUE)
   }
   
 })
@@ -530,6 +541,34 @@ output$plotTimeline <- renderPlot({
                                  displayFormat = input$displayFormat)
       )}} }  
 }, height=numRowsTimeline)
+
+# Presence of symptoms graph ####
+# Menu
+output$selectMeasurementForPresencePlot <- renderUI({
+  if(!is.null(input$selectedGraphOverTime)) {
+  if(input$selectedGraphOverTime=="presencePlot") {
+    selectInput(inputId="selectedMeasurementForPresencePlot",
+                label="Select the measurement occasion (time):",
+                choices=measurementLevels(), selected=measurementLevels()[1])
+  }
+  }
+  }
+  )
+
+# Graph
+output$plotPresence <- renderPlot({
+  if(!is.null(input$selectedMeasurementForPresencePlot)) {
+    if(input$selectedGraphOverTime=="presencePlot") {
+ 
+      plot <- plotPresenceofSymptoms(data=dataFiltered(),
+                         selectedSymptoms=input$selectedSymptoms,
+                         measurementVar=input$measurementVar,
+                         measurement=input$selectedMeasurementForPresencePlot,
+                         thresholdValue=ifelse(!is.null(input$thresholdValue),input$thresholdValue ,0))
+      print(plot)
+  }}
+  }, height=numRowsPresencePlot)
+
 
 # TAB - Summary tables : time ####
 # Boxplot tables
