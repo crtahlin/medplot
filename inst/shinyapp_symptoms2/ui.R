@@ -94,12 +94,22 @@ shinyUI(pageWithSidebar(
       ),
       
       # TAB - Graphical exploration : grouping variable ####
-      tabPanel(title="Graphical exploration : grouping variable"
-               
+      tabPanel(title="Graphical exploration : grouping variable",
+               textOutput("messageNotAppropriate5"),
+               plotOutput("plotPyramid", height="auto"),              
+               plotOutput("plotPropCIs", height="auto")
                  ),
       
       # TAB - Summary tables : grouping variable ####
-      tabPanel(title="Summary tables : grouping variable"
+      tabPanel(title="Summary tables : grouping variable",
+               textOutput("messageNotAppropriate10"),
+               uiOutput("UIpropTable"),
+               
+               tableOutput("tablePropGroups"),
+               uiOutput("textTablePropGroups"),
+               
+               tableOutput("tableMedianGroups"),
+               uiOutput("textTableMedianGroups")
                ),
       
       
@@ -120,6 +130,12 @@ shinyUI(pageWithSidebar(
       # TAB - Regression model : all evaluation times ####
       tabPanel(title="Regression model : all evaluation times"
       ),
+      
+      # TAB - Selected data ####
+      tabPanel(title="Uploaded data", 
+               # textOutput("messageSelectVars"),
+               tableOutput("data")),
+      
       
 #       # TAB - Timeline ####
 #       tabPanel(title="Timeline",
@@ -160,19 +176,19 @@ shinyUI(pageWithSidebar(
       ),
       
       # TAB - Distribution of the variables: by grouping variable ####
-      tabPanel(title="Distribution of the variables: by grouping variable",
-               textOutput("messageNotAppropriate5"),
+      tabPanel(title="Distribution of the variables: by grouping variable"#,
+#                textOutput("messageNotAppropriate5"),
                # textOutput("messageSelectVars"),
-               plotOutput("plotPyramid", height="auto"),              
-               plotOutput("plotPropCIs", height="auto"),
+#                plotOutput("plotPyramid", height="auto"),              
+#                plotOutput("plotPropCIs", height="auto"),
                           
-               uiOutput("UIpropTable"),
-              
-               tableOutput("tablePropGroups"),
-               uiOutput("textTablePropGroups"),
-               
-               tableOutput("tableMedianGroups"),
-               uiOutput("textTableMedianGroups")
+#                uiOutput("UIpropTable"),
+#               
+#                tableOutput("tablePropGroups"),
+#                uiOutput("textTablePropGroups"),
+#                
+#                tableOutput("tableMedianGroups"),
+#                uiOutput("textTableMedianGroups")
                
                ),
       
@@ -210,15 +226,11 @@ shinyUI(pageWithSidebar(
                plotOutput("mixedModelGraph2", height="auto"),
                tableOutput("mixedModelTable3"),
                plotOutput("mixedModelGraph3", height="auto")
-               ),
+               )
       
-      # TAB - Selected data ####
-      tabPanel(title="Selected data", 
-              # textOutput("messageSelectVars"),
-               tableOutput("data")),
       
       # TAB - Debug ####
-      tabPanel("Debug", verbatimTextOutput("debug"))
+      # tabPanel("Debug", verbatimTextOutput("debug"))
     )
   )
 )

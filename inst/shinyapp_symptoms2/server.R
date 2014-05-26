@@ -31,9 +31,6 @@ library(permute)
 library(lme4)
 library(lmerTest)
 
-# TEMP for debuging
-# source("C:/Users/Crt Ahlin/Documents/Dropbox/medplot_package/R/TablePropWithSymptoms.r")
-
 # Main function -----------------------------------------------------------
 
 shinyServer(function(input, output, session) {
@@ -187,7 +184,7 @@ shinyServer(function(input, output, session) {
       #       symptoms <- importSymptomsData(datafile=templateLocation,
       #                                      format="Excel")
       #       data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
-      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEMShort.txt")
+      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEM.txt")
       data <- importSymptomsData(datafile=templateLocation,
                                  format="TSV")
       return(data)
@@ -586,6 +583,219 @@ output$tableforBoxplots <- renderUI({
 })
 
 
+# TAB - Graphical exploration : by grouping variable ####
+# Proportion by groups (aka Pyramid plot) ####
+# Message
+output$messageNotAppropriate5 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==FALSE) {
+      "This type of analysis is not appropriate for numerical responses."
+    }}
+})
+
+# Graph
+output$plotPyramid <- renderPlot ({
+  try({
+    if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
+      if(input$treatasBinary==TRUE){
+        
+        plotPropWithSymptoms(data=dataFilteredwithThreshold(),
+                             grouping=input$groupingVar,
+                             measurements=input$measurementVar,
+                             symptomsNames=input$selectedSymptoms)
+        
+      }
+    }
+  }, silent=TRUE)
+} ,height=numRowsProportions)
+
+# Proportions by groups with confidence intervals ####
+# Graph
+output$plotPropCIs <- renderPlot ({
+  try({
+    if(!is.null(dataFilteredwithThreshold())){
+      if(input$treatasBinary==TRUE){
+        print(
+          plotPropWithSymptomsCI(data=dataFilteredwithThreshold(),
+                                 groupingVar=input$groupingVar,
+                                 measurementVar=input$measurementVar,
+                                 selectedSymptoms=input$selectedSymptoms)
+        )
+      }
+    }
+  }, silent=TRUE)
+} ,height=numRowsProportionsCI)
+
+
+# TAB - Summary tables : grouping variable ####
+# Menu
+output$UIpropTable = renderUI({
+  if(!is.null(measurementLevels())){
+    if(input$treatasBinary==TRUE){
+      #select the measurement
+      selectInput(inputId="measurementSelectedprop",
+                  label="Select the measurement occasion (time):", 
+                  choices=measurementLevels(), selected=measurementLevels()[1])
+    }
+  }
+})
+
+# Tables
+# Table of proportions of patients in a group with a symptom ####
+output$tablePropGroups <- renderTable ({
+  
+  if(!(is.null(dataFiltered()) || is.null(input$thresholdValue)  )){
+    if(input$treatasBinary==TRUE){
+      tablePropWithSymptoms(data=dataFiltered(),
+                            groupingVar=input$groupingVar,
+                            measurementVar=input$measurementVar,
+                            forMeasurement=input$measurementSelectedprop,
+                            symptomsNames=input$selectedSymptoms,
+                            thresholdValue=input$thresholdValue)
+    }
+  }
+  
+})
+
+# text - explaining tablePropGroups
+output$textTablePropGroups <- renderUI({
+  if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE){
+      tagList(p("Table displays for each variable the proportion of subjects in a
+                certain group, P value for the difference of proportions and the 
+                95% confidence interval for the difference of proportions. 
+                Data with missing values for grouping variable 
+                are removed from analysis.", br(), br()))
+    }
+    }
+    })
+
+# Table with medians of symptoms values in a group ####
+output$tableMedianGroups <- renderTable ({
+  if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedprop) )){
+    if(input$treatasBinary==TRUE){
+      tableMediansWithSymptoms(data=dataFiltered(),
+                               groupingVar=input$groupingVar,
+                               measurementVar=input$measurementVar,
+                               forMeasurement=input$measurementSelectedprop,
+                               symptomsNames=input$selectedSymptoms,
+                               thresholdValue=input$thresholdValue)
+    }
+  }
+})
+
+# text - explainig tableMedianGroups
+output$textTableMedianGroups <- renderUI({
+  if(!is.null(dataFiltered())){
+    if(input$treatasBinary==TRUE){
+      tagList(p("Table displays for each variable the median value for subjects in a
+                certain group, interquantile range for of the variable 
+                (25th to 75th percentile)and P value for the difference of samples (Mann-Whitney test). 
+                Data with missing values for grouping variable 
+                are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
+    }
+    }
+    })
+
+
+output$messageNotAppropriate10 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==FALSE) {
+      "This type of analysis is not appropriate for numerical responses."
+    }}
+})
+
+
+# TAB - Clustering ####
+# Menu
+output$clusteringUI = renderUI({
+  if(!(is.null(measurementLevels()) || is.null(measurementLevels()) )){
+    if(input$treatasBinary==FALSE){
+      #select the measurement
+      selectInput(inputId="selectedMeasurementValue",
+                  label="Select the measurement occasion (time):", 
+                  choices=measurementLevels(), selected=measurementLevels()[1])
+    }
+  }
+})
+
+# Graphs
+# Dendrogram plot ####
+output$plotClusterDendrogram=renderPlot({
+  if(!(is.null(dataFiltered()) || is.null(input$selectedMeasurementValue) )){
+    if(input$treatasBinary==FALSE){
+      plotClusterDendrogram(data=dataFiltered(),
+                            variableName=input$measurementVar,
+                            variableValue=input$selectedMeasurementValue,
+                            selectedSymptoms=input$selectedSymptoms)
+    }
+  }
+},height=numRowsClustering)
+
+
+# Heatmap - Selection of annotation variables
+output$selectClusterAnnotations <- renderUI({
+  if(!is.null(dataFiltered())){
+    if(input$treatasBinary==FALSE){
+      selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
+      selectInput(inputId="selectedClusterAnnotations",
+                  label="Select variables for annotating graph:",
+                  # TODO: remove some variables from selection
+                  choices=dataVariableNames()[-selectedSymptoms],
+                  selected=c(input$groupingVar),
+                  multiple=TRUE)
+    }
+  }
+})
+
+
+
+# Heatmap plot ####
+output$plotClusterHeatmap=renderPlot({
+  if(!is.null(dataExtended())){
+    if(input$treatasBinary==FALSE){
+      plotClusterHeatmap(data=dataExtended(),
+                         #TODO: make dependent on selection
+                         variableName=input$measurementVar,
+                         variableValue=input$selectedMeasurementValue,
+                         selectedSymptoms=input$selectedSymptoms,
+                         annotationVars=input$selectedClusterAnnotations) 
+    }
+  }
+},height=numRowsClustering2)
+
+output$messageNotAppropriate6 <- renderText({
+  if(!is.null(input$treatasBinary)){
+    if (input$treatasBinary==TRUE) {
+      "This type of analysis is not appropriate for binary responses."
+    }}
+})
+
+
+
+# TAB - Uploaded data ####
+# Table - list the subseted data in an output slot ####
+output$data <- renderTable({
+  if(!is.null(dataFiltered())){
+    data <- dataFiltered()
+    # TODO: We could render a renderDataTable(), but how to display dates in 
+    # format 1.12.2014 and still sort them correctly?
+    # Sys.setlocale("LC_TIME", "Slovenian")
+    #data[,input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")
+    data[,input$dateVar] <- as.character(as.Date(data[,input$dateVar], format="%d.%m.%Y"),
+                                         format="%d.%m.%Y")
+    
+    #data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
+    
+    save(data, file="dataFiltered.Rdata")
+    
+    return(data)
+    # NOTE: if we want to render the table of data, we have to convert the dates into 
+    # characters, since renderTable seems to use xtable, which seems to not handle
+    # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
+  }
+})
+
 # TAB - Timeline ####
 # output$selectDisplayFormat <- renderUI({
 #   if(!is.null(dataFiltered())){
@@ -837,177 +1047,114 @@ output$messageNotAppropriate4 <- renderText({
 
 
 # TAB - Distribution of the variables: by grouping variable ####
-# plot - pyramid plot of proportions ###
-output$plotPyramid <- renderPlot ({
-  try({
-  if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
-    if(input$treatasBinary==TRUE){
-    
-      plotPropWithSymptoms(data=dataFilteredwithThreshold(),
-                         grouping=input$groupingVar,
-                         measurements=input$measurementVar,
-                         symptomsNames=input$selectedSymptoms)
-    
-    }
-  }
-  }, silent=TRUE)
-} ,height=numRowsProportions)
-
-# plot - plot of proportions with conf. intervals
-output$plotPropCIs <- renderPlot ({
-  try({
-  if(!is.null(dataFilteredwithThreshold())){
-    if(input$treatasBinary==TRUE){
-    print(
-      plotPropWithSymptomsCI(data=dataFilteredwithThreshold(),
-                             groupingVar=input$groupingVar,
-                             measurementVar=input$measurementVar,
-                             selectedSymptoms=input$selectedSymptoms)
-    )
-    }
-  }
-  }, silent=TRUE)
-} ,height=numRowsProportionsCI)
-
-
-# ui - user interface to select which measurements to draw tables for ###
-output$UIpropTable = renderUI({
-  if(!is.null(measurementLevels())){
-    if(input$treatasBinary==TRUE){
-    #select the measurement
-    selectInput(inputId="measurementSelectedprop",
-                label="Select the measurement occasion (time):", 
-                choices=measurementLevels(), selected=measurementLevels()[1])
-    }
-  }
-})
-
-# table - of proportions of patients in a group with a symptom
-output$tablePropGroups <- renderTable ({
-  
-  if(!(is.null(dataFiltered()) || is.null(input$thresholdValue)  )){
-    if(input$treatasBinary==TRUE){
-    tablePropWithSymptoms(data=dataFiltered(),
-                          groupingVar=input$groupingVar,
-                          measurementVar=input$measurementVar,
-                          forMeasurement=input$measurementSelectedprop,
-                          symptomsNames=input$selectedSymptoms,
-                          thresholdValue=input$thresholdValue)
-    }
-  }
-  
-})
-
-# text - explainig tablePropGroups
-output$textTablePropGroups <- renderUI({
-  if(!is.null(dataFiltered())){
-    if(input$treatasBinary==TRUE){
-    tagList(p("Table displays for each variable the proportion of subjects in a
-  certain group, P value for the difference of proportions and the 
-  95% confidence interval for the difference of proportions. 
-              Data with missing values for grouping variable 
-              are removed from analysis.", br(), br()))
-    }
-  }
-})
-
-# table - with medians of symptoms values in a group
-output$tableMedianGroups <- renderTable ({
-  if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedprop) )){
-    if(input$treatasBinary==TRUE){
-    tableMediansWithSymptoms(data=dataFiltered(),
-                             groupingVar=input$groupingVar,
-                             measurementVar=input$measurementVar,
-                             forMeasurement=input$measurementSelectedprop,
-                             symptomsNames=input$selectedSymptoms,
-                             thresholdValue=input$thresholdValue)
-    }
-  }
-})
-
-# text - explainig tableMedianGroups
-output$textTableMedianGroups <- renderUI({
-  if(!is.null(dataFiltered())){
-    if(input$treatasBinary==TRUE){
-    tagList(p("Table displays for each variable the median value for subjects in a
-certain group, interquantile range for of the variable 
-(25th to 75th percentile)and P value for the difference of samples (Mann-Whitney test). 
-              Data with missing values for grouping variable 
-              are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
-    }
-  }
-})
-
-output$messageNotAppropriate5 <- renderText({
-  if(!is.null(input$treatasBinary)){
-    if (input$treatasBinary==FALSE) {
-      "This type of analysis is not appropriate for numerical responses."
-    }}
-})
-
-# TAB - Clustering ####
-# ui - selection of measurement occasions  ###
-output$clusteringUI = renderUI({
-  if(!(is.null(measurementLevels()) || is.null(measurementLevels()) )){
-    if(input$treatasBinary==FALSE){
-    #select the measurement
-    selectInput(inputId="selectedMeasurementValue",
-                label="Select the measurement occasion (time):", 
-                choices=measurementLevels(), selected=measurementLevels()[1])
-    }
-  }
-})
-
-# plot - dendrogram plot on the Clustering tab ###
-output$plotClusterDendrogram=renderPlot({
-  if(!(is.null(dataFiltered()) || is.null(input$selectedMeasurementValue) )){
-    if(input$treatasBinary==FALSE){
-    plotClusterDendrogram(data=dataFiltered(),
-                          variableName=input$measurementVar,
-                          variableValue=input$selectedMeasurementValue,
-                          selectedSymptoms=input$selectedSymptoms)
-    }
-  }
-},height=numRowsClustering)
+# # plot - pyramid plot of proportions ###
+# output$plotPyramid <- renderPlot ({
+#   try({
+#   if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
+#     if(input$treatasBinary==TRUE){
+#     
+#       plotPropWithSymptoms(data=dataFilteredwithThreshold(),
+#                          grouping=input$groupingVar,
+#                          measurements=input$measurementVar,
+#                          symptomsNames=input$selectedSymptoms)
+#     
+#     }
+#   }
+#   }, silent=TRUE)
+# } ,height=numRowsProportions)
+# 
+# # plot - plot of proportions with conf. intervals
+# output$plotPropCIs <- renderPlot ({
+#   try({
+#   if(!is.null(dataFilteredwithThreshold())){
+#     if(input$treatasBinary==TRUE){
+#     print(
+#       plotPropWithSymptomsCI(data=dataFilteredwithThreshold(),
+#                              groupingVar=input$groupingVar,
+#                              measurementVar=input$measurementVar,
+#                              selectedSymptoms=input$selectedSymptoms)
+#     )
+#     }
+#   }
+#   }, silent=TRUE)
+# } ,height=numRowsProportionsCI)
 
 
-# ui - selection of annotation variables
-output$selectClusterAnnotations <- renderUI({
-  if(!is.null(dataFiltered())){
-    if(input$treatasBinary==FALSE){
-    selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
-    selectInput(inputId="selectedClusterAnnotations",
-                label="Select variables for annotating graph:",
-                # TODO: remove some variables from selection
-                choices=dataVariableNames()[-selectedSymptoms],
-                selected=c(input$groupingVar),
-                multiple=TRUE)
-    }
-  }
-})
+# # ui - user interface to select which measurements to draw tables for ###
+# output$UIpropTable = renderUI({
+#   if(!is.null(measurementLevels())){
+#     if(input$treatasBinary==TRUE){
+#     #select the measurement
+#     selectInput(inputId="measurementSelectedprop",
+#                 label="Select the measurement occasion (time):", 
+#                 choices=measurementLevels(), selected=measurementLevels()[1])
+#     }
+#   }
+# })
+# 
+# # table - of proportions of patients in a group with a symptom
+# output$tablePropGroups <- renderTable ({
+#   
+#   if(!(is.null(dataFiltered()) || is.null(input$thresholdValue)  )){
+#     if(input$treatasBinary==TRUE){
+#     tablePropWithSymptoms(data=dataFiltered(),
+#                           groupingVar=input$groupingVar,
+#                           measurementVar=input$measurementVar,
+#                           forMeasurement=input$measurementSelectedprop,
+#                           symptomsNames=input$selectedSymptoms,
+#                           thresholdValue=input$thresholdValue)
+#     }
+#   }
+#   
+# })
+# 
+# # text - explainig tablePropGroups
+# output$textTablePropGroups <- renderUI({
+#   if(!is.null(dataFiltered())){
+#     if(input$treatasBinary==TRUE){
+#     tagList(p("Table displays for each variable the proportion of subjects in a
+#   certain group, P value for the difference of proportions and the 
+#   95% confidence interval for the difference of proportions. 
+#               Data with missing values for grouping variable 
+#               are removed from analysis.", br(), br()))
+#     }
+#   }
+# })
+# 
+# # table - with medians of symptoms values in a group
+# output$tableMedianGroups <- renderTable ({
+#   if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedprop) )){
+#     if(input$treatasBinary==TRUE){
+#     tableMediansWithSymptoms(data=dataFiltered(),
+#                              groupingVar=input$groupingVar,
+#                              measurementVar=input$measurementVar,
+#                              forMeasurement=input$measurementSelectedprop,
+#                              symptomsNames=input$selectedSymptoms,
+#                              thresholdValue=input$thresholdValue)
+#     }
+#   }
+# })
+# 
+# # text - explainig tableMedianGroups
+# output$textTableMedianGroups <- renderUI({
+#   if(!is.null(dataFiltered())){
+#     if(input$treatasBinary==TRUE){
+#     tagList(p("Table displays for each variable the median value for subjects in a
+# certain group, interquantile range for of the variable 
+# (25th to 75th percentile)and P value for the difference of samples (Mann-Whitney test). 
+#               Data with missing values for grouping variable 
+#               are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
+#     }
+#   }
+# })
 
+# output$messageNotAppropriate5 <- renderText({
+#   if(!is.null(input$treatasBinary)){
+#     if (input$treatasBinary==FALSE) {
+#       "This type of analysis is not appropriate for numerical responses."
+#     }}
+# })
 
-
-# plot - heatmap plot on the Clustering tab ###
-output$plotClusterHeatmap=renderPlot({
-  if(!is.null(dataExtended())){
-    if(input$treatasBinary==FALSE){
-    plotClusterHeatmap(data=dataExtended(),
-                       #TODO: make dependent on selection
-                       variableName=input$measurementVar,
-                       variableValue=input$selectedMeasurementValue,
-                       selectedSymptoms=input$selectedSymptoms,
-                       annotationVars=input$selectedClusterAnnotations) 
-    }
-  }
-},height=numRowsClustering2)
-
-output$messageNotAppropriate6 <- renderText({
-  if(!is.null(input$treatasBinary)){
-    if (input$treatasBinary==TRUE) {
-      "This type of analysis is not appropriate for binary responses."
-    }}
-})
 
 # TAB - RCS ####
 # ui - user interface to select a numerical variable to associate with the presence of symptom ###
@@ -1236,41 +1383,11 @@ output$mixedModelGraph3 <- renderPlot({
   }}
 }, height=numRowsMixedModels3)
 
-# TAB - Selected transformed data ####
-# table - list the subseted data in an output slot ###
-output$data <- renderTable({
-  if(!is.null(dataFiltered())){
-    data <- dataFiltered()
-    # TODO: We could render a renderDataTable(), but how to display dates in 
-    # format 1.12.2014 and still sort them correctly?
-    # Sys.setlocale("LC_TIME", "Slovenian")
-    #data[,input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")
-    data[,input$dateVar] <- as.character(as.Date(data[,input$dateVar], format="%d.%m.%Y"),
-                                         format="%d.%m.%Y")
-    
-    #data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
-    
-    save(data, file="dataFiltered.Rdata")
-    
-    return(data)
-    # NOTE: if we want to render the table of data, we have to convert the dates into 
-    # characters, since renderTable seems to use xtable, which seems to not handle
-    # dates very well (http://stackoverflow.com/questions/8652674/r-xtable-and-dates)
-  }
-})
+
 
 # TAB - Debug ####
 # table - debuging information ###
-output$debug <- renderPrint(paste(str(dataExtended())))
-
-
-### TEMP CODE ####
-#  
-#
-
-
-
-
+#output$debug <- renderPrint(paste(str(dataExtended())))
 })
 
 
