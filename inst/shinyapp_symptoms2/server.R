@@ -176,7 +176,7 @@ shinyServer(function(input, output, session) {
       #       symptoms <- importSymptomsData(datafile=templateLocation,
       #                                      format="Excel")
       #       data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
-      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEM.txt")
+      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEMShort.txt")
       data <- importSymptomsData(datafile=templateLocation,
                                  format="TSV")
       return(data)
@@ -362,6 +362,7 @@ output$dataSummary <- renderPrint({
 
 # TAB - Graphical exploration over time ####
 output$selectGraphOverTime <- renderUI({
+  if (!is.null(dataFiltered())) {
   selectInput(inputId="selectedGraphOverTime",
               label="Select type of graph:",
               choices=c("Profile plots"="profilePlot",
@@ -372,6 +373,7 @@ output$selectGraphOverTime <- renderUI({
                         "Presence of symptoms with CIs"="presenceCIPlot"),
               selected=NULL,
               multiple=FALSE)
+  }
   
 })
 
@@ -379,7 +381,7 @@ output$selectGraphOverTime <- renderUI({
 # Menus
 # ui - select type of graph
 output$selectGraphType <- renderUI({
-  if(!is.null(dataFiltered())) {
+  if(!is.null(input$selectedGraphOverTime)) {
     if (input$selectedGraphOverTime=="profilePlot") {
     if(input$treatasBinary==FALSE){
       selectInput(inputId="selectedGraphType",
@@ -396,6 +398,7 @@ output$selectGraphType <- renderUI({
 
 output$selectRandomSampleSize <- renderUI({
   if(!is.null(input$selectedGraphType)) {
+    if (input$selectedGraphOverTime=="profilePlot") {
     if (input$selectedGraphType=="randomSample") {
       if(input$treatasBinary==FALSE){
         numericInput(inputId="sampleSize",
@@ -405,12 +408,13 @@ output$selectRandomSampleSize <- renderUI({
                      max=100,
                      step=5)
       }
-    }}
+    }}}
 })
 
 
 output$selectMaxGroupSize <- renderUI({
   if(!is.null(input$selectedGraphType)) {
+    if (input$selectedGraphOverTime=="profilePlot") {
     if (input$selectedGraphType=="multipleGraphs") {
       if(input$treatasBinary==FALSE){
         numericInput(inputId="groupSize",
@@ -420,7 +424,7 @@ output$selectMaxGroupSize <- renderUI({
                      max=100,
                      step=5)
       }
-    }}
+    }}}
 })
 
 # Graph
@@ -444,6 +448,9 @@ output$plotTimelineProfiles <- renderPlot({
 # Lasagna plots ####
 # Graph
 output$plotLasagna <- renderUI({
+  if (!is.null(input$selectedGraphOverTime)) {
+  if (input$selectedGraphOverTime=="lasagnaPlot") {
+  
   filenames <- vector()
   # generate as many files as there are plots
   for (symptom in input$selectedSymptoms) {
@@ -469,7 +476,7 @@ output$plotLasagna <- renderUI({
 out <- pastePlotFilenames(filenames)
   
 return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
-
+}}
 })
 
 # Boxplots ####
