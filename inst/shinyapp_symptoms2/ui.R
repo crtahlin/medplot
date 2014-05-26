@@ -16,7 +16,7 @@ shinyUI(pageWithSidebar(
     wellPanel(
       conditionalPanel(
         condition="input.dataFileType =='Demo'",
-        h2("Working with DEMO data!")),
+        h4("Working with DEMO data")),
       
       # selection of type of data file
       selectInput(inputId="dataFileType",
