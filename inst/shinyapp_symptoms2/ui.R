@@ -76,6 +76,7 @@ shinyUI(pageWithSidebar(
                uiOutput("plotLasagna"), #, height="700px"),
                
                # Boxplots
+               uiOutput("selectFacetingType"),
                plotOutput("plotTimelineBoxplots", height="auto"),
                
                # Timeline graph

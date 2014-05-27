@@ -107,7 +107,8 @@ plotTimelineProfiles <- function (data,
 plotTimelineBoxplots <- function(data,
                                  personIDVar,
                                  measurementVar,
-                                 selectedSymptoms) {
+                                 selectedSymptoms,
+                                 faceting) {
   # prepare data
   dataMelted <- melt(data=data,
                      id.vars=c(personIDVar, measurementVar),
@@ -123,13 +124,26 @@ plotTimelineBoxplots <- function(data,
 
 # code to draw graph
 #   # define x, y axis, groups, coloring
+if (faceting=="variablesOnYaxis") {
 p <- ggplot(data=dataMelted, aes(x=Measurement, y=value)) +
   # draw points, jitter points, draw boxplots, facet by variable, use black & white theme
-  geom_point() + 
-  geom_jitter() +
   geom_boxplot(width=0.5) +
+  geom_jitter(alpha=I(1/5)) +
   facet_grid(variable ~.) +
-  theme_bw() 
+  theme_bw() +
+  ylab("Value") + xlab("Measurement occasion")
+}
+
+if (faceting=="variablesOnXaxis") {
+  p <- ggplot(data=dataMelted, aes(x=variable, y=value)) +
+    # draw points, jitter points, draw boxplots, facet by variable, use black & white theme
+    geom_boxplot(width=0.5) +
+    geom_jitter(alpha=I(1/5)) +   
+    facet_grid(Measurement ~.) +
+    theme_bw() +
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    ylab("Value") + xlab("Variable")
+}
 
 # return ggplot
 return(p)

@@ -68,12 +68,26 @@ shinyServer(function(input, output, session) {
   } else {return(0)} # if there is no data, height of plot should be zero
   }
   
+  
+#   selectInput(inputId="selectedFacetingType",
+#               label="Select faceting type:",
+#               choices=c("Variables ~ Measurement occasions"="variablesOnYaxis",
+#                         "Measurement occasions ~ Variables"="variablesOnXaxis")
+#   
   numRowsTimelineBoxplots <- function(){if(!is.null(dataFiltered())){
     if(input$selectedGraphOverTime!="boxPlot") {return(0)}
+    if (input$selectedFacetingType=="variablesOnYaxis") {
     if(input$treatasBinary==TRUE) {return(0)} 
     tmp <- max(ceiling(length(input$selectedSymptoms))*200,
                300) # minumum reserved space
-    return(tmp)
+    return(tmp)}
+    
+    if (input$selectedFacetingType=="variablesOnXaxis") {
+      if(input$treatasBinary==TRUE) {return(0)} 
+      tmp <- max(ceiling(length(unique(na.omit(Measurement()))))*200,
+                 300) # minumum reserved space
+      return(tmp)}
+    
     }else{return(0)} # height of plot when no data available
   }
   
@@ -488,6 +502,19 @@ return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
 })
 
 # Boxplots ####
+# Menu
+output$selectFacetingType <- renderUI({
+  if(!is.null(input$selectedGraphType)) {
+    if (input$selectedGraphOverTime=="boxPlot") {
+  selectInput(inputId="selectedFacetingType",
+              label="Select faceting type:",
+              choices=c("Variables ~ Measurement occasions"="variablesOnYaxis",
+                        "Measurement occasions ~ Variables"="variablesOnXaxis")
+              )
+    }}
+  })
+   
+
 # Graph
 output$plotTimelineBoxplots <- renderPlot({
   if(!is.null(dataFiltered())) {
@@ -497,7 +524,8 @@ output$plotTimelineBoxplots <- renderPlot({
       print(plotTimelineBoxplots(data=dataFiltered(),
                                  personIDVar=input$patientIDVar,
                                  measurementVar=input$measurementVar,
-                                 selectedSymptoms=input$selectedSymptoms)
+                                 selectedSymptoms=input$selectedSymptoms,
+                                 faceting=input$selectedFacetingType)
       )
     }}
   } else {return()}
