@@ -1,12 +1,12 @@
 mixedModel <- function(data,               # dataFiltered()
-                        selectedSymptoms,    # input$selectedSymptoms
-                        groupingVar,         # input$groupingVar
-                        subjectIDVar,        # input$patientIDVar
-                        measurementVar,      # input$measurementVar
-                        dateVar,             # input$dateVar
-                        thresholdValue,      # input$thresholdValue
-                        treatasBinary,       # input$treatasBinary
-                        selectedModel){      # input$selectedMixedModelType
+                       selectedSymptoms,    # input$selectedSymptoms
+                       groupingVar,         # input$groupingVar
+                       subjectIDVar,        # input$patientIDVar
+                       measurementVar,      # input$measurementVar
+                       dateVar,             # input$dateVar
+                       thresholdValue,      # input$thresholdValue
+                       treatasBinary,       # input$treatasBinary
+                       selectedModel){      # input$selectedMixedModelType
   
   # make groupingVar bniary variable
   data[, groupingVar] <- as.factor(data[, groupingVar])
@@ -22,9 +22,9 @@ mixedModel <- function(data,               # dataFiltered()
   
   
   if (selectedModel=="MMtimeSinceInclusion") {
-  # if the model includes days since inclusion, add this info to the data (column "daysSinceInclusion")
-  data <- calculateDaysSinceInclusion(data, subjectIDVar, dateVar)
-  time <- "daysSinceInclusion"
+    # if the model includes days since inclusion, add this info to the data (column "daysSinceInclusion")
+    data <- calculateDaysSinceInclusion(data, subjectIDVar, dateVar)
+    time <- "daysSinceInclusion"
   }
   
   # prepare data frame for the results, depending on what kind of response variable we have
@@ -60,7 +60,7 @@ mixedModel <- function(data,               # dataFiltered()
       formula <- as.formula(paste(symptom, "~", time,"+", groupingVar, "+(1|", subjectIDVar, ")"))
     }
     
-        
+    
     # build the model depending on whether the response is binary or not
     if (treatasBinary==TRUE) {
       model <- glmer(formula, family=binomial,  na.action=na.omit, data=data)
@@ -76,35 +76,34 @@ mixedModel <- function(data,               # dataFiltered()
               qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
       resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "ORPValue"] <- 
         summary(model)$coef[groupingVarCoefName, "Pr(>|z|)"]
-    
+      
       if (selectedModel=="MMmeasurement") {
-      # results for the measurement variable
-      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "OR"] <- 
-        exp(summary(model)$coef[measurementVar, "Estimate"])
-      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORCILower"] <- 
-        exp(summary(model)$coef[measurementVar, "Estimate"] - 
-              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
-      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORCIUpper"] <- 
-        exp(summary(model)$coef[measurementVar, "Estimate"] +
-              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
-      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORPValue"] <- 
-        summary(model)$coef[measurementVar, "Pr(>|z|)"]
+        # results for the measurement variable
+        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "OR"] <- 
+          exp(summary(model)$coef[measurementVar, "Estimate"])
+        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORCILower"] <- 
+          exp(summary(model)$coef[measurementVar, "Estimate"] - 
+                qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORCIUpper"] <- 
+          exp(summary(model)$coef[measurementVar, "Estimate"] +
+                qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORPValue"] <- 
+          summary(model)$coef[measurementVar, "Pr(>|z|)"]
       }
       
       if (selectedModel=="MMtimeSinceInclusion") {
-      # results for the days since inclusion variable
-      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "OR"] <- 
-        exp(summary(model)$coef[time, "Estimate"])
-      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCILower"] <- 
-        exp(summary(model)$coef[time, "Estimate"] - 
-              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
-      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCIUpper"] <- 
-        exp(summary(model)$coef[time, "Estimate"] +
-              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
-      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORPValue"] <- 
-        summary(model)$coef[time, "Pr(>|z|)"]
-      }
-      
+        # results for the days since inclusion variable
+        resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "OR"] <- 
+          exp(summary(model)$coef[time, "Estimate"])
+        resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCILower"] <- 
+          exp(summary(model)$coef[time, "Estimate"] - 
+                qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+        resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCIUpper"] <- 
+          exp(summary(model)$coef[time, "Estimate"] +
+                qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+        resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORPValue"] <- 
+          summary(model)$coef[time, "Pr(>|z|)"]
+      }      
     }
     
     
@@ -122,30 +121,28 @@ mixedModel <- function(data,               # dataFiltered()
         lmerTest::summary(model)$coef[groupingVarCoefName, "Pr(>|t|)"]
       
       if (selectedModel=="MMmeasurement") {
-      # results for the measurement variable
-      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "beta"] <-
-        summary(model)$coef[measurementVar, "Estimate"]
-      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaCILower"] <-
-        confint(model)[measurementVar, "2.5 %"]
-      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaCIUpper"] <-
-        confint(model)[measurementVar, "97.5 %"]
-      resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaPValue"] <-
-        lmerTest::summary(model)$coef[measurementVar, "Pr(>|t|)"]
+        # results for the measurement variable
+        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "beta"] <-
+          summary(model)$coef[measurementVar, "Estimate"]
+        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaCILower"] <-
+          confint(model)[measurementVar, "2.5 %"]
+        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaCIUpper"] <-
+          confint(model)[measurementVar, "97.5 %"]
+        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "betaPValue"] <-
+          lmerTest::summary(model)$coef[measurementVar, "Pr(>|t|)"]
       }
-     
+      
       if (selectedModel=="MMtimeSinceInclusion") {
-      # results for the days since inclusion variable
-      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "beta"] <-
-        summary(model)$coef[time, "Estimate"]
-      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCILower"] <-
-        confint(model)[time, "2.5 %"]
-      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCIUpper"] <-
-        confint(model)[time, "97.5 %"]
-      resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaPValue"] <-
-        lmerTest::summary(model)$coef[time, "Pr(>|t|)"]
+        # results for the days since inclusion variable
+        resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "beta"] <-
+          summary(model)$coef[time, "Estimate"]
+        resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCILower"] <-
+          confint(model)[time, "2.5 %"]
+        resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCIUpper"] <-
+          confint(model)[time, "97.5 %"]
+        resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaPValue"] <-
+          lmerTest::summary(model)$coef[time, "Pr(>|t|)"]
       }
-      
-      
     }
   }
   return(list(groupingVar=resultsGroupingVar,
@@ -155,8 +152,8 @@ mixedModel <- function(data,               # dataFiltered()
 }
 
 calculateDaysSinceInclusion <- function (data,
-                                          subjectIDVar,
-                                          dateVar) {
+                                         subjectIDVar,
+                                         dateVar) {
   
   # find the day of inclusion in the study for each person
   uniquePeople <- as.data.frame(unique(data[subjectIDVar]))
@@ -174,49 +171,11 @@ calculateDaysSinceInclusion <- function (data,
 }
 
 plotFixedEffectsofGroupingVar <- function (calculatedStatistics,
-                                            groupingVar,
-                                            groupingVarReferenceValue,
-                                            treatasBinary) {
-  
+                                           groupingVar,
+                                           groupingVarReferenceValue,
+                                           treatasBinary) {
   graphTitle <- paste("Fixed effects of", groupingVar)
   
-    
-  
-  # for binary response variable
-  if (treatasBinary==TRUE) {
-    xlabLabel <- "Odds ratios"
-  plot <- ggplot() +
-    geom_errorbarh(data=calculatedStatistics, 
-                   mapping=aes(y=Variable, x=ORCIUpper, xmin=ORCIUpper, xmax=ORCILower),
-                   height=0.2, size=1) +
-    geom_point(data=calculatedStatistics, 
-               mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  
-    }
-
-# for continious response variable
-if (treatasBinary==FALSE) {
-  xlabLabel <- "Slope coefficients"
-  plot <- ggplot() +
-    geom_errorbarh(data=calculatedStatistics, 
-                   mapping=aes(y=Variable, x=betaCIUpper, xmin=betaCIUpper, xmax=betaCILower),
-                   height=0.2, size=1) +
-    geom_point(data=calculatedStatistics, 
-               mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white")  
-    }
-
-plot <- plot + theme_bw() + labs(title=graphTitle,
-                                 x= xlabLabel)
-return(plot)
-
-}
-
-
-plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
-                                               measurementVar,
-                                               treatasBinary) {
-  
-  graphTitle <- paste("Fixed effects of", measurementVar)
-    
   # for binary response variable
   if (treatasBinary==TRUE) {
     xlabLabel <- "Odds ratios"
@@ -241,16 +200,46 @@ plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
   
   plot <- plot + theme_bw() + labs(title=graphTitle,
                                    x= xlabLabel)
-  return(plot)
-  
+  return(plot)  
 }
 
 
-# .plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
-#                                       treatasBinary=input$treatasBinary) 
+plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
+                                              measurementVar,
+                                              treatasBinary) {
+  
+  graphTitle <- paste("Fixed effects of", measurementVar)
+  
+  # for binary response variable
+  if (treatasBinary==TRUE) {
+    xlabLabel <- "Odds ratios"
+    plot <- ggplot() +
+      geom_errorbarh(data=calculatedStatistics, 
+                     mapping=aes(y=Variable, x=ORCIUpper, xmin=ORCIUpper, xmax=ORCILower),
+                     height=0.2, size=1) +
+      geom_point(data=calculatedStatistics, 
+                 mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  
+  }
+  
+  # for continious response variable
+  if (treatasBinary==FALSE) {
+    xlabLabel <- "Slope coefficients"
+    plot <- ggplot() +
+      geom_errorbarh(data=calculatedStatistics, 
+                     mapping=aes(y=Variable, x=betaCIUpper, xmin=betaCIUpper, xmax=betaCILower),
+                     height=0.2, size=1) +
+      geom_point(data=calculatedStatistics, 
+                 mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white")  
+  }
+  
+  plot <- plot + theme_bw() + labs(title=graphTitle,
+                                   x= xlabLabel)
+  return(plot)  
+}
+
 
 plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
-                                                   treatasBinary) {
+                                                  treatasBinary) {
   
   graphTitle <- paste("Fixed effects of days since inclusion in the study")
   
@@ -278,6 +267,5 @@ plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
   
   plot <- plot + theme_bw() + labs(title=graphTitle,
                                    x= xlabLabel)
-  return(plot)
-  
+  return(plot)  
 }

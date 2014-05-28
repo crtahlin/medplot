@@ -13,13 +13,11 @@ plotLogistf <- function (data,
   
   
   ########### plot of the results
-  
-  
   my.data.symptoms.yn=data.yn[measurement==measurementSelectedlogistf,]
   
   #which variable is used in the model
   my.var=data[measurement==measurementSelectedlogistf, logistfIDVar]
- 
+  
   #fix this problem: if a variable is selected and it has just one value - like in our example Response at t=0, the program freezes
   if(length(unique(my.var))==1) return()
   
@@ -29,7 +27,7 @@ plotLogistf <- function (data,
   for(i in 1:numSymptoms){
     my.mod.firth[[i]]=logistf(my.data.symptoms.yn[,i]~ my.var, family="binomial")
   }
- 
+  
   linch <-  max(strwidth(selectedSymptoms, "inch")+0.4, na.rm = TRUE)
   par(mai=c(1.02,linch,0.82,0.42))
   
@@ -39,7 +37,6 @@ plotLogistf <- function (data,
   par(mfrow=c(max(num.levels,1), 1))
   
   for(i in 1:max(num.levels, 1)){
-    
     OR.b.0=matrix(unlist(lapply(my.mod.firth,
                                 function(x) exp(cbind(x$coef, x$ci.lower, x$ci.upper)[i+1,]))),
                   ncol=3, byrow=3)
@@ -74,25 +71,35 @@ plotLogistf <- function (data,
 #' 
 #' @param TODO
 tabelizeLogistf <- function (data,
-                             data.yn,
-                             measurement,
-                             measurementSelectedlogistf,
-                             logistfIDVar,
-                             selectedSymptoms) {
+                             measurementVar,
+                             selectedMeasurement,
+                             covariate,
+                             selectedSymptoms,
+                             thresholdValue) {
 
-
-  dataSubset <- data.yn[measurement==measurementSelectedlogistf,]
-  variable <- data[measurement==measurementSelectedlogistf, logistfIDVar]
+  # subset the data, using only the selected evaluation
+  data <- data[data[,measurementVar]==selectedMeasurement,]
+  #data <- data[measurementValues==selectedMeasurement,]
+  # binarize the data
+  data[, selectedSymptoms] <- ifelse(data[, selectedSymptoms]>thresholdValue, 1, 0)
   
-  table <- data.frame("Variable"=selectedSymptoms)
+  table <- data.frame("Variable"=selectedSymptoms) # table of printable results
+  table2 <- data.frame("Variable"=selectedSymptoms) # table of raw results
+  levels <- levels(as.factor(data[,covariate])) # levels of the covariate
+  oddsFor <- paste(levels[2],"vs",levels[1]) # text describing which variables were compared
+  
   for (symptom in selectedSymptoms) {
-  model <- logistf(dataSubset[,symptom] ~ variable, family="binomial")
-  table[table["Variable"]==symptom, "Odds ratio"] <- 
-    exp(model$coef[2])
-  table[table["Variable"]==symptom, "95% conf. interval"] <- 
-    paste(format(exp(model$ci.lower[2]), nsmall=2, digits=2),
-          " to ",
-          format(exp(model$ci.upper[2]), nsmall=2, digits=2))
+    model <- logistf(data[,symptom] ~ data[,covariate], family="binomial")
+    table[table["Variable"]==symptom, "Odds ratio"] <- 
+      exp(model$coef[2])
+    table[table["Variable"]==symptom, "95% conf. interval"] <- 
+      paste(format(exp(model$ci.lower[2]), nsmall=2, digits=2),
+            " to ",
+            format(exp(model$ci.upper[2]), nsmall=2, digits=2))
+    table2[table2["Variable"]==symptom, "OR"] <- exp(model$coef[2])
+    table2[table2["Variable"]==symptom, "CILower"] <- exp(model$ci.lower[2])
+    table2[table2["Variable"]==symptom, "CIUpper"] <- exp(model$ci.upper[2])
+    
   }
-  return(table)
+  return(list(printableResultsTable=table, rawResultsTable=table2, referenceValue=oddsFor))
 }

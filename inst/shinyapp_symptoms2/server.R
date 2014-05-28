@@ -800,6 +800,152 @@ output$messageNotAppropriate6 <- renderText({
 })
 
 
+# TAB - Regression model : one evaluation ####
+# Menu
+
+output$selectEvaluationTime <- renderUI({
+  selectInput(inputId="selectedEvaluationTime",
+              label="Select evaluation occasion:",
+              choices=measurementLevels(),
+              selected=measurementLevels()[1])
+  
+  })
+
+
+output$selectCovariate <- renderUI({
+  selectInput(inputId="selectedCovariate",
+              label="Select covariate for analysis:",
+              choices=dataVariableNames(),
+              selected=input$groupingVar)
+  })
+
+output$checkUseFirthCorrection <- renderUI({
+  checkboxInput(inputId="useFirthCorrection",
+                label="Use Firth correction?",
+                value=TRUE)
+  
+  })
+
+output$checkUseRCSModel <- renderUI({
+  checkboxInput(inputId="useRCSModel",
+                label="Use flexible model of the association of the selected
+                variables with the numerical covariate?",
+                value=TRUE)
+  
+})
+
+# Graph(s)
+
+# Scenario - Logistic regression with Firth correction
+# Create results of Logistic regression with Firth correction
+resultsLogistf <- reactive({
+  if(input$useFirthCorrection==TRUE) {
+    out <- tabelizeLogistf(data=dataExtended(),
+                    measurementVar=input$measurementVar,
+                    selectedMeasurement=input$selectedEvaluationTime,
+                    covariate=input$selectedCovariate,
+                    selectedSymptoms=input$selectedSymptoms,
+                    thresholdValue=input$thresholdValue)
+    return(out)
+  }
+  
+  })
+
+# plot - logistf ###
+output$plotLogistf <- renderPlot({
+  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+    if(input$useFirthCorrection==TRUE) {
+      if (input$treatasBinary==TRUE) {
+        plotLogistf(data=dataExtended(),
+                    data.yn=dataFiltered.yn(),
+                    measurement=Measurement(),
+                    measurementSelectedlogistf=input$selectedEvaluationTime,
+                    logistfIDVar=input$selectedCovariate,
+                    selectedSymptoms=input$selectedSymptoms,
+                    numSymptoms=length(input$selectedSymptoms))
+      }
+    }}
+}, height=numRowsLogistf)
+
+# plot - logistf ###
+output$plotLogistf2 <- renderPlot({
+  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+    if(input$useFirthCorrection==TRUE) {
+      if (input$treatasBinary==TRUE) {
+       out <- plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
+                          variableName="Variable",
+                          valueName="OR",
+                          CILowerName="CILower",
+                          CIUpperName="CIUpper",
+                          xLabel="Odds ratios",
+                          yLabel="Variables",
+                          graphTitle=paste("Odds ratios and confidence intervals for",
+                                           resultsLogistf()[["referenceValue"]], 
+                                           "at evaluation T=",
+                                           input$selectedEvaluationTime))    
+       
+       print(out)
+      }
+    }}
+}, height=numRowsLogistf)
+
+# table - logistf ###
+output$tableLogistf <- renderTable({
+  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+    if(input$useFirthCorrection==TRUE) {
+      if (input$treatasBinary==TRUE) {
+        resultsLogistf()[["printableResultsTable"]]
+      }}}
+})
+
+
+# Scenario - logistic regression (without Firth correction)
+resultsLogist <- reactive({
+  if(input$useFirthCorrection==FALSE) {
+    out <- tabelizeLogist(data=dataExtended(),
+                           measurementVar=input$measurementVar,
+                           selectedMeasurement=input$selectedEvaluationTime,
+                           covariate=input$selectedCovariate,
+                           selectedSymptoms=input$selectedSymptoms,
+                           thresholdValue=input$thresholdValue)
+    return(out)
+  }
+  
+})
+
+
+# table - logist ###
+output$tableLogist <- renderTable({
+  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+    if(input$useFirthCorrection==FALSE) {
+      if (input$treatasBinary==TRUE) {
+        resultsLogist()[["printableResultsTable"]]
+      }}}
+})
+
+
+# plot - logist ###
+output$plotLogist <- renderPlot({
+  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+    if(input$useFirthCorrection==FALSE) {
+      if (input$treatasBinary==TRUE) {
+        out <- plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
+                                 variableName="Variable",
+                                 valueName="OR",
+                                 CILowerName="CILower",
+                                 CIUpperName="CIUpper",
+                                 xLabel="Odds ratios",
+                                 yLabel="Variables",
+                                 graphTitle=paste("Odds ratios and confidence intervals for",
+                                                  resultsLogistf()[["referenceValue"]], 
+                                                  "at evaluation T=",
+                                                  input$selectedEvaluationTime))    
+        
+        print(out)
+      }
+    }}
+}, height=numRowsLogistf)
+
 
 # TAB - Uploaded data ####
 # Table - list the subseted data in an output slot ####
@@ -1276,34 +1422,34 @@ output$logistfUI2= renderUI({
   }
 })
 
-# plot - logistf ###
-output$plotLogistf <- renderPlot({
-  if(!(is.null(Measurement()) || is.null(input$measurementSelectedlogistf) )){
-    if (input$treatasBinary==TRUE) {
-    plotLogistf(data=dataExtended(),
-                data.yn=dataFiltered.yn(),
-                measurement=Measurement(),
-                measurementSelectedlogistf=input$measurementSelectedlogistf,
-                logistfIDVar=input$logistfIDVar,
-                selectedSymptoms=input$selectedSymptoms,
-                numSymptoms=length(input$selectedSymptoms))
-    }
-  }
-}, height=numRowsLogistf)
-
-
-# table - logistf ###
-output$tableLogistf <- renderTable({
-  if(!(is.null(Measurement()) || is.null(input$measurementSelectedlogistf) )){
-    if (input$treatasBinary==TRUE) {
-  tabelizeLogistf(data=dataExtended(),
-                  data.yn=dataFiltered.yn(),
-                  measurement=Measurement(),
-                  measurementSelectedlogistf=input$measurementSelectedlogistf,
-                  logistfIDVar=input$logistfIDVar,
-                  selectedSymptoms=input$selectedSymptoms)
-    }}
-  })
+# # plot - logistf ###
+# output$plotLogistf <- renderPlot({
+#   if(!(is.null(Measurement()) || is.null(input$measurementSelectedlogistf) )){
+#     if (input$treatasBinary==TRUE) {
+#     plotLogistf(data=dataExtended(),
+#                 data.yn=dataFiltered.yn(),
+#                 measurement=Measurement(),
+#                 measurementSelectedlogistf=input$measurementSelectedlogistf,
+#                 logistfIDVar=input$logistfIDVar,
+#                 selectedSymptoms=input$selectedSymptoms,
+#                 numSymptoms=length(input$selectedSymptoms))
+#     }
+#   }
+# }, height=numRowsLogistf)
+# 
+# 
+# # table - logistf ###
+# output$tableLogistf <- renderTable({
+#   if(!(is.null(Measurement()) || is.null(input$measurementSelectedlogistf) )){
+#     if (input$treatasBinary==TRUE) {
+#   tabelizeLogistf(data=dataExtended(),
+#                   data.yn=dataFiltered.yn(),
+#                   measurement=Measurement(),
+#                   measurementSelectedlogistf=input$measurementSelectedlogistf,
+#                   logistfIDVar=input$logistfIDVar,
+#                   selectedSymptoms=input$selectedSymptoms)
+#     }}
+#   })
 
 output$messageNotAppropriate8 <- renderText({
   if(!is.null(input$treatasBinary)){

@@ -125,11 +125,27 @@ shinyUI(pageWithSidebar(
                plotOutput("plotClusterHeatmap"), height="auto"),
     
       # TAB - Regression model : one evaluation time ####
-      tabPanel(title="Regression model : one evaluation time"
+      tabPanel(title="Regression model : one evaluation time",
+               # Menus
+               uiOutput("selectEvaluationTime"),
+               uiOutput("selectCovariate"),
+               uiOutput("checkUseFirthCorrection"),
+               uiOutput("checkUseRCSModel"),
+               
+               # Graphs
+               # Logistic regression with Firth correction
+               plotOutput("plotLogistf", height="auto"),
+               plotOutput("plotLogistf2", height="auto"),
+               tableOutput("tableLogistf"),
+               
+               # Logistic regression 
+               plotOutput("plotLogist", height="auto"),
+               tableOutput("tableLogist")
         ),
       
       # TAB - Regression model : all evaluation times ####
-      tabPanel(title="Regression model : all evaluation times"
+      tabPanel(title="Regression model : all evaluation times"#,
+               
       ),
       
       # TAB - Selected data ####
@@ -213,9 +229,9 @@ shinyUI(pageWithSidebar(
                textOutput("messageNotAppropriate8"),
                # textOutput("messageSelectVars"),
                uiOutput("logistfUI2"),
-               uiOutput("logistfUI"),
-               plotOutput("plotLogistf", height="auto"),
-               tableOutput("tableLogistf")
+               uiOutput("logistfUI")#,
+#                plotOutput("plotLogistf", height="auto"),
+#                tableOutput("tableLogistf")
                ),
       
       # TAB - Mixed model ####
