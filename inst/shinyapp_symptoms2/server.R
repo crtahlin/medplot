@@ -851,21 +851,21 @@ resultsLogistf <- reactive({
   
   })
 
-# plot - logistf ###
-output$plotLogistf <- renderPlot({
-  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
-    if(input$useFirthCorrection==TRUE) {
-      if (input$treatasBinary==TRUE) {
-        plotLogistf(data=dataExtended(),
-                    data.yn=dataFiltered.yn(),
-                    measurement=Measurement(),
-                    measurementSelectedlogistf=input$selectedEvaluationTime,
-                    logistfIDVar=input$selectedCovariate,
-                    selectedSymptoms=input$selectedSymptoms,
-                    numSymptoms=length(input$selectedSymptoms))
-      }
-    }}
-}, height=numRowsLogistf)
+# plot - logistf ### OBSOLETE
+# output$plotLogistf <- renderPlot({
+#   if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+#     if(input$useFirthCorrection==TRUE) {
+#       if (input$treatasBinary==TRUE) {
+#         plotLogistf(data=dataExtended(),
+#                     data.yn=dataFiltered.yn(),
+#                     measurement=Measurement(),
+#                     measurementSelectedlogistf=input$selectedEvaluationTime,
+#                     logistfIDVar=input$selectedCovariate,
+#                     selectedSymptoms=input$selectedSymptoms,
+#                     numSymptoms=length(input$selectedSymptoms))
+#       }
+#     }}
+# }, height=numRowsLogistf)
 
 # plot - logistf ###
 output$plotLogistf2 <- renderPlot({

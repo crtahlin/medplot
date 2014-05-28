@@ -2,8 +2,8 @@
 \alias{tabelizeLogistf}
 \title{Logistf data in tabular format}
 \usage{
-tabelizeLogistf(data, data.yn, measurement, measurementSelectedlogistf,
-  logistfIDVar, selectedSymptoms)
+tabelizeLogistf(data, measurementVar, selectedMeasurement, covariate,
+  selectedSymptoms, thresholdValue)
 }
 \arguments{
   \item{TODO}{}

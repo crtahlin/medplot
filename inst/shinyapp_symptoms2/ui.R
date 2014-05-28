@@ -134,7 +134,7 @@ shinyUI(pageWithSidebar(
                
                # Graphs
                # Logistic regression with Firth correction
-               plotOutput("plotLogistf", height="auto"),
+               # plotOutput("plotLogistf", height="auto"),
                plotOutput("plotLogistf2", height="auto"),
                tableOutput("tableLogistf"),
                
