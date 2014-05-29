@@ -92,7 +92,6 @@ tabelizeLogistf <- function (data,
   oddsFor <- paste(levels[2],"vs",levels[1]) # text describing which variables were compared
   }
   
-  browser()
   if (determineTypeofVariable(data[,covariate])[["nLevels"]]=="multilevel" &  # numerical var w multi levels
        ( determineTypeofVariable(data[,covariate])[["type"]]=="integer") 
       | determineTypeofVariable(data[,covariate])[["type"]]=="numeric") { 

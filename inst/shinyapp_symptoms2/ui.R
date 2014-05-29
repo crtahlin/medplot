@@ -140,7 +140,15 @@ shinyUI(pageWithSidebar(
                
                # Logistic regression 
                plotOutput("plotLogist", height="auto"),
-               tableOutput("tableLogist")
+               tableOutput("tableLogist"),
+               
+               # Linear regression
+               plotOutput("plotLinear", height="auto"),
+               tableOutput("tableLinear"),
+               
+               # RCS regression
+               plotOutput("plotRCS", height="100%"),
+               tableOutput("tableRCS")
         ),
       
       # TAB - Regression model : all evaluation times ####
@@ -219,9 +227,9 @@ shinyUI(pageWithSidebar(
                #textOutput("messageNotAppropriate7"),
                #textOutput("messageSelectVars"),
                uiOutput("rcsUI"),
-               uiOutput("rcsUI2"),
-               plotOutput("plotRCS", height="100%"),
-               tableOutput("tableRCS")
+               uiOutput("rcsUI2")#,
+#                plotOutput("plotRCS", height="100%"),
+#                tableOutput("tableRCS")
       ),
       
       # TAB - Logistf ####

@@ -1,14 +1,21 @@
 \name{tabelizeLogistf}
 \alias{tabelizeLogistf}
-\title{Logistf data in tabular format}
+\title{OBSOLETE Plot logistf
+#
+#}
 \usage{
 tabelizeLogistf(data, measurementVar, selectedMeasurement, covariate,
   selectedSymptoms, thresholdValue)
 }
 \arguments{
+  \item{TODO}{TODO write instructions}
+
   \item{TODO}{}
 }
 \description{
-TODO
+TODO write description # #
+}
+\details{
+#
 }
 

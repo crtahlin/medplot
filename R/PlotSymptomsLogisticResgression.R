@@ -14,8 +14,19 @@ tabelizeLogist <- function(data,
   
   table <- data.frame("Variable"=selectedSymptoms) # table of printable results
   table2 <- data.frame("Variable"=selectedSymptoms) # table of raw results
+  
+# check if covariate is binary and generate text which levels we are comparing
+   if (determineTypeofVariable(data[,covariate])[["nLevels"]]=="binary") { # binary var
   levels <- levels(as.factor(data[,covariate])) # levels of the covariate
   oddsFor <- paste(levels[2],"vs",levels[1]) # text describing which variables were compared
+   }
+
+  if (determineTypeofVariable(data[,covariate])[["nLevels"]]=="multilevel" &  # numerical var w multi levels
+        ( determineTypeofVariable(data[,covariate])[["type"]]=="integer") 
+      | determineTypeofVariable(data[,covariate])[["type"]]=="numeric") { 
+    #levels <- levels(as.factor(data[,covariate])) # levels of the covariate
+    oddsFor <- paste("unit difference in", covariate) # text describing which variables were compared
+  }
   
   for (symptom in selectedSymptoms) {
     model <- glm(data[,symptom] ~ data[,covariate], family=binomial())

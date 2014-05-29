@@ -150,11 +150,30 @@ shinyServer(function(input, output, session) {
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
-  numRowsLogistf <- function() {if(!is.null(dataFiltered())){
-    if(input$treatasBinary==FALSE){return(0)}
+  numRowsLogistf <- function() {if(!is.null(input$useFirthCorrection)){
+    if(input$useFirthCorrection==FALSE) {return(0)}
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
+numRowsLogist <- function() {if(!is.null(input$useFirthCorrection)){
+  if(input$useFirthCorrection==TRUE) {return(0)}
+  if(input$treatasBinary==FALSE) {return(0)}
+  max(ceiling(length(input$selectedSymptoms))*30,
+      300)}else{return(0)}}
+
+
+numRowsLinear <- function() {if(!is.null(input$useRCSModel)){
+  if(input$useRCSModel==TRUE) {return(0)}
+  if(input$treatasBinary==TRUE) {return(0)}
+  max(ceiling(length(input$selectedSymptoms))*30,
+      300)}else{return(0)}}
+
+numRowsRCSModel <- function() {if(!is.null(input$useRCSModel)){
+  if(input$useRCSModel==FALSE) {return(0)}
+  if(input$treatasBinary==TRUE) {return(0)}
+  max(ceiling(length(input$selectedSymptoms))*100,
+      300)}else{return(0)}}
+
   numRowsMixedModels1 <- function(){if(!is.null(dataFiltered()) &
                                          !is.null(input$selectedMixedModelType)){
     ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
@@ -811,7 +830,6 @@ output$selectEvaluationTime <- renderUI({
   
   })
 
-
 output$selectCovariate <- renderUI({
   selectInput(inputId="selectedCovariate",
               label="Select covariate for analysis:",
@@ -820,18 +838,37 @@ output$selectCovariate <- renderUI({
   })
 
 output$checkUseFirthCorrection <- renderUI({
+  if (!is.null(dataFiltered()) & !is.null(input$selectedCovariate)) {
+    if (input$treatasBinary==TRUE) {
+    if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="binary") {
   checkboxInput(inputId="useFirthCorrection",
                 label="Use Firth correction?",
-                value=TRUE)
-  
+                value=FALSE)
+  }}}
   })
 
 output$checkUseRCSModel <- renderUI({
+  if (!is.null(dataFiltered()) & !is.null(input$selectedCovariate)) {
+    if (input$treatasBinary==FALSE) {
+    if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="multilevel" &
+          (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["type"]]=="integer" |
+             determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["type"]]=="numeric")
+        ) {
   checkboxInput(inputId="useRCSModel",
                 label="Use flexible model of the association of the selected
                 variables with the numerical covariate?",
-                value=TRUE)
-  
+                value=FALSE)}
+  }}
+})
+
+# reset checkboxes on parameter change
+observe({input$selectedCovariate
+         updateCheckboxInput(session, inputId="useRCSModel",value=NULL)
+         updateCheckboxInput(session, inputId="useFirthCorrection",value=NULL)
+         })
+observe({input$treatasBinary
+         updateCheckboxInput(session, inputId="useRCSModel",value=NULL)
+         updateCheckboxInput(session, inputId="useFirthCorrection",value=NULL)
 })
 
 # Graph(s)
@@ -867,7 +904,7 @@ resultsLogistf <- reactive({
 #     }}
 # }, height=numRowsLogistf)
 
-# plot - logistf ###
+# plot - logistf ####
 output$plotLogistf2 <- renderPlot({
   if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
     if(input$useFirthCorrection==TRUE) {
@@ -882,16 +919,17 @@ output$plotLogistf2 <- renderPlot({
                           graphTitle=paste("Odds ratios and confidence intervals for",
                                            resultsLogistf()[["referenceValue"]], 
                                            "at evaluation T=",
-                                           input$selectedEvaluationTime))    
+                                           input$selectedEvaluationTime,
+                                           "(using Firth correction)"))    
        
        print(out)
       }
     }}
 }, height=numRowsLogistf)
 
-# table - logistf ###
+# table - logistf ####
 output$tableLogistf <- renderTable({
-  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+  if(!(is.null(input$useFirthCorrection))){
     if(input$useFirthCorrection==TRUE) {
       if (input$treatasBinary==TRUE) {
         resultsLogistf()[["printableResultsTable"]]
@@ -901,7 +939,10 @@ output$tableLogistf <- renderTable({
 
 # Scenario - logistic regression (without Firth correction)
 resultsLogist <- reactive({
+  if(!(is.null(input$useFirthCorrection))){
+    if(!is.null(input$treatasBinary)) {
   if(input$useFirthCorrection==FALSE) {
+    if (input$treatasBinary==TRUE) {
     out <- tabelizeLogist(data=dataExtended(),
                            measurementVar=input$measurementVar,
                            selectedMeasurement=input$selectedEvaluationTime,
@@ -909,14 +950,14 @@ resultsLogist <- reactive({
                            selectedSymptoms=input$selectedSymptoms,
                            thresholdValue=input$thresholdValue)
     return(out)
-  }
+  }}}}
   
 })
 
 
-# table - logist ###
+# table - logist ####
 output$tableLogist <- renderTable({
-  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+  if(!(is.null(resultsLogist()))){
     if(input$useFirthCorrection==FALSE) {
       if (input$treatasBinary==TRUE) {
         resultsLogist()[["printableResultsTable"]]
@@ -924,9 +965,9 @@ output$tableLogist <- renderTable({
 })
 
 
-# plot - logist ###
+# plot - logist ####
 output$plotLogist <- renderPlot({
-  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+  if(!(is.null(resultsLogist()))){
     if(input$useFirthCorrection==FALSE) {
       if (input$treatasBinary==TRUE) {
         out <- plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
@@ -937,15 +978,93 @@ output$plotLogist <- renderPlot({
                                  xLabel="Odds ratios",
                                  yLabel="Variables",
                                  graphTitle=paste("Odds ratios and confidence intervals for",
-                                                  resultsLogistf()[["referenceValue"]], 
+                                                  resultsLogist()[["referenceValue"]], 
                                                   "at evaluation T=",
                                                   input$selectedEvaluationTime))    
         
         print(out)
       }
     }}
-}, height=numRowsLogistf)
+}, height=numRowsLogist)
 
+
+# Scenario - linear regression
+resultsLinear <- reactive({
+    out <- tabelizeLinear(data=dataExtended(),
+                          measurementVar=input$measurementVar,
+                          selectedMeasurement=input$selectedEvaluationTime,
+                          covariate=input$selectedCovariate,
+                          selectedSymptoms=input$selectedSymptoms)
+    return(out)
+  
+  
+})
+
+# table - linear ####
+output$tableLinear <- renderTable({
+  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+    if (input$treatasBinary==FALSE) {
+      if(input$useRCSModel==FALSE) {
+        resultsLinear()[["printableResultsTable"]]
+      }}}
+})
+
+# plot - linear ####
+output$plotLinear <- renderPlot({
+  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
+      if (input$treatasBinary==FALSE) {
+        if(input$useRCSModel==FALSE) {
+        out <- plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
+                                 variableName="Variable",
+                                 valueName="beta",
+                                 CILowerName="CILower",
+                                 CIUpperName="CIUpper",
+                                 xLabel="Beta (slope) coefficient",
+                                 yLabel="Variables",
+                                 graphTitle=paste("Beta coefficients and confidence intervals for effects of",
+                                                  input$selectedCovariate, 
+                                                  "on selected variables at evaluation T=",
+                                                  input$selectedEvaluationTime))    
+        
+        print(out)
+      }}
+    }
+}, height=numRowsLinear) 
+
+# Scenario - modeling with Restricted Cubic Splines
+
+# plot - RCS plot ####
+output$plotRCS=renderPlot({
+  
+  if(!(is.null(dataFiltered.yn()) || is.null(input$useRCSModel) )){
+    if(input$useRCSModel==TRUE){
+      
+    plotRCS(data.all=dataExtended(),
+            data.yn=dataFiltered.yn(),
+            measurement=Measurement(),
+            selectedSymptoms=input$selectedSymptoms,
+            measurementSelectedrcs=input$selectedEvaluationTime,
+            rcsIDVar=input$selectedCovariate,
+            binaryVar=input$treatasBinary)   
+  }}
+}, height=numRowsRCSModel)
+
+# table - RCS table ####
+output$tableRCS <- renderTable({
+  
+  if(!(is.null(dataFiltered.yn()) || is.null(input$useRCSModel) )){
+    if(input$useRCSModel==TRUE){
+    tabelizeRCS(data.all=dataExtended(),
+                data.yn=dataFiltered.yn(),
+                measurement=Measurement(),
+                selectedSymptoms=input$selectedSymptoms,
+                measurementSelectedrcs=input$selectedEvaluationTime,
+                rcsIDVar=input$selectedCovariate, 
+                binaryVar=input$treatasBinary
+    )
+  }
+  }
+})
 
 # TAB - Uploaded data ####
 # Table - list the subseted data in an output slot ####
@@ -1356,19 +1475,19 @@ output$rcsUI2 = renderUI({
   }
 })
 
-# plot - RCS plot ###
-output$plotRCS=renderPlot({
- 
-  if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedrcs) )){
-    plotRCS(data.all=dataExtended(),
-            data.yn=dataFiltered.yn(),
-            measurement=Measurement(),
-            selectedSymptoms=input$selectedSymptoms,
-            measurementSelectedrcs=input$measurementSelectedrcs,
-            rcsIDVar=input$rcsIDVar,
-            binaryVar=input$treatasBinary)   
-   }
-}, height=NumRows)
+# # plot - RCS plot ###
+# output$plotRCS=renderPlot({
+#  
+#   if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedrcs) )){
+#     plotRCS(data.all=dataExtended(),
+#             data.yn=dataFiltered.yn(),
+#             measurement=Measurement(),
+#             selectedSymptoms=input$selectedSymptoms,
+#             measurementSelectedrcs=input$measurementSelectedrcs,
+#             rcsIDVar=input$rcsIDVar,
+#             binaryVar=input$treatasBinary)   
+#    }
+# }, height=NumRows)
 
 output$messageNotAppropriate7 <- renderText({
   if(!is.null(input$treatasBinary)){
@@ -1377,22 +1496,22 @@ output$messageNotAppropriate7 <- renderText({
     }}
 })
 
-# table - RCS table ###
-output$tableRCS <- renderTable({
-  
-  if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedrcs) )){
-    #if(input$treatasBinary==TRUE){
-      tabelizeRCS(data.all=dataExtended(),
-                  data.yn=dataFiltered.yn(),
-                  measurement=Measurement(),
-                  selectedSymptoms=input$selectedSymptoms,
-                  measurementSelectedrcs=input$measurementSelectedrcs,
-                  rcsIDVar=input$rcsIDVar, 
-				  binaryVar=input$treatasBinary
-				  )
-    #}
-	}
-})
+# # table - RCS table ###
+# output$tableRCS <- renderTable({
+#   
+#   if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedrcs) )){
+#     #if(input$treatasBinary==TRUE){
+#       tabelizeRCS(data.all=dataExtended(),
+#                   data.yn=dataFiltered.yn(),
+#                   measurement=Measurement(),
+#                   selectedSymptoms=input$selectedSymptoms,
+#                   measurementSelectedrcs=input$measurementSelectedrcs,
+#                   rcsIDVar=input$rcsIDVar, 
+# 				  binaryVar=input$treatasBinary
+# 				  )
+#     #}
+# 	}
+# })
 
 ################ association of variables with the outcome using logistic regression with Firth correction
 
