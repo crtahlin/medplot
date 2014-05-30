@@ -414,8 +414,7 @@ output$selectGraphOverTime <- renderUI({
                         "Presence of symptoms"="presencePlot"),
               selected=NULL,
               multiple=FALSE)
-  }
-  
+  }  
 })
 
 # Profile plots ####
@@ -432,9 +431,7 @@ output$selectGraphType <- renderUI({
                             "Multiple graphs per variable"="multipleGraphs"),
                   selected="randomSample",
                   multiple=FALSE)
-    }
-    }
-  }
+    }}}
 })
 
 output$selectRandomSampleSize <- renderUI({
@@ -448,8 +445,7 @@ output$selectRandomSampleSize <- renderUI({
                      min=1,
                      max=100,
                      step=5)
-      }
-    }}}
+      }}}}
 })
 
 
@@ -464,8 +460,7 @@ output$selectMaxGroupSize <- renderUI({
                      min=10,
                      max=100,
                      step=5)
-      }
-    }}}
+      }}}}
 })
 
 # Graph
@@ -490,8 +485,7 @@ output$plotTimelineProfiles <- renderPlot({
                                    selectedSymptoms=input$selectedSymptoms,
                                    sizeofRandomSample=input$sampleSize,
                                    sizeofGroup=input$groupSize))
-      }
-    }}
+      }}}
 }, height=numRowsTimelineProfile)
 
 # Lasagna plots ####
