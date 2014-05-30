@@ -413,8 +413,7 @@ output$selectGraphOverTime <- renderUI({
                         "Timeline"="timelinePlot",
                         "Presence of symptoms"="presencePlot"),
               selected=NULL,
-              multiple=FALSE,
-              selectize=TRUE)
+              multiple=FALSE)
   }
   
 })
