@@ -5,6 +5,11 @@
 
 # load library for generation interactive web pages
 library(shiny)
+if(!require(shinyIncubator)) {
+  devtools::install_github("shiny-incubator", "rstudio")
+  library(shinyIncubator)
+}
+# library(shinyIncubator) # NOTE!!!: this is not available on CRAN, might not be best to include it?
 # load library for generating graph scales
 library(scales)
 # load library for melting data
@@ -471,6 +476,14 @@ output$plotTimelineProfiles <- renderPlot({
            (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
            (input$selectedGraphType=="multipleGraphs" && !is.null(input$groupSize))) {
       if(input$treatasBinary==FALSE){
+        
+        progress <- Progress$new(session, min=1, max=100)
+        on.exit(progress$close())
+        
+        progress$set(message = 'Calculation in progress',
+                     detail = 'This may take a while...', 
+                     value=NULL)
+        
         print(plotTimelineProfiles(data=dataFiltered(),
                                    plotType=input$selectedGraphType,
                                    personIDVar=input$patientIDVar,
@@ -488,6 +501,14 @@ output$plotLasagna <- renderUI({
   if (!is.null(input$selectedGraphOverTime)) {
   if (input$selectedGraphOverTime=="lasagnaPlot") {
   
+    progress <- Progress$new(session, min=1, max=100)
+    on.exit(progress$close())
+    
+    progress$set(message = 'Calculation in progress',
+                 detail = 'This may take a while...', 
+                 value=NULL)
+    
+    
   filenames <- vector()
   # generate as many files as there are plots
   for (symptom in input$selectedSymptoms) {
@@ -536,6 +557,14 @@ output$plotTimelineBoxplots <- renderPlot({
     if(input$selectedGraphOverTime=="boxPlot") {
       
     if(input$treatasBinary==FALSE){
+      
+      progress <- Progress$new(session, min=1, max=100)
+      on.exit(progress$close())
+      
+      progress$set(message = 'Calculation in progress',
+                   detail = 'This may take a while...', 
+                   value=NULL)
+      
       print(plotTimelineBoxplots(data=dataFiltered(),
                                  personIDVar=input$patientIDVar,
                                  measurementVar=input$measurementVar,
@@ -568,7 +597,15 @@ output$selectDisplayFormat <- renderUI({
 output$plotTimeline <- renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
     if(input$selectedGraphOverTime=="timelinePlot") {
-    if (input$treatasBinary==FALSE) { 
+    if (input$treatasBinary==FALSE) {
+      
+      progress <- Progress$new(session, min=1, max=100)
+      on.exit(progress$close())
+      
+      progress$set(message = 'Calculation in progress',
+                   detail = 'This may take a while...', 
+                   value=NULL)
+      
       data=dataFiltered()
       # observe({dataFiltered()})
       # if no symbols are selected, do not plot
@@ -590,16 +627,21 @@ output$selectMeasurementForPresencePlot <- renderUI({
     selectInput(inputId="selectedMeasurementForPresencePlot",
                 label="Select the measurement occasion (time):",
                 choices=measurementLevels(), selected=measurementLevels()[1])
-  }
-  }
-  }
-  )
+  }}
+})
 
 # Graph
 output$plotPresence <- renderPlot({
   if(!is.null(input$selectedMeasurementForPresencePlot)) {
     if(input$selectedGraphOverTime=="presencePlot") {
  
+      progress <- Progress$new(session, min=1, max=100)
+      on.exit(progress$close())
+      
+      progress$set(message = 'Calculation in progress',
+                   detail = 'This may take a while...', 
+                   value=NULL)
+      
       plot <- plotPresenceofSymptoms(data=dataFiltered(),
                          selectedSymptoms=input$selectedSymptoms,
                          measurementVar=input$measurementVar,
@@ -615,6 +657,12 @@ output$plotPresence <- renderPlot({
 output$tableforBoxplots <- renderUI({
   if(!is.null(dataFiltered())) {
     if(input$treatasBinary==FALSE){
+      progress <- Progress$new(session, min=1, max=100)
+      on.exit(progress$close())
+      
+      progress$set(message = 'Calculation in progress',
+                   detail = 'This may take a while...', 
+                   value=NULL)
       
       out <- tabelizeBoxplots(measurements=Measurement(),
                               measurementVar=input$measurementVar,
@@ -642,6 +690,13 @@ output$plotPyramid <- renderPlot ({
     if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
       if(input$treatasBinary==TRUE){
         
+        progress <- Progress$new(session, min=1, max=100)
+        on.exit(progress$close())
+        
+        progress$set(message = 'Calculation in progress',
+                     detail = 'This may take a while...', 
+                     value=NULL)
+        
         plotPropWithSymptoms(data=dataFilteredwithThreshold(),
                              grouping=input$groupingVar,
                              measurements=input$measurementVar,
@@ -658,6 +713,14 @@ output$plotPropCIs <- renderPlot ({
   try({
     if(!is.null(dataFilteredwithThreshold())){
       if(input$treatasBinary==TRUE){
+        
+        progress <- Progress$new(session, min=1, max=100)
+        on.exit(progress$close())
+        
+        progress$set(message = 'Calculation in progress',
+                     detail = 'This may take a while...', 
+                     value=NULL)
+        
         print(
           plotPropWithSymptomsCI(data=dataFilteredwithThreshold(),
                                  groupingVar=input$groupingVar,
@@ -687,14 +750,25 @@ output$UIpropTable = renderUI({
 # Table of proportions of patients in a group with a symptom ####
 output$tablePropGroups <- renderTable ({
   
+  
+  
   if(!(is.null(dataFiltered()) || is.null(input$thresholdValue)  )){
     if(input$treatasBinary==TRUE){
-      tablePropWithSymptoms(data=dataFiltered(),
+      
+      progress <- Progress$new(session, min=1, max=100)
+      
+      progress$set(message = 'Calculation in progress',
+                   detail = 'This will take a while...', 
+                   value=NULL)
+      
+      out <- tablePropWithSymptoms(data=dataFiltered(),
                             groupingVar=input$groupingVar,
                             measurementVar=input$measurementVar,
                             forMeasurement=input$measurementSelectedprop,
                             symptomsNames=input$selectedSymptoms,
                             thresholdValue=input$thresholdValue)
+      on.exit(progress$close())
+      return(out)
     }
   }
   
@@ -717,12 +791,20 @@ output$textTablePropGroups <- renderUI({
 output$tableMedianGroups <- renderTable ({
   if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedprop) )){
     if(input$treatasBinary==TRUE){
+      
+      progress <- Progress$new(session, min=1, max=100)
+      
+      progress$set(message = 'Calculation in progress',
+                   detail = 'This will take a while...', 
+                   value=NULL)
+      
       tableMediansWithSymptoms(data=dataFiltered(),
                                groupingVar=input$groupingVar,
                                measurementVar=input$measurementVar,
                                forMeasurement=input$measurementSelectedprop,
                                symptomsNames=input$selectedSymptoms,
                                thresholdValue=input$thresholdValue)
+      on.exit(progress$close())
     }
   }
 })
@@ -1108,6 +1190,14 @@ output$selectMixedModelType <- renderUI({
 
 # Results
 mixedModelResults <- reactive({
+  
+  progress <- Progress$new(session, min=1, max=100)
+  
+  progress$set(message = 'Calculation in progress',
+               detail = 'This will take a while...', 
+               value=NULL)
+  on.exit(progress$close())
+  
   mixedModel(data=dataFiltered(),
              selectedSymptoms=input$selectedSymptoms,
              groupingVar=input$groupingVar,

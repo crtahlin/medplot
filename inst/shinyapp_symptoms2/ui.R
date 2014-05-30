@@ -2,6 +2,7 @@
 # graph for displaying presence of symptoms. 
 
 library(shiny)
+library(shinyIncubator)
 
 # Define UI for displaying presence of symptoms
 shinyUI(pageWithSidebar(
@@ -57,6 +58,7 @@ shinyUI(pageWithSidebar(
   
   # Define the main panel ####
   mainPanel(
+    progressInit(),
     tabsetPanel(
       # TAB - summary of data ####
       tabPanel(title="Data overview",
@@ -85,7 +87,7 @@ shinyUI(pageWithSidebar(
                
                # Presence of symptoms graph
                uiOutput("selectMeasurementForPresencePlot"),
-               plotOutput("plotPresence")
+               plotOutput("plotPresence", height="auto")
                
       ),
      
