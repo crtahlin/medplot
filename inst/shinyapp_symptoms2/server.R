@@ -150,27 +150,23 @@ shinyServer(function(input, output, session) {
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
-  numRowsLogistf <- function() {if(!is.null(input$useFirthCorrection)){
-    if(input$useFirthCorrection==FALSE) {return(0)}
+  numRowsLogistf <- function() {if(!is.null(regressionScenario())){
+    if(regressionScenario()!="scenarioLogistf") {return(0)}
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
-numRowsLogist <- function() {if(!is.null(input$useFirthCorrection)){
-  if(input$useFirthCorrection==TRUE) {return(0)}
-  if(input$treatasBinary==FALSE) {return(0)}
+numRowsLogist <- function() {if(!is.null(regressionScenario())){
+  if(regressionScenario()!="scenarioLogist") {return(0)}
   max(ceiling(length(input$selectedSymptoms))*30,
       300)}else{return(0)}}
 
-
-numRowsLinear <- function() {if(!is.null(input$useRCSModel)){
-  if(input$useRCSModel==TRUE) {return(0)}
-  if(input$treatasBinary==TRUE) {return(0)}
+numRowsLinear <- function() {if(!is.null(regressionScenario())){
+  if(regressionScenario()!="scenarioLinearModel") {return(0)}
   max(ceiling(length(input$selectedSymptoms))*30,
       300)}else{return(0)}}
 
-numRowsRCSModel <- function() {if(!is.null(input$useRCSModel)){
-  if(input$useRCSModel==FALSE) {return(0)}
-  if(input$treatasBinary==TRUE) {return(0)}
+numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
+  if(regressionScenario()!="scenarioRCSModel") {return(0)}
   max(ceiling(length(input$selectedSymptoms))*100,
       300)}else{return(0)}}
 
@@ -821,12 +817,21 @@ output$messageNotAppropriate6 <- renderText({
 
 # TAB - Regression model : one evaluation ####
 # Menu
+output$debug10 <- renderText({paste(regressionScenario())})
+
+output$debug9 <- renderText({
+  paste("selectedEvaluationTime:", ifelse(is.null(input$selectedEvaluationTime), "NULL", input$selectedEvaluationTime),
+        "selectedCovariate:", ifelse(is.null(input$selectedCovariate), "NULL", input$selectedCovariate) ,
+        "treatasBinary:",ifelse(is.null(input$treatasBinary), "NULL", input$treatasBinary),
+        "useFirthCorrection:", ifelse(is.null(input$useFirthCorrection), "NULL", input$useFirthCorrection),
+        "useRCSModel:", ifelse(is.null(input$useRCSModel), "NULL", input$useRCSModel))
+  })
 
 output$selectEvaluationTime <- renderUI({
   selectInput(inputId="selectedEvaluationTime",
               label="Select evaluation occasion:",
-              choices=measurementLevels(),
-              selected=measurementLevels()[1])
+              choices=if(!is.null(measurementLevels())) {measurementLevels()},
+              selected=if(!is.null(measurementLevels())) {measurementLevels()[1]})
   
   })
 
@@ -838,45 +843,77 @@ output$selectCovariate <- renderUI({
   })
 
 output$checkUseFirthCorrection <- renderUI({
-  if (!is.null(dataFiltered()) & !is.null(input$selectedCovariate)) {
+  if (!is.null(input$treatasBinary)) {
     if (input$treatasBinary==TRUE) {
-    if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="binary") {
-  checkboxInput(inputId="useFirthCorrection",
-                label="Use Firth correction?",
-                value=FALSE)
-  }}}
+    #if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="binary") {
+      checkboxInput(inputId="useFirthCorrection",
+                    label="Use Firth correction?",
+                    value=FALSE)
+  # }
+  }}
   })
 
 output$checkUseRCSModel <- renderUI({
-  if (!is.null(dataFiltered()) & !is.null(input$selectedCovariate)) {
+  if (!is.null(input$treatasBinary) & !is.null(input$selectedCovariate)) {
     if (input$treatasBinary==FALSE) {
-    if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="multilevel" &
-          (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["type"]]=="integer" |
-             determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["type"]]=="numeric")
-        ) {
-  checkboxInput(inputId="useRCSModel",
-                label="Use flexible model of the association of the selected
+      if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="multilevel" &
+            (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["type"]]=="integer" |
+               determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["type"]]=="numeric")
+          ) {
+        checkboxInput(inputId="useRCSModel", label="Use flexible model of the association of the selected
                 variables with the numerical covariate?",
-                value=FALSE)}
-  }}
+                value=FALSE)
+      }}}
 })
 
-# reset checkboxes on parameter change
-observe({input$selectedCovariate
-         updateCheckboxInput(session, inputId="useRCSModel",value=NULL)
-         updateCheckboxInput(session, inputId="useFirthCorrection",value=NULL)
-         })
-observe({input$treatasBinary
-         updateCheckboxInput(session, inputId="useRCSModel",value=NULL)
-         updateCheckboxInput(session, inputId="useFirthCorrection",value=NULL)
+# Determine scenario ####
+regressionScenario <- reactive({
+  if (!is.null(input$treatasBinary) &
+        !is.null(input$selectedEvaluationTime) &
+        !is.null(input$selectedCovariate) &
+        !is.null(dataFiltered()) &
+        !is.null(input$measurementVar) &
+        !is.null(input$selectedSymptoms)
+      ) {
+
+  if (input$treatasBinary==TRUE) {
+    if (is.null(input$useFirthCorrection)) {return("scenarioLogist")}
+    if (input$useFirthCorrection==FALSE) {return("scenarioLogist")}
+    if (input$useFirthCorrection==TRUE) {return("scenarioLogistf")}
+  }
+  
+  if (input$treatasBinary==FALSE) {
+    if (is.null(input$useRCSModel) ) {return("scenarioLinearModel")}
+    if (input$useRCSModel==FALSE) {return("scenarioLinearModel")}
+    if (input$useRCSModel==TRUE) {return("scenarioRCSModel")}
+  }
+  }
 })
+
+
+# reset checkboxes on parameter change
+# observe({input$selectedCovariate
+#          print("Observer triggered")
+#          updateCheckboxInput(session, inputId="useRCSModel",value=FALSE)
+#          updateCheckboxInput(session, inputId="useFirthCorrection",value=FALSE)
+#          print("Observer triggered2")
+#          print(input$useFirthCorrection)
+#          })
+# observe({input$treatasBinary
+#          print("Observer triggered")
+#          updateCheckboxInput(session, inputId="useRCSModel",value=FALSE)
+#          updateCheckboxInput(session, inputId="useFirthCorrection",value=FALSE)
+#          print("Observer triggered2")
+#          print(input$useFirthCorrection)
+# })
 
 # Graph(s)
 
 # Scenario - Logistic regression with Firth correction
 # Create results of Logistic regression with Firth correction
 resultsLogistf <- reactive({
-  if(input$useFirthCorrection==TRUE) {
+  if(!is.null(regressionScenario())) {
+  if(regressionScenario()=="scenarioLogistf") {
     out <- tabelizeLogistf(data=dataExtended(),
                     measurementVar=input$measurementVar,
                     selectedMeasurement=input$selectedEvaluationTime,
@@ -884,7 +921,7 @@ resultsLogistf <- reactive({
                     selectedSymptoms=input$selectedSymptoms,
                     thresholdValue=input$thresholdValue)
     return(out)
-  }
+  }}
   
   })
 
@@ -906,9 +943,8 @@ resultsLogistf <- reactive({
 
 # plot - logistf ####
 output$plotLogistf2 <- renderPlot({
-  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
-    if(input$useFirthCorrection==TRUE) {
-      if (input$treatasBinary==TRUE) {
+  if(!is.null(resultsLogistf()) ){
+    if(regressionScenario()=="scenarioLogistf") {
        out <- plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
                           variableName="Variable",
                           valueName="OR",
@@ -924,52 +960,46 @@ output$plotLogistf2 <- renderPlot({
        
        print(out)
       }
-    }}
+    }
 }, height=numRowsLogistf)
 
 # table - logistf ####
 output$tableLogistf <- renderTable({
-  if(!(is.null(input$useFirthCorrection))){
-    if(input$useFirthCorrection==TRUE) {
-      if (input$treatasBinary==TRUE) {
-        resultsLogistf()[["printableResultsTable"]]
-      }}}
-})
+  if(!is.null(resultsLogistf()) ){
+    if(regressionScenario()=="scenarioLogistf") {
+      resultsLogistf()[["printableResultsTable"]]
+    }}
+  })
 
 
 # Scenario - logistic regression (without Firth correction)
 resultsLogist <- reactive({
-  if(!(is.null(input$useFirthCorrection))){
-    if(!is.null(input$treatasBinary)) {
-  if(input$useFirthCorrection==FALSE) {
-    if (input$treatasBinary==TRUE) {
-    out <- tabelizeLogist(data=dataExtended(),
-                           measurementVar=input$measurementVar,
-                           selectedMeasurement=input$selectedEvaluationTime,
-                           covariate=input$selectedCovariate,
-                           selectedSymptoms=input$selectedSymptoms,
-                           thresholdValue=input$thresholdValue)
-    return(out)
-  }}}}
-  
-})
+  if(!is.null(regressionScenario()) ){
+    if(regressionScenario()=="scenarioLogist") {
+      out <- tabelizeLogist(data=dataExtended(),
+                            measurementVar=input$measurementVar,
+                            selectedMeasurement=input$selectedEvaluationTime,
+                            covariate=input$selectedCovariate,
+                            selectedSymptoms=input$selectedSymptoms,
+                            thresholdValue=input$thresholdValue)
+      return(out)
+    }}
+  })
 
 
 # table - logist ####
 output$tableLogist <- renderTable({
-  if(!(is.null(resultsLogist()))){
-    if(input$useFirthCorrection==FALSE) {
-      if (input$treatasBinary==TRUE) {
-        resultsLogist()[["printableResultsTable"]]
-      }}}
-})
+  if(!is.null(resultsLogist()) ){
+    if(regressionScenario()=="scenarioLogist") {
+      resultsLogist()[["printableResultsTable"]]
+    }}
+  })
 
 
 # plot - logist ####
 output$plotLogist <- renderPlot({
   if(!(is.null(resultsLogist()))){
-    if(input$useFirthCorrection==FALSE) {
-      if (input$treatasBinary==TRUE) {
+    if(regressionScenario()=="scenarioLogist") {
         out <- plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
                                  variableName="Variable",
                                  valueName="OR",
@@ -983,37 +1013,35 @@ output$plotLogist <- renderPlot({
                                                   input$selectedEvaluationTime))    
         
         print(out)
-      }
     }}
-}, height=numRowsLogist)
+  }, height=numRowsLogist)
 
 
 # Scenario - linear regression
 resultsLinear <- reactive({
-    out <- tabelizeLinear(data=dataExtended(),
-                          measurementVar=input$measurementVar,
-                          selectedMeasurement=input$selectedEvaluationTime,
-                          covariate=input$selectedCovariate,
-                          selectedSymptoms=input$selectedSymptoms)
-    return(out)
-  
-  
+  if (!is.null(regressionScenario())) {
+    if (regressionScenario()=="scenarioLinearModel") {
+      out <- tabelizeLinear(data=dataExtended(),
+                            measurementVar=input$measurementVar,
+                            selectedMeasurement=input$selectedEvaluationTime,
+                            covariate=input$selectedCovariate,
+                            selectedSymptoms=input$selectedSymptoms)
+      return(out)
+    }}
 })
 
 # table - linear ####
 output$tableLinear <- renderTable({
-  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
-    if (input$treatasBinary==FALSE) {
-      if(input$useRCSModel==FALSE) {
-        resultsLinear()[["printableResultsTable"]]
-      }}}
-})
+  if(!is.null(resultsLinear())){
+    if (regressionScenario()=="scenarioLinearModel") {
+      resultsLinear()[["printableResultsTable"]]
+    }}
+  })
 
 # plot - linear ####
 output$plotLinear <- renderPlot({
-  if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
-      if (input$treatasBinary==FALSE) {
-        if(input$useRCSModel==FALSE) {
+  if(!is.null(resultsLinear())){
+    if (regressionScenario()=="scenarioLinearModel") {
         out <- plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
                                  variableName="Variable",
                                  valueName="beta",
@@ -1024,20 +1052,18 @@ output$plotLinear <- renderPlot({
                                  graphTitle=paste("Beta coefficients and confidence intervals for effects of",
                                                   input$selectedCovariate, 
                                                   "on selected variables at evaluation T=",
-                                                  input$selectedEvaluationTime))    
-        
+                                                  input$selectedEvaluationTime))  
         print(out)
-      }}
-    }
-}, height=numRowsLinear) 
+    }}
+  }, height=numRowsLinear) 
 
 # Scenario - modeling with Restricted Cubic Splines
 
 # plot - RCS plot ####
 output$plotRCS=renderPlot({
   
-  if(!(is.null(dataFiltered.yn()) || is.null(input$useRCSModel) )){
-    if(input$useRCSModel==TRUE){
+  if(!is.null(regressionScenario())){
+    if (regressionScenario()=="scenarioRCSModel") {
       
     plotRCS(data.all=dataExtended(),
             data.yn=dataFiltered.yn(),
@@ -1052,8 +1078,8 @@ output$plotRCS=renderPlot({
 # table - RCS table ####
 output$tableRCS <- renderTable({
   
-  if(!(is.null(dataFiltered.yn()) || is.null(input$useRCSModel) )){
-    if(input$useRCSModel==TRUE){
+  if(!is.null(regressionScenario())){
+    if (regressionScenario()=="scenarioRCSModel") {
     tabelizeRCS(data.all=dataExtended(),
                 data.yn=dataFiltered.yn(),
                 measurement=Measurement(),
@@ -1062,9 +1088,112 @@ output$tableRCS <- renderTable({
                 rcsIDVar=input$selectedCovariate, 
                 binaryVar=input$treatasBinary
     )
+  }}
+})
+
+# TAB - Regression model : all evaluations ####
+# Menu
+output$selectMixedModelType <- renderUI({
+  selectInput(inputId="selectedMixedModelType",
+              label="Select a mixed model type:",
+              choices=c("Model response with fixed effect of grouping variable and
+                        random intercept for every subject"="MMsimple",
+                        "Model response with fixed effects of grouping variable,
+                        measurement occasion and random intercept for every subject"="MMmeasurement",
+                        "Model response with fixed effect of grouping variable,
+                        time from inclusion in study and 
+                        random intercept for every subject"="MMtimeSinceInclusion"),
+              selected="MMsimple")
+})
+
+# Results
+mixedModelResults <- reactive({
+  mixedModel(data=dataFiltered(),
+             selectedSymptoms=input$selectedSymptoms,
+             groupingVar=input$groupingVar,
+             subjectIDVar=input$patientIDVar,
+             measurementVar=input$measurementVar,
+             dateVar=input$dateVar,
+             thresholdValue=input$thresholdValue,
+             treatasBinary=input$treatasBinary,
+             selectedModel=input$selectedMixedModelType)
+})
+
+# Table 1 ####
+output$mixedModelTable1 <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
+    results <- mixedModelResults()[["groupingVar"]] 
+    
+    out <- print(xtable(results, caption=paste("Fixed effects of", input$groupingVar)),
+                 type="html",
+                 html.table.attributes='class="data table table-bordered table-condensed"',
+                 caption.placement="top")
+    return(div(HTML(out),class="shiny-html-output"))
   }
+  
+})
+
+# Graph 1 ####
+output$mixedModelGraph1 <- renderPlot({
+  if(!is.null(input$selectedMixedModelType)) {
+    print(plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
+                                        groupingVar=input$groupingVar,
+                                        groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
+                                        treatasBinary=input$treatasBinary) 
+    )
+  }
+}, height=numRowsMixedModels1)
+
+# Table 2 ####
+output$mixedModelTable2 <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMmeasurement") {
+      results <- mixedModelResults()[["measurementVar"]] 
+      
+      out <- print(xtable(results, caption=paste("Fixed effects of", input$measurementVar)),
+                   type="html",
+                   html.table.attributes='class="data table table-bordered table-condensed"',
+                   caption.placement="top")
+      return(div(HTML(out),class="shiny-html-output"))
+    }
   }
 })
+
+# Graph 2 ####
+output$mixedModelGraph2 <- renderPlot({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMmeasurement") {
+      print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
+                                             measurementVar=input$measurementVar,
+                                             treatasBinary=input$treatasBinary) 
+      )
+    }}
+}, height=numRowsMixedModels2)
+
+# Table 3 ####
+output$mixedModelTable3 <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+      results <- mixedModelResults()[["daysSinceInclusion"]] 
+      
+      out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
+                   type="html",
+                   html.table.attributes='class="data table table-bordered table-condensed"',
+                   caption.placement="top")
+      return(div(HTML(out),class="shiny-html-output"))
+    }
+  }
+})
+
+# Graph 3 ####
+output$mixedModelGraph3 <- renderPlot({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+      print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+                                                 treatasBinary=input$treatasBinary) 
+      )
+    }}
+}, height=numRowsMixedModels3)
 
 # TAB - Uploaded data ####
 # Table - list the subseted data in an output slot ####
@@ -1578,103 +1707,103 @@ output$messageNotAppropriate8 <- renderText({
 })
 
 
-# TAB - Mixed model ####
-output$selectMixedModelType <- renderUI({
-  selectInput(inputId="selectedMixedModelType",
-              label="Select a mixed model type:",
-choices=c("Model response with fixed effect of grouping variable and
-          random intercept for every subject"="MMsimple",
-          "Model response with fixed effects of grouping variable,
-          measurement occasion and random intercept for every subject"="MMmeasurement",
-          "Model response with fixed effect of grouping variable,
-          time from inclusion in study and 
-          random intercept for every subject"="MMtimeSinceInclusion"),
-              selected="MMsimple")
-})
-
-
-mixedModelResults <- reactive({
-  mixedModel(data=dataFiltered(),
-              selectedSymptoms=input$selectedSymptoms,
-              groupingVar=input$groupingVar,
-              subjectIDVar=input$patientIDVar,
-              measurementVar=input$measurementVar,
-              dateVar=input$dateVar,
-              thresholdValue=input$thresholdValue,
-              treatasBinary=input$treatasBinary,
-              selectedModel=input$selectedMixedModelType)
-  })
-
-output$mixedModelTable1 <- renderUI({
-  if(!is.null(input$selectedMixedModelType)) {
-  results <- mixedModelResults()[["groupingVar"]] 
-  
-  out <- print(xtable(results, caption=paste("Fixed effects of", input$groupingVar)),
-        type="html",
-        html.table.attributes='class="data table table-bordered table-condensed"',
-        caption.placement="top")
-  return(div(HTML(out),class="shiny-html-output"))
-  }
-  
-  })
-
-output$mixedModelGraph1 <- renderPlot({
-  if(!is.null(input$selectedMixedModelType)) {
-  print(plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
-                                       groupingVar=input$groupingVar,
-                                       groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
-                                       treatasBinary=input$treatasBinary) 
-  )
-  }
-}, height=numRowsMixedModels1)
-
-
-output$mixedModelTable2 <- renderUI({
-  if(!is.null(input$selectedMixedModelType)) {
-  if (input$selectedMixedModelType=="MMmeasurement") {
-  results <- mixedModelResults()[["measurementVar"]] 
-  
-  out <- print(xtable(results, caption=paste("Fixed effects of", input$measurementVar)),
-               type="html",
-               html.table.attributes='class="data table table-bordered table-condensed"',
-               caption.placement="top")
-  return(div(HTML(out),class="shiny-html-output"))
-  }
-  }
-})
-
-output$mixedModelGraph2 <- renderPlot({
-  if(!is.null(input$selectedMixedModelType)) {
-    if (input$selectedMixedModelType=="MMmeasurement") {
-  print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
-                                       measurementVar=input$measurementVar,
-                                       treatasBinary=input$treatasBinary) 
-  )
-  }}
-}, height=numRowsMixedModels2)
-
-output$mixedModelTable3 <- renderUI({
-  if(!is.null(input$selectedMixedModelType)) {
-  if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
-  results <- mixedModelResults()[["daysSinceInclusion"]] 
-  
-  out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
-               type="html",
-               html.table.attributes='class="data table table-bordered table-condensed"',
-               caption.placement="top")
-  return(div(HTML(out),class="shiny-html-output"))
-  }
-  }
-})
-
-output$mixedModelGraph3 <- renderPlot({
-  if(!is.null(input$selectedMixedModelType)) {
-    if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
-  print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
-                                       treatasBinary=input$treatasBinary) 
-  )
-  }}
-}, height=numRowsMixedModels3)
+# # TAB - Mixed model ####
+# output$selectMixedModelType <- renderUI({
+#   selectInput(inputId="selectedMixedModelType",
+#               label="Select a mixed model type:",
+# choices=c("Model response with fixed effect of grouping variable and
+#           random intercept for every subject"="MMsimple",
+#           "Model response with fixed effects of grouping variable,
+#           measurement occasion and random intercept for every subject"="MMmeasurement",
+#           "Model response with fixed effect of grouping variable,
+#           time from inclusion in study and 
+#           random intercept for every subject"="MMtimeSinceInclusion"),
+#               selected="MMsimple")
+# })
+# 
+# 
+# mixedModelResults <- reactive({
+#   mixedModel(data=dataFiltered(),
+#               selectedSymptoms=input$selectedSymptoms,
+#               groupingVar=input$groupingVar,
+#               subjectIDVar=input$patientIDVar,
+#               measurementVar=input$measurementVar,
+#               dateVar=input$dateVar,
+#               thresholdValue=input$thresholdValue,
+#               treatasBinary=input$treatasBinary,
+#               selectedModel=input$selectedMixedModelType)
+#   })
+# 
+# output$mixedModelTable1 <- renderUI({
+#   if(!is.null(input$selectedMixedModelType)) {
+#   results <- mixedModelResults()[["groupingVar"]] 
+#   
+#   out <- print(xtable(results, caption=paste("Fixed effects of", input$groupingVar)),
+#         type="html",
+#         html.table.attributes='class="data table table-bordered table-condensed"',
+#         caption.placement="top")
+#   return(div(HTML(out),class="shiny-html-output"))
+#   }
+#   
+#   })
+# 
+# output$mixedModelGraph1 <- renderPlot({
+#   if(!is.null(input$selectedMixedModelType)) {
+#   print(plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
+#                                        groupingVar=input$groupingVar,
+#                                        groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
+#                                        treatasBinary=input$treatasBinary) 
+#   )
+#   }
+# }, height=numRowsMixedModels1)
+# 
+# 
+# output$mixedModelTable2 <- renderUI({
+#   if(!is.null(input$selectedMixedModelType)) {
+#   if (input$selectedMixedModelType=="MMmeasurement") {
+#   results <- mixedModelResults()[["measurementVar"]] 
+#   
+#   out <- print(xtable(results, caption=paste("Fixed effects of", input$measurementVar)),
+#                type="html",
+#                html.table.attributes='class="data table table-bordered table-condensed"',
+#                caption.placement="top")
+#   return(div(HTML(out),class="shiny-html-output"))
+#   }
+#   }
+# })
+# 
+# output$mixedModelGraph2 <- renderPlot({
+#   if(!is.null(input$selectedMixedModelType)) {
+#     if (input$selectedMixedModelType=="MMmeasurement") {
+#   print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
+#                                        measurementVar=input$measurementVar,
+#                                        treatasBinary=input$treatasBinary) 
+#   )
+#   }}
+# }, height=numRowsMixedModels2)
+# 
+# output$mixedModelTable3 <- renderUI({
+#   if(!is.null(input$selectedMixedModelType)) {
+#   if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+#   results <- mixedModelResults()[["daysSinceInclusion"]] 
+#   
+#   out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
+#                type="html",
+#                html.table.attributes='class="data table table-bordered table-condensed"',
+#                caption.placement="top")
+#   return(div(HTML(out),class="shiny-html-output"))
+#   }
+#   }
+# })
+# 
+# output$mixedModelGraph3 <- renderPlot({
+#   if(!is.null(input$selectedMixedModelType)) {
+#     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+#   print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+#                                        treatasBinary=input$treatasBinary) 
+#   )
+#   }}
+# }, height=numRowsMixedModels3)
 
 
 

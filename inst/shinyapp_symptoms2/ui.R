@@ -127,9 +127,12 @@ shinyUI(pageWithSidebar(
       # TAB - Regression model : one evaluation time ####
       tabPanel(title="Regression model : one evaluation time",
                # Menus
+               textOutput("debug10"),
+               textOutput("debug9"),
                uiOutput("selectEvaluationTime"),
                uiOutput("selectCovariate"),
-               uiOutput("checkUseFirthCorrection"),
+               conditionalPanel(condition="input.treatasBinary=='TRUE'",
+                                uiOutput("checkUseFirthCorrection")),
                uiOutput("checkUseRCSModel"),
                
                # Graphs
@@ -152,8 +155,14 @@ shinyUI(pageWithSidebar(
         ),
       
       # TAB - Regression model : all evaluation times ####
-      tabPanel(title="Regression model : all evaluation times"#,
-               
+      tabPanel(title="Regression model : all evaluation times",
+               uiOutput("selectMixedModelType"),
+               tableOutput("mixedModelTable1"),
+               plotOutput("mixedModelGraph1", height="auto"),               
+               tableOutput("mixedModelTable2"),
+               plotOutput("mixedModelGraph2", height="auto"),
+               tableOutput("mixedModelTable3"),
+               plotOutput("mixedModelGraph3", height="auto")
       ),
       
       # TAB - Selected data ####
@@ -187,7 +196,7 @@ shinyUI(pageWithSidebar(
 #                ),
 #       
       # TAB - Distribution of the variables ####
-      tabPanel(title="Distribution of the variables: by measurement occasion",
+      tabPanel(title="OBSOLETE - Distribution of the variables: by measurement occasion",
               textOutput("messageNotAppropriate4"),
                # textOutput("messageSelectVars"),
                uiOutput("proportionUI"),
@@ -198,61 +207,61 @@ shinyUI(pageWithSidebar(
                
                tableOutput("tablePropMedian"),
                uiOutput("textTablePropMedian")
-      ),
+      )
       
-      # TAB - Distribution of the variables: by grouping variable ####
-      tabPanel(title="Distribution of the variables: by grouping variable"#,
-#                textOutput("messageNotAppropriate5"),
-               # textOutput("messageSelectVars"),
-#                plotOutput("plotPyramid", height="auto"),              
-#                plotOutput("plotPropCIs", height="auto"),
-                          
-#                uiOutput("UIpropTable"),
-#               
-#                tableOutput("tablePropGroups"),
-#                uiOutput("textTablePropGroups"),
+#       # TAB - Distribution of the variables: by grouping variable ####
+#       tabPanel(title="Distribution of the variables: by grouping variable"#,
+# #                textOutput("messageNotAppropriate5"),
+#                # textOutput("messageSelectVars"),
+# #                plotOutput("plotPyramid", height="auto"),              
+# #                plotOutput("plotPropCIs", height="auto"),
+#                           
+# #                uiOutput("UIpropTable"),
+# #               
+# #                tableOutput("tablePropGroups"),
+# #                uiOutput("textTablePropGroups"),
+# #                
+# #                tableOutput("tableMedianGroups"),
+# #                uiOutput("textTableMedianGroups")
 #                
-#                tableOutput("tableMedianGroups"),
-#                uiOutput("textTableMedianGroups")
-               
-               ),
-      
+#                ),
+#       
       
      
       
       
       
-      # TAB - RCS ####
-      tabPanel(title="RCS: by measurement occasion",
-               #textOutput("messageNotAppropriate7"),
-               #textOutput("messageSelectVars"),
-               uiOutput("rcsUI"),
-               uiOutput("rcsUI2")#,
-#                plotOutput("plotRCS", height="100%"),
-#                tableOutput("tableRCS")
-      ),
+#       # TAB - RCS ####
+#       tabPanel(title="RCS: by measurement occasion",
+#                #textOutput("messageNotAppropriate7"),
+#                #textOutput("messageSelectVars"),
+#                uiOutput("rcsUI"),
+#                uiOutput("rcsUI2")#,
+# #                plotOutput("plotRCS", height="100%"),
+# #                tableOutput("tableRCS")
+#       ),
+#       
+#       # TAB - Logistf ####
+#       tabPanel(title="Logistf: by measurement occasion",
+#                textOutput("messageNotAppropriate8"),
+#                # textOutput("messageSelectVars"),
+#                uiOutput("logistfUI2"),
+#                uiOutput("logistfUI")#,
+# #                plotOutput("plotLogistf", height="auto"),
+# #                tableOutput("tableLogistf")
+#                )#,
       
-      # TAB - Logistf ####
-      tabPanel(title="Logistf: by measurement occasion",
-               textOutput("messageNotAppropriate8"),
-               # textOutput("messageSelectVars"),
-               uiOutput("logistfUI2"),
-               uiOutput("logistfUI")#,
-#                plotOutput("plotLogistf", height="auto"),
-#                tableOutput("tableLogistf")
-               ),
-      
-      # TAB - Mixed model ####
-      tabPanel(title="Mixed model",
-               uiOutput("selectMixedModelType"),
-               tableOutput("mixedModelTable1"),
-               plotOutput("mixedModelGraph1", height="auto"),               
-               tableOutput("mixedModelTable2"),
-               plotOutput("mixedModelGraph2", height="auto"),
-               tableOutput("mixedModelTable3"),
-               plotOutput("mixedModelGraph3", height="auto")
-               )
-      
+#       # TAB - Mixed model ####
+#       tabPanel(title="Mixed model",
+#                uiOutput("selectMixedModelType"),
+#                tableOutput("mixedModelTable1"),
+#                plotOutput("mixedModelGraph1", height="auto"),               
+#                tableOutput("mixedModelTable2"),
+#                plotOutput("mixedModelGraph2", height="auto"),
+#                tableOutput("mixedModelTable3"),
+#                plotOutput("mixedModelGraph3", height="auto")
+#                )
+#       
       
       # TAB - Debug ####
       # tabPanel("Debug", verbatimTextOutput("debug"))
