@@ -8,8 +8,10 @@ mixedModel <- function(data,               # dataFiltered()
                        treatasBinary,       # input$treatasBinary
                        selectedModel){      # input$selectedMixedModelType
   
-  # make groupingVar bniary variable
+  # make groupingVar binary variable
   data[, groupingVar] <- as.factor(data[, groupingVar])
+  # make measurementVar a factor variable
+  data[, measurementVar] <- as.factor(data[, measurementVar])
   
   # name of the binary grouping variable coeficient assigned by R
   groupingVarCoefName <- paste0(groupingVar,levels(data[,groupingVar])[2])
@@ -20,9 +22,8 @@ mixedModel <- function(data,               # dataFiltered()
                               ifelse(data[,selectedSymptoms]>thresholdValue, 1, 0)                            
   }
   
-  
+  # if the model includes days since inclusion, add this info to the data (column "daysSinceInclusion")
   if (selectedModel=="MMtimeSinceInclusion") {
-    # if the model includes days since inclusion, add this info to the data (column "daysSinceInclusion")
     data <- calculateDaysSinceInclusion(data, subjectIDVar, dateVar)
     time <- "daysSinceInclusion"
   }
@@ -48,7 +49,7 @@ mixedModel <- function(data,               # dataFiltered()
   # cycle through response variables
   for (symptom in selectedSymptoms) {
     
-    # choose the right model depending on user selected option
+    # choose the right model formula depending on user selected option of model
     # construct the right formula based on selected model
     if (selectedModel=="MMsimple") {
       formula <- as.formula(paste(symptom, "~", groupingVar, "+(1|", subjectIDVar, ")"))
@@ -64,7 +65,6 @@ mixedModel <- function(data,               # dataFiltered()
     # build the model depending on whether the response is binary or not
     if (treatasBinary==TRUE) {
       model <- glmer(formula, family=binomial,  na.action=na.omit, data=data)
-      
       # results for the grouping variable
       resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "OR"] <- 
         exp(summary(model)$coef[groupingVarCoefName, "Estimate"])
@@ -77,8 +77,8 @@ mixedModel <- function(data,               # dataFiltered()
       resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "ORPValue"] <- 
         summary(model)$coef[groupingVarCoefName, "Pr(>|z|)"]
       
+      # results for the measurement variable
       if (selectedModel=="MMmeasurement") {
-        # results for the measurement variable
         resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "OR"] <- 
           exp(summary(model)$coef[measurementVar, "Estimate"])
         resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom, "ORCILower"] <- 
@@ -91,8 +91,8 @@ mixedModel <- function(data,               # dataFiltered()
           summary(model)$coef[measurementVar, "Pr(>|z|)"]
       }
       
+      # results for the days since inclusion variable
       if (selectedModel=="MMtimeSinceInclusion") {
-        # results for the days since inclusion variable
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "OR"] <- 
           exp(summary(model)$coef[time, "Estimate"])
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCILower"] <- 
