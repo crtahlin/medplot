@@ -30,9 +30,7 @@ shinyUI(pageWithSidebar(
                   )),
       
       conditionalPanel(
-        # condition="input.dataFileType =='Excel' || input.dataFileType =='TSV'",
-        # Q : make displaying conditional? Looks OK as it is?
-        condition="TRUE",
+        condition="input.dataFileType =='Excel' || input.dataFileType =='TSV'",
         fileInput(inputId="dataFile",
                   label={h5("Upload data file:")},
                   multiple=FALSE,
