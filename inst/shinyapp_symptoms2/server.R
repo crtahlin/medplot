@@ -181,11 +181,14 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
   
   numRowsMixedModels2 <- function(){if(!is.null(dataFiltered()) &
                                                   !is.null(input$selectedMixedModelType)){
-    (input$selectedMixedModelType=="MMmeasurement")*ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
+    nFacets <- length(unique(Measurement()))-1
+    (input$selectedMixedModelType=="MMmeasurement")*
+      ceiling(length(input$selectedSymptoms))*30*nFacets  }else{return(0)} }
   
   numRowsMixedModels3 <- function(){if(!is.null(dataFiltered()) &
                                                   !is.null(input$selectedMixedModelType)){
-    (input$selectedMixedModelType=="MMtimeSinceInclusion")*ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
+    (input$selectedMixedModelType=="MMtimeSinceInclusion")*
+      ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
   
   NumRows <- function(){if(!is.null(dataFiltered())){
     #if(input$treatasBinary==FALSE){return(0)}
@@ -1207,7 +1210,10 @@ output$mixedModelTable1 <- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     results <- mixedModelResults()[["groupingVar"]] 
     
-    out <- print(xtable(results, caption=paste("Fixed effects of", input$groupingVar)),
+    out <- print(xtable(results, caption=paste("Fixed effects of",
+                                               input$groupingVar,
+                                               "for", 
+                                               mixedModelResults()[["groupingVarComparison"]])),
                  type="html",
                  html.table.attributes='class="data table table-bordered table-condensed"',
                  caption.placement="top")
@@ -1233,7 +1239,11 @@ output$mixedModelTable2 <- renderUI({
     if (input$selectedMixedModelType=="MMmeasurement") {
       results <- mixedModelResults()[["measurementVar"]] 
       
-      out <- print(xtable(results, caption=paste("Fixed effects of", input$measurementVar)),
+      out <- print(xtable(results, caption=paste("Fixed effects of",
+                                                 input$measurementVar,
+                                                 "for T=",
+                                                 mixedModelResults()[["measurementVarComparison"]],
+                                                 "used as reference")),
                    type="html",
                    html.table.attributes='class="data table table-bordered table-condensed"',
                    caption.placement="top")
