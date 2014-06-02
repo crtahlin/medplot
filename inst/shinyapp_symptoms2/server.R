@@ -410,11 +410,19 @@ output$selectGraphOverTime <- renderUI({
   if (!is.null(dataFiltered())) {
   selectInput(inputId="selectedGraphOverTime",
               label="Select type of graph:",
-              choices=c("Profile plots"="profilePlot",
-                        "Lasagna plots"="lasagnaPlot",
-                        "Boxplots"="boxPlot",
-                        "Timeline"="timelinePlot",
-                        "Presence of symptoms"="presencePlot"),
+              choices= if (input$treatasBinary==TRUE) {
+                c(#"Profile plots"="profilePlot",
+                  "Lasagna plots"="lasagnaPlot",
+                  #"Boxplots"="boxPlot",
+                  #"Timeline"="timelinePlot",
+                  "Presence of symptoms"="presencePlot"
+                  )} else {
+                    c("Profile plots"="profilePlot",
+                      "Lasagna plots"="lasagnaPlot",
+                      "Boxplots"="boxPlot",
+                      "Timeline"="timelinePlot" #,
+                      # "Presence of symptoms"="presencePlot"
+                        )},
               selected=NULL,
               multiple=FALSE)
   }  
