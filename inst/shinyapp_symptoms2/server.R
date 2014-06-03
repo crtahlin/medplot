@@ -660,7 +660,7 @@ output$plotPresence <- renderPlot({
 # Boxplot tables
 output$tableforBoxplots <- renderUI({
   if(!is.null(dataFiltered())) {
-    if(input$treatasBinary==FALSE){
+    #if(input$treatasBinary==FALSE){
       progress <- Progress$new(session, min=1, max=100)
       on.exit(progress$close())
       
@@ -674,7 +674,7 @@ output$tableforBoxplots <- renderUI({
                               selectedSymptoms=input$selectedSymptoms) 
       
       return(div(HTML(out),class="shiny-html-output"))
-    }}
+    } #}
 })
 
 
