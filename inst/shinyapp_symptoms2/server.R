@@ -305,7 +305,7 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
   output$selectSymptoms <- renderUI({
     if (!is.null(dataVariableNames())) {
       selectInput(inputId="selectedSymptoms",
-                  label="Choose variables to analyse:", 
+                  label="Choose outcome variables to analyse:", 
                   choices=dataVariableNames(),
                   multiple=TRUE,
                   if (input$dataFileType=="Demo"){selected=c("Fatigue","Malaise",
@@ -352,7 +352,7 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
   output$selectMeasurementVar <- renderUI({
     if (!is.null(dataVariableNames())) {
       selectInput(inputId="measurementVar",
-                  label="Choose measurement occasion variable:", 
+                  label="Choose evaluation occasion variable:", 
                   choices=dataVariableNames(),
                   selected="Measurement")
     }
@@ -362,7 +362,7 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
   output$selectTreatasBinary <- renderUI({
     if (!is.null(dataVariableNames())){
       checkboxInput(inputId="treatasBinary",
-                    label="Treat and analyse variables as binary?",
+                    label="Treat and analyse outcome variables as binary?",
                     value=FALSE)
     }  
     
@@ -373,7 +373,7 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
     if (!is.null(dataVariableNames()) & !is.null(input$treatasBinary)){
       if(input$treatasBinary==TRUE) {
         numericInput(inputId="thresholdValue",
-                     "Threshold for positivity of the variables:",
+                     "Threshold for positivity of the outcome variables:",
                      value=0,
                      min=0,
                      max=10)
@@ -439,7 +439,7 @@ output$selectGraphType <- renderUI({
                   label="Select type of graphs to plot:",
                   choices=c("All subjects on one graph"="oneGraph",
                             "Random selection of subjects on one graph"="randomSample",
-                            "Multiple graphs per variable"="multipleGraphs"),
+                            "Multiple graphs per outcome variable"="multipleGraphs"),
                   selected="randomSample",
                   multiple=FALSE)
     }}}
@@ -548,8 +548,8 @@ output$selectFacetingType <- renderUI({
     if (input$selectedGraphOverTime=="boxPlot") {
   selectInput(inputId="selectedFacetingType",
               label="Select faceting type:",
-              choices=c("Variables ~ Measurement occasions"="variablesOnYaxis",
-                        "Measurement occasions ~ Variables"="variablesOnXaxis")
+              choices=c("Variables ~ Evaluation occasions"="variablesOnYaxis",
+                        "Evaluation occasions ~ Variables"="variablesOnXaxis")
               )
     }}
   })
@@ -589,7 +589,7 @@ output$selectDisplayFormat <- renderUI({
                     label="Choose what to display on the horizontal axis:",
                     choices=c("Dates" = "dates",
                               "Time from inclusion" ="timeFromInclusion",
-                              "Measurement occasions" = "measurementOccasions"),
+                              "Evaluation occasions" = "measurementOccasions"),
                     selected="dates",
                     multiple=FALSE)
       }
@@ -629,7 +629,7 @@ output$selectMeasurementForPresencePlot <- renderUI({
   if(!is.null(input$selectedGraphOverTime)) {
   if(input$selectedGraphOverTime=="presencePlot") {
     selectInput(inputId="selectedMeasurementForPresencePlot",
-                label="Select the measurement occasion (time):",
+                label="Select evaluation occasion:",
                 choices=measurementLevels(), selected=measurementLevels()[1])
   }}
 })
@@ -744,7 +744,7 @@ output$UIpropTable = renderUI({
     if(input$treatasBinary==TRUE){
       #select the measurement
       selectInput(inputId="measurementSelectedprop",
-                  label="Select the measurement occasion (time):", 
+                  label="Select evaluation occasion:", 
                   choices=measurementLevels(), selected=measurementLevels()[1])
     }
   }
@@ -842,7 +842,7 @@ output$clusteringUI = renderUI({
     if(input$treatasBinary==FALSE){
       #select the measurement
       selectInput(inputId="selectedMeasurementValue",
-                  label="Select the measurement occasion (time):", 
+                  label="Select evaluation occasion:", 
                   choices=measurementLevels(), selected=measurementLevels()[1])
     }
   }
@@ -1185,7 +1185,7 @@ output$selectMixedModelType <- renderUI({
               choices=c("Model response with fixed effect of grouping variable and
                         random intercept for every subject"="MMsimple",
                         "Model response with fixed effects of grouping variable,
-                        measurement occasion and random intercept for every subject"="MMmeasurement",
+                        evaluation occasion and random intercept for every subject"="MMmeasurement",
                         "Model response with fixed effect of grouping variable,
                         time from inclusion in study and 
                         random intercept for every subject"="MMtimeSinceInclusion"),
@@ -1468,7 +1468,7 @@ output$proportionUI = renderUI({
   if(!(is.null(measurementLevels()) || is.null(measurementLevels())  )){ 
     if(input$treatasBinary==TRUE){
     selectInput(inputId="measurementSelectedProportion",
-                label="Select the measurement occasion (time):", 
+                label="Select evaluation occasion:", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
     }
   }
@@ -1699,7 +1699,7 @@ output$rcsUI2 = renderUI({
    
     #select the measurement
     selectInput(inputId="measurementSelectedrcs",
-                label="Select the measurement occasion (time):", 
+                label="Select evaluation occasion:", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
    
   }
@@ -1752,7 +1752,7 @@ output$logistfUI = renderUI({
     if (input$treatasBinary==TRUE) {
     #select the measurement
     selectInput(inputId="measurementSelectedlogistf",
-                label="Select the measurement occasion (time):", 
+                label="Select evaluation occasion:", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
     }
   }
