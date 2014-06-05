@@ -168,7 +168,7 @@ shinyUI(pageWithSidebar(
       # TAB - Selected data ####
       tabPanel(title="Uploaded data", 
                # textOutput("messageSelectVars"),
-               tableOutput("data")),
+               dataTableOutput("data")),
       
       
 #       # TAB - Timeline ####
