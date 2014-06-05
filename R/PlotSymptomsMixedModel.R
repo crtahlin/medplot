@@ -242,7 +242,8 @@ plotFixedEffectsofGroupingVar <- function (calculatedStatistics,
                      mapping=aes(y=Variable, x=ORCIUpper, xmin=ORCIUpper, xmax=ORCILower),
                      height=0.2, size=1) +
       geom_point(data=calculatedStatistics, 
-                 mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  
+                 mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white") +
+      geom_vline(xintercept=1)
   }
   
   # for continious response variable
@@ -253,7 +254,8 @@ plotFixedEffectsofGroupingVar <- function (calculatedStatistics,
                      mapping=aes(y=Variable, x=betaCIUpper, xmin=betaCIUpper, xmax=betaCILower),
                      height=0.2, size=1) +
       geom_point(data=calculatedStatistics, 
-                 mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white")  
+                 mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white") +
+      geom_vline(xintercept=0)
   }
   
   plot <- plot + theme_bw() + labs(title=graphTitle,
@@ -277,6 +279,7 @@ plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
                      height=0.2, size=1) +
       geom_point(data=calculatedStatistics, 
                  mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white") +
+      geom_vline(xintercept=1) +
       facet_grid(Measurement ~ .)
   }
   
@@ -289,6 +292,7 @@ plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
                      height=0.2, size=1) +
       geom_point(data=calculatedStatistics, 
                  mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white") +
+      geom_vline(xintercept=0) +
       facet_grid(Measurement ~ .)  
   }
   
@@ -311,7 +315,8 @@ plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
                      mapping=aes(y=Variable, x=ORCIUpper, xmin=ORCIUpper, xmax=ORCILower),
                      height=0.2, size=1) +
       geom_point(data=calculatedStatistics, 
-                 mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white")  
+                 mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white") +
+      geom_vline(xintercept=1)
   }
   
   # for continious response variable
@@ -322,7 +327,8 @@ plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
                      mapping=aes(y=Variable, x=betaCIUpper, xmin=betaCIUpper, xmax=betaCILower),
                      height=0.2, size=1) +
       geom_point(data=calculatedStatistics, 
-                 mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white")  
+                 mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white") +
+      geom_vline(xintercept=0)
   }
   
   plot <- plot + theme_bw() + labs(title=graphTitle,

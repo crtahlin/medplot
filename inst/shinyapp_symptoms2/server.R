@@ -1051,7 +1051,8 @@ output$plotLogistf2 <- renderPlot({
                                            resultsLogistf()[["referenceValue"]], 
                                            "at evaluation T=",
                                            input$selectedEvaluationTime,
-                                           "(using Firth correction)"))    
+                                           "(using Firth correction)"),
+                          vLine=1)    
        
        print(out)
       }
@@ -1105,7 +1106,8 @@ output$plotLogist <- renderPlot({
                                  graphTitle=paste("Odds ratios and confidence intervals for",
                                                   resultsLogist()[["referenceValue"]], 
                                                   "at evaluation T=",
-                                                  input$selectedEvaluationTime))    
+                                                  input$selectedEvaluationTime),
+                                 vLine=1)    
         
         print(out)
     }}
@@ -1147,7 +1149,8 @@ output$plotLinear <- renderPlot({
                                  graphTitle=paste("Beta coefficients and confidence intervals for effects of",
                                                   input$selectedCovariate, 
                                                   "on selected variables at evaluation T=",
-                                                  input$selectedEvaluationTime))  
+                                                  input$selectedEvaluationTime),
+                                 vLine=0)  
         print(out)
     }}
   }, height=numRowsLinear) 

@@ -5,7 +5,8 @@ plotValueswithCIs <- function (data,
                                CIUpperName="CIUpper",
                                xLabel,
                                yLabel,
-                               graphTitle) {
+                               graphTitle,
+                               vLine=NULL) {
   
   plot <- ggplot() +
   geom_errorbarh(data=data,
@@ -15,7 +16,8 @@ plotValueswithCIs <- function (data,
              mapping=aes_string(y=variableName, x=valueName),
              size=4, shape=21, fill="white") +
   theme_bw() + 
-  labs(title=graphTitle, x= xLabel, y=yLabel)
+  labs(title=graphTitle, x= xLabel, y=yLabel) + 
+    geom_vline(xintercept = vLine)
 
 return(plot)  
 
