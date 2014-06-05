@@ -36,9 +36,17 @@ library(permute)
 library(lme4)
 library(lmerTest)
 
+# Global activity ####
+# purge temporary files
+file.remove(list.files(paste0(x=getwd(), "/www/temp"), full.names=TRUE))
+
 # Main function -----------------------------------------------------------
 
 shinyServer(function(input, output, session) {
+  
+  # VARIABLES ####
+  # the working directory
+  workingDir <- paste0(gsub(pattern="/", replacement="\\\\", x=getwd()))
   
   # FUNCTIONS ####
   #how much space should be used for the graphical output of the Rcs estimates and others?  
@@ -423,7 +431,7 @@ output$selectGraphOverTime <- renderUI({
                       "Timeline"="timelinePlot" #,
                       # "Presence of symptoms"="presencePlot"
                         )},
-              selected=NULL,
+              selected= if (input$treatasBinary==TRUE) {"presencePlot"} else {"timelinePlot"},
               multiple=FALSE)
   }  
 })
@@ -514,23 +522,23 @@ output$plotLasagna <- renderUI({
     
     
   filenames <- vector()
+  
   # generate as many files as there are plots
   for (symptom in input$selectedSymptoms) {
-  filenames[symptom] <- paste0("Lasagna",symptom,".png")
-  }
-  
+    filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"\\www\\temp"), fileext=".png")
+   
   # plot graph for each symptom
-  for(symptom in input$selectedSymptoms) {
+  #for(symptom in input$selectedSymptoms) {
         
-    png(filename=paste0(getwd(),"/www/",filenames[symptom]))
-    plotLasagna(data=dataFiltered(), 
-                  treatasBinary=FALSE, #input$treatasBinary,
+    png(paste0(filenames[symptom]))
+    plotLasagna(if (input$treatasBinary==FALSE) {dataFiltered()}else{dataFilteredwithThreshold()}, 
+                  treatasBinary=input$treatasBinary, 
                   symptom=symptom,
-                  dateVar="Date", #input$dateVar,
-                  personIDVar="PersonID",#input$patientIDVar, 
-                  measurementVar="Measurement",#input$measurementVar,
-                  groupingVar="Sex", #input$groupingVar, 
-                  thresholdValue=0) #input$thresholdValue)
+                  dateVar=input$dateVar, 
+                  personIDVar=input$patientIDVar, 
+                  measurementVar=input$measurementVar,
+                  groupingVar=input$groupingVar,  
+                  thresholdValue=input$thresholdValue) 
     dev.off()
   }
   
@@ -540,6 +548,7 @@ out <- pastePlotFilenames(filenames)
 return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
 }}
 })
+
 
 # Boxplots ####
 # Menu

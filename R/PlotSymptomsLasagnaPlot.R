@@ -7,72 +7,42 @@ plotLasagna <- function(data, # dataFiltered()
                         groupingVar, # input$groupingVar
                         thresholdValue # input$thresholdValue
 ) {
+  # list all subject IDs
+  subjects <- as.character(unique(data[, personIDVar]))
+  # list all levels of evaluation occasions
+  levels <- as.character(unique(data[, measurementVar]))
+  # construct empty matrix of results for all possible combinations of subjects X levels
+  results <- matrix(nrow=length(subjects), ncol=length(levels), dimnames=list(subjects, levels))
   
-  if (treatasBinary==TRUE) {
-    # make values binary
-    dataFiltered.yn=ifelse(data[ ,selectedSymptoms] > thresholdValue, 1, 0)
-    
-    time=tapply(data[,measurementVar], INDEX=data[,1], FUN=function(x) x )
-    res=tapply(data.yn[,symptom], INDEX=data[,1], FUN=function(x) x )
-    
-    my.levels.m=unique(unlist(time))
-    
-    my.mat=matrix(NA, ncol=length(my.levels.m), nrow=length(res))
-    
-    lapply(1:length(res), function(i) {
-      for(j in 1:length(my.levels.m)) {
-        k=which(my.levels.m[j]==time[[i]])
-        #cat(k)
-        if(length(k)>0) my.mat[i,j]<<- res[[i]][k]
+  # run a loop filling the data into the matrix
+  for (level in levels) {
+    # subset data for a particular evaluation accasion
+    tempdata <- data[data[, measurementVar]==level, c(personIDVar,symptom)]
+    # only look at subjects, that were measured at that evaluation occasion
+    subjects <- as.character(unique(tempdata[, personIDVar]))
+    for (subject in subjects) {
+       results[subject, level] <- tempdata[tempdata[,personIDVar]==subject, symptom]
       }
-    })
-    
-    pheatmap(my.mat, cluster_cols=FALSE, main=symptom)
-    
   }
-  
-#   output$mytabs = renderUI({
-#     nTabs = input$nTabs
-#     myTabs = lapply(paste('Tab', 1: nTabs), tabPanel)
-#     do.call(tabsetPanel, myTabs)
-#   })
-  
-  if (treatasBinary==FALSE) {
-    #a <- layout(matrix(c(1:16), 16, 1, byrow=TRUE), heights=rep(lcm(0.5),16) )
-    #layout(matrix(c(1:16), 16, 1, byrow=TRUE), heights=rep(lcm(0.5),16) )
-    #layout.show(a)
-    #class(a)
-    #png("./test.png")
-    
-    time=tapply(data[,measurementVar], INDEX=data[,1], FUN=function(x) x )
-    res=tapply(data[,symptom], INDEX=data[,1], FUN=function(x) x )
-    
-    my.levels.m=unique(unlist(time))
-    
-    my.mat=matrix(NA, ncol=length(my.levels.m), nrow=length(res))
-    
-    lapply(1:length(res), function(i) {
-      for(j in 1:length(my.levels.m)) {
-        k=which(my.levels.m[j]==time[[i]])
-        #cat(k)
-        if(length(k)>0) my.mat[i,j]<<- res[[i]][k]
-      }
-    })
-    
-    pheatmap(my.mat, cluster_cols=FALSE, main=symptom)
-    #plot(1)
-    
-    #layout.show(a)
-    #dev.off()
+
+  # plot a different graph if data is binary (legend is different)
+  if (treatasBinary==TRUE) { 
+    pheatmap(results, cluster_cols=FALSE, main=symptom, show_rownames=FALSE, 
+             legend_breaks=c(0,1),
+             legend_labels=c(0,1),
+             color=c('red','blue'),
+             drop_levels=TRUE)
+    } else {
+    pheatmap(results, cluster_cols=FALSE, main=symptom, show_rownames=FALSE)
   }
-  
 }
 
+########
 pastePlotFilenames <- function(filenames) {
   out <- vector()
   for (file in filenames) {
     #data <- readPNG(file, native=TRUE)
-    out <- paste(out, img(src=paste0(file)))
+    out <- paste(out, img(src=paste0("/temp/",basename(file))))
     #out <- paste(out, (img(src=data)))
   }
   return(out)
