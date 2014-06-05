@@ -193,6 +193,32 @@ tabelizeBoxplots <- function(measurements,
       quantile(na.omit(data[ ,symptom]), 0.25)
     result[result[,"Variables"]==symptom,"75th perc."] <-
       quantile(na.omit(data[ ,symptom]), 0.75)
-      }
+
+    calculateMedian <- function(data, indices) {median(data[indices], na.rm=TRUE)}
+    temp <- boot(data=data[,symptom], R=2000, statistic=calculateMedian)
+    res <- boot.ci(temp, type="perc", conf=c(0.95))
+    
+    result[result[,"Variables"]==symptom, "Bootstrap 95% CI for median"] <-
+      paste(format(res$percent[4], nsmall=), "to", format(res$percent[5], nsmall=2) )
+
+    result[result[,"Variables"]==symptom, "# of NA values"] <-
+      sum(is.na(data[,symptom]))
+    
+    #     # number of samples 
+#     R <- 20
+#     dataLength <- length(data[,symptom])
+#     res <- vector()
+#     for (sample in 1:R) {
+#       for (i in 1:dataLength) {
+#         set <- sample(data[,symptom], replace=TRUE, size=length(data[,symptom]))
+#         res[sample] <- median(set, na.rm=TRUE)
+#       }}
+#     result[result[,"Variables"]==symptom, "Bootstrap 95% CI for median"] <-
+#       paste(quantile(res, 0.025), "to", quantile(res, 0.975) )
+#   
+    
+    # temp <- boot(data=na.omit(data[,symptom]), statistic=median, R=1000)
+
+  }
   return(result)  
 }

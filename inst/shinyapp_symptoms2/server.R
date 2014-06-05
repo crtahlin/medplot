@@ -32,6 +32,8 @@ library(rms)
 library(logistf)
 # library for permutation tests
 library(permute)
+# bootstrap library
+library(boot)
 # libraries for mixed models
 library(lme4)
 library(lmerTest)
@@ -1318,7 +1320,7 @@ output$data <- renderDataTable({
     # Sys.setlocale("LC_TIME", "Slovenian")
     data[,input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")
     #data[,input$dateVar] <- as.character(as.Date(data[,input$dateVar], format="%d.%m.%Y"),
-     #                                    format="%d.%m.%Y")
+    #                                    format="%d.%m.%Y")
     
     #data$Date <- as.character(as.Date(data$Date, origin="1899-12-30"),format="%d.%m.%Y")
     
