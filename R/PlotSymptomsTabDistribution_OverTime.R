@@ -181,10 +181,13 @@ tabelizeBoxplotsforMeasurement <- function(measurement,
                                             selectedSymptoms) {
   
   result <- data.frame("Variables"=selectedSymptoms, "Median"=NA)
+  result2 <- data.frame("Variables"=selectedSymptoms)
   data <- data[data[,measurementVar]==measurement, ]
   
   for (symptom in selectedSymptoms) {
     result[result[,"Variables"]==symptom,"Median"] <-
+      median(na.omit(data[ ,symptom]))
+    result2[result2[,"Variables"]==symptom,"Median"] <-
       median(na.omit(data[ ,symptom]))
     
     calculateMedian <- function(data, indices) {median(data[indices], na.rm=TRUE)}
@@ -193,6 +196,8 @@ tabelizeBoxplotsforMeasurement <- function(measurement,
     
     result[result[,"Variables"]==symptom, "95% CI (bootstrap)"] <-
       paste(format(res$percent[4], nsmall=2, digits=2), "to", format(res$percent[5], nsmall=2, digits=2) )
+    result2[result2[,"Variables"]==symptom,"CILower"] <- res$percent[4]
+    result2[result2[,"Variables"]==symptom,"CIUpper"] <- res$percent[5]
     
     result[result[,"Variables"]==symptom,"IQR"] <-
       IQR(na.omit(data[ ,symptom]))
@@ -206,7 +211,7 @@ tabelizeBoxplotsforMeasurement <- function(measurement,
     result[result[,"Variables"]==symptom, "# NAs"] <-
       sum(is.na(data[,symptom]))
   }
-  return(result)  
+  return(list(printableTable=result, rawTable=result2))  
 }
 
 # construct a table of proportions
@@ -231,6 +236,9 @@ tabelizeProportionsforMeasurement <- function(measurement,
     
     result[result[,"Variables"]==symptom, "95% CI for proportion"] <-
       paste(format(res$conf.int[1], nsmall=2, digits=2), "to", format(res$conf.int[2], nsmall=2, digits=2) )
+    
+    result[result[,"Variables"]==symptom, "# NAs"] <-
+      sum(is.na(data[,symptom]))
     
   }
   return(result)  

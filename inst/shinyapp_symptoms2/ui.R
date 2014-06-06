@@ -81,20 +81,22 @@ shinyUI(pageWithSidebar(
                
                # Timeline graph
                uiOutput("selectDisplayFormat"),
-               plotOutput("plotTimeline", height="auto"),
+               plotOutput("plotTimeline", height="auto")
                
-               # Presence of symptoms graph
-               uiOutput("selectMeasurementForPresencePlot"),
-               plotOutput("plotPresence", height="auto")
+#                # Presence of symptoms graph
+#                uiOutput("selectMeasurementForPresencePlot"),
                
       ),
      
-      # TAB - Summary tables over time ####
-      tabPanel(title="Summary tables : time",
+      # TAB - Summary (tables) over time ####
+      tabPanel(title="Summary : time",
                #uiOutput("tableforBoxplots")
                uiOutput("selectEvaluationTime2"),
                tableOutput("tableforBoxplots"),
-               tableOutput("tableforProportions")
+               tableOutput("tableforProportions"),
+               plotOutput("plotPresence", height="auto"),
+               plotOutput("plotMedians", height="auto")
+               
       ),
       
       # TAB - Graphical exploration : grouping variable ####

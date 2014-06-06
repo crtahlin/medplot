@@ -144,14 +144,25 @@ shinyServer(function(input, output, session) {
   
   numRowsPresencePlot <- function(){
     try({
-      if(!is.null(input$selectedMeasurementForPresencePlot)){
-        if(input$selectedGraphOverTime=="presencePlot") {
+      if(!is.null(input$selectedEvaluationTime2)) {
+        if(input$treatasBinary==TRUE) {
         max(ceiling(length(input$selectedSymptoms))*30,
             300 # minumum reserved space
-        )}}else{return(0)} # height of plot when no data available
+        )
+        }}else{return(0)} # height of plot when no data available
     }, silent=TRUE)
   }
   
+numRowsMedianPlot <- function(){
+  try({
+    if(!is.null(input$selectedEvaluationTime2)) {
+      if(input$treatasBinary==FALSE) {
+        max(ceiling(length(input$selectedSymptoms))*30,
+            300 # minumum reserved space
+        )
+      }}else{return(0)} # height of plot when no data available
+  }, silent=TRUE)
+}
   
   numRowsClustering <- function() {if(!is.null(dataFiltered())){
     if(input$treatasBinary==TRUE) {return(0)}
@@ -637,40 +648,22 @@ output$plotTimeline <- renderPlot({
       )}} }  
 }, height=numRowsTimeline)
 
-# Presence of symptoms graph ####
+# Presence of symptoms graph ##
 # Menu
-output$selectMeasurementForPresencePlot <- renderUI({
-  if(!is.null(input$selectedGraphOverTime)) {
-  if(input$selectedGraphOverTime=="presencePlot") {
-    selectInput(inputId="selectedMeasurementForPresencePlot",
-                label="Select evaluation occasion:",
-                choices=measurementLevels(), selected=measurementLevels()[1])
-  }}
-})
+# output$selectMeasurementForPresencePlot <- renderUI({
+#   if(!is.null(input$selectedGraphOverTime)) {
+#   if(input$selectedGraphOverTime=="presencePlot") {
+#     selectInput(inputId="selectedMeasurementForPresencePlot",
+#                 label="Select evaluation occasion:",
+#                 choices=measurementLevels(), selected=measurementLevels()[1])
+#   }}
+# })
 
-# Graph
-output$plotPresence <- renderPlot({
-  if(!is.null(input$selectedMeasurementForPresencePlot)) {
-    if(input$selectedGraphOverTime=="presencePlot") {
- 
-      progress <- Progress$new(session, min=1, max=100)
-      on.exit(progress$close())
-      
-      progress$set(message = 'Calculation in progress',
-                   detail = 'This may take a while...', 
-                   value=NULL)
-      
-      plot <- plotPresenceofSymptoms(data=dataFiltered(),
-                         selectedSymptoms=input$selectedSymptoms,
-                         measurementVar=input$measurementVar,
-                         measurement=input$selectedMeasurementForPresencePlot,
-                         thresholdValue=ifelse(!is.null(input$thresholdValue),input$thresholdValue ,0))
-      print(plot)
-  }}
-  }, height=numRowsPresencePlot)
+
 
 
 # TAB - Summary tables : time ####
+
 # Boxplot tables - all tables at once
 # output$tableforBoxplots <- renderUI({
 #   if(!is.null(dataFiltered())) {
@@ -703,8 +696,8 @@ output$selectEvaluationTime2 <- renderUI({
   
 })
 
-# Boxplot tables
-output$tableforBoxplots <- renderTable({
+# calculate data for tables of medians & CI plots
+dataforSummaryNonBinary <- reactive({
   if(!is.null(dataFiltered())) {
     if(input$treatasBinary==FALSE){
       progress <- Progress$new(session, min=1, max=100)
@@ -714,14 +707,42 @@ output$tableforBoxplots <- renderTable({
                    detail = 'This may take a while...', 
                    value=NULL)
       
-      out <- tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
-                              measurementVar=input$measurementVar,
-                              data=dataFiltered(),
-                              selectedSymptoms=input$selectedSymptoms) 
+  tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
+                                 measurementVar=input$measurementVar,
+                                 data=dataFiltered(),
+                                 selectedSymptoms=input$selectedSymptoms)
+    }}
+  })
+
+# Median tables
+output$tableforBoxplots <- renderTable({
+  if(!is.null(dataFiltered())) {
+    if(input$treatasBinary==FALSE){
+      return(dataforSummaryNonBinary()[["printableTable"]])
       
-      return(out)
+#       out <- tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
+#                               measurementVar=input$measurementVar,
+#                               data=dataFiltered(),
+#                               selectedSymptoms=input$selectedSymptoms)[["printableTable"]] 
+#       
+#       return(out)
     } }
 })
+
+# Median plot
+print("lala")
+output$plotMedians <- renderPlot({
+  plot <- plotValueswithCIs(data=dataforSummaryNonBinary()[["rawTable"]],
+                            variableName="Variables",
+                            valueName="Median",
+                            CILowerName="CILower",
+                            CIUpperName="CIUpper",
+                            xLabel="Medians",
+                            yLabel="Variable",
+                            graphTitle="Medians of variables (with confidence intervals)",
+                            vLine=NULL)
+  print(plot)
+}, height=numRowsMedianPlot)
 
 # Proportions tables
 output$tableforProportions <- renderTable({
@@ -732,14 +753,30 @@ output$tableforProportions <- renderTable({
                                             measurementVar=input$measurementVar,
                                             data=dataFilteredwithThreshold(),
                                             selectedSymptoms=input$selectedSymptoms) 
-      
       return(out)
-      
-      
-    }
-  }
-  
+      }}
   })
+
+# Proportions graph
+output$plotPresence <- renderPlot({
+  if(!is.null(input$selectedEvaluationTime2)) {
+    if(input$treatasBinary==TRUE) {
+      
+      progress <- Progress$new(session, min=1, max=100)
+      on.exit(progress$close())
+      
+      progress$set(message = 'Calculation in progress',
+                   detail = 'This may take a while...', 
+                   value=NULL)
+      
+      plot <- plotPresenceofSymptoms(data=dataFiltered(),
+                                     selectedSymptoms=input$selectedSymptoms,
+                                     measurementVar=input$measurementVar,
+                                     measurement=input$selectedEvaluationTime2,
+                                     thresholdValue=ifelse(!is.null(input$thresholdValue),input$thresholdValue ,0))
+      print(plot)
+    }}
+}, height=numRowsPresencePlot)
 
 
 # TAB - Graphical exploration : by grouping variable ####
