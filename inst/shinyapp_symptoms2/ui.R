@@ -81,16 +81,18 @@ shinyUI(pageWithSidebar(
                
                # Timeline graph
                uiOutput("selectDisplayFormat"),
-               plotOutput("plotTimeline", height="auto")
+               plotOutput("plotTimeline", height="auto"),
                
-#                # Presence of symptoms graph
-#                uiOutput("selectMeasurementForPresencePlot"),
+               # Presence of symptoms graph
+               uiOutput("selectMeasurementForPresencePlot"),
+               plotOutput("plotProportion", height="auto") 
                
       ),
      
-      # TAB - Summary (tables) over time ####
-      tabPanel(title="Summary : time",
+      # TAB - Summary ####
+      tabPanel(title="Summary",
                #uiOutput("tableforBoxplots")
+               plotOutput("plotPyramid", height="auto"),
                uiOutput("selectEvaluationTime2"),
                tableOutput("tableforBoxplots"),
                tableOutput("tableforProportions"),
@@ -101,8 +103,7 @@ shinyUI(pageWithSidebar(
       
       # TAB - Graphical exploration : grouping variable ####
       tabPanel(title="Graphical exploration : grouping variable",
-               textOutput("messageNotAppropriate5"),
-               plotOutput("plotPyramid", height="auto"),              
+               textOutput("messageNotAppropriate5"),                            
                plotOutput("plotPropCIs", height="auto")
                  ),
       
@@ -205,7 +206,7 @@ shinyUI(pageWithSidebar(
               textOutput("messageNotAppropriate4"),
                # textOutput("messageSelectVars"),
                uiOutput("proportionUI"),
-               plotOutput("plotProportion", height="auto"), 
+               #plotOutput("plotProportion", height="auto"), 
                plotOutput("plotCI", height="auto"), 
                plotOutput("plotBoxplot", height="auto"),
                uiOutput("selectPosOnly"),

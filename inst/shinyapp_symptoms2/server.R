@@ -194,6 +194,13 @@ numRowsLinear <- function() {if(!is.null(regressionScenario())){
   max(ceiling(length(input$selectedSymptoms))*30,
       300)}else{return(0)}}
 
+numRowsProportion <- function(){
+  if(!(is.null(dataFiltered.yn()) || is.null(input$selectedMeasurementForPresencePlot) )){
+    if(input$treatasBinary==TRUE){
+      ceiling(length(input$selectedSymptoms))*30  
+    }} else {return(0)}
+}
+
 numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
   if(regressionScenario()!="scenarioRCSModel") {return(0)}
   max(ceiling(length(input$selectedSymptoms))*100,
@@ -435,17 +442,13 @@ output$selectGraphOverTime <- renderUI({
   selectInput(inputId="selectedGraphOverTime",
               label="Select type of graph:",
               choices= if (input$treatasBinary==TRUE) {
-                c(#"Profile plots"="profilePlot",
-                  "Lasagna plots"="lasagnaPlot",
-                  #"Boxplots"="boxPlot",
-                  #"Timeline"="timelinePlot",
-                  "Presence of symptoms"="presencePlot"
+                c("Lasagna plots"="lasagnaPlot",
+                  "Barplots with proportions"="presencePlot"
                   )} else {
                     c("Profile plots"="profilePlot",
                       "Lasagna plots"="lasagnaPlot",
                       "Boxplots"="boxPlot",
-                      "Timeline"="timelinePlot" #,
-                      # "Presence of symptoms"="presencePlot"
+                      "Timeline"="timelinePlot" 
                         )},
               selected= if (input$treatasBinary==TRUE) {"presencePlot"} else {"timelinePlot"},
               multiple=FALSE)
@@ -648,21 +651,34 @@ output$plotTimeline <- renderPlot({
       )}} }  
 }, height=numRowsTimeline)
 
-# Presence of symptoms graph ##
-# Menu
-# output$selectMeasurementForPresencePlot <- renderUI({
-#   if(!is.null(input$selectedGraphOverTime)) {
-#   if(input$selectedGraphOverTime=="presencePlot") {
-#     selectInput(inputId="selectedMeasurementForPresencePlot",
-#                 label="Select evaluation occasion:",
-#                 choices=measurementLevels(), selected=measurementLevels()[1])
-#   }}
-# })
+#Presence of symptoms graph ####
+#Menu
+output$selectMeasurementForPresencePlot <- renderUI({
+  if(!is.null(input$selectedGraphOverTime)) {
+  if(input$selectedGraphOverTime=="presencePlot") {
+    selectInput(inputId="selectedMeasurementForPresencePlot",
+                label="Select evaluation occasion:",
+                choices=measurementLevels(), selected=measurementLevels()[1])
+  }}
+})
+
+
+# Plot - Presence (plot - proportions) ###
+output$plotProportion=renderPlot({
+  if(!(is.null(dataFiltered.yn()) || is.null(input$selectedMeasurementForPresencePlot) )){
+    if(input$treatasBinary==TRUE){
+      plotDistribution(data=dataFiltered.yn(),
+                       selectedSymptoms=input$selectedSymptoms,
+                       selectedProportion=input$selectedMeasurementForPresencePlot,
+                       measurements=Measurement())
+    }
+  }
+}, height=numRowsProportion) #height=numRowsDistributions)
 
 
 
 
-# TAB - Summary tables : time ####
+# TAB - Summary ####
 
 # Boxplot tables - all tables at once
 # output$tableforBoxplots <- renderUI({
@@ -695,6 +711,30 @@ output$selectEvaluationTime2 <- renderUI({
               selected=if(!is.null(measurementLevels())) {measurementLevels()[1]})
   
 })
+
+# Pyramid plot ####
+# Graph
+output$plotPyramid <- renderPlot ({
+  try({
+    if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
+      if(input$treatasBinary==TRUE){
+        
+        progress <- Progress$new(session, min=1, max=100)
+        on.exit(progress$close())
+        
+        progress$set(message = 'Calculation in progress',
+                     detail = 'This may take a while...', 
+                     value=NULL)
+        
+        plotPropWithSymptoms(data=dataFilteredwithThreshold(),
+                             grouping=input$groupingVar,
+                             measurements=input$measurementVar,
+                             symptomsNames=input$selectedSymptoms)
+        
+      }
+    }
+  }, silent=TRUE)
+} ,height=numRowsProportions)
 
 # calculate data for tables of medians & CI plots
 dataforSummaryNonBinary <- reactive({
@@ -789,28 +829,7 @@ output$messageNotAppropriate5 <- renderText({
     }}
 })
 
-# Graph
-output$plotPyramid <- renderPlot ({
-  try({
-    if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
-      if(input$treatasBinary==TRUE){
-        
-        progress <- Progress$new(session, min=1, max=100)
-        on.exit(progress$close())
-        
-        progress$set(message = 'Calculation in progress',
-                     detail = 'This may take a while...', 
-                     value=NULL)
-        
-        plotPropWithSymptoms(data=dataFilteredwithThreshold(),
-                             grouping=input$groupingVar,
-                             measurements=input$measurementVar,
-                             symptomsNames=input$selectedSymptoms)
-        
-      }
-    }
-  }, silent=TRUE)
-} ,height=numRowsProportions)
+
 
 # Proportions by groups with confidence intervals ####
 # Graph
@@ -1423,7 +1442,7 @@ output$data <- renderDataTable({
   }
 })
 
-# TAB - Timeline ####
+# TAB - Timeline ###
 # output$selectDisplayFormat <- renderUI({
 #   if(!is.null(dataFiltered())){
 #     if(input$selectedGraphOverTime=="timelinePlot") {
@@ -1465,7 +1484,7 @@ output$data <- renderDataTable({
 #   }}
 # })
 
-# TAB - Distribution of the variables: over time ####
+# TAB - Distribution of the variables: over time ###
 # # ui - select type of graph
 #     output$selectGraphType <- renderUI({
 #       if(!is.null(dataFiltered())) {
@@ -1593,17 +1612,17 @@ output$selectPosOnly <- renderUI({
   }
 })
 
-# plot - proportions ###
-output$plotProportion=renderPlot({
-  if(!(is.null(dataFiltered.yn()) || is.null(input$measurementSelectedProportion) )){
-    if(input$treatasBinary==TRUE){
-          plotDistribution(data=dataFiltered.yn(),
-                     selectedSymptoms=input$selectedSymptoms,
-                     selectedProportion=input$measurementSelectedProportion,
-                     measurements=Measurement())
-    }
-  }
-}, height=numRowsDistributions)
+# # plot - proportions ###
+# output$plotProportion=renderPlot({
+#   if(!(is.null(dataFiltered.yn()) || is.null(input$measurementSelectedProportion) )){
+#     if(input$treatasBinary==TRUE){
+#           plotDistribution(data=dataFiltered.yn(),
+#                      selectedSymptoms=input$selectedSymptoms,
+#                      selectedProportion=input$measurementSelectedProportion,
+#                      measurements=Measurement())
+#     }
+#   }
+# }, height=numRowsDistributions)
 
 # plot - boxplots ###
 output$plotBoxplot=renderPlot({
@@ -1912,7 +1931,7 @@ output$messageNotAppropriate8 <- renderText({
 })
 
 
-# # TAB - Mixed model ####
+# # TAB - Mixed model ###
 # output$selectMixedModelType <- renderUI({
 #   selectInput(inputId="selectedMixedModelType",
 #               label="Select a mixed model type:",
@@ -2012,7 +2031,7 @@ output$messageNotAppropriate8 <- renderText({
 
 
 
-# TAB - Debug ####
+# TAB - Debug ###
 # table - debuging information ###
 #output$debug <- renderPrint(paste(str(dataExtended())))
 })
