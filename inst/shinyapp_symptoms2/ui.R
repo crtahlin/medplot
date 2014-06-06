@@ -91,7 +91,9 @@ shinyUI(pageWithSidebar(
      
       # TAB - Summary tables over time ####
       tabPanel(title="Summary tables : time",
-               uiOutput("tableforBoxplots")
+               #uiOutput("tableforBoxplots")
+               uiOutput("selectEvaluationTime2"),
+               tableOutput("tableforBoxplots")
       ),
       
       # TAB - Graphical exploration : grouping variable ####

@@ -42,6 +42,9 @@ library(lmerTest)
 # purge temporary files
 file.remove(list.files(paste0(x=getwd(), "/www/temp"), full.names=TRUE))
 
+# set number of processors for boot package
+options(boot.ncpus=Sys.getenv('NUMBER_OF_PROCESSORS'))
+
 # Main function -----------------------------------------------------------
 
 shinyServer(function(input, output, session) {
@@ -668,8 +671,37 @@ output$plotPresence <- renderPlot({
 
 
 # TAB - Summary tables : time ####
+# Boxplot tables - all tables at once
+# output$tableforBoxplots <- renderUI({
+#   if(!is.null(dataFiltered())) {
+#     #if(input$treatasBinary==FALSE){
+#       progress <- Progress$new(session, min=1, max=100)
+#       on.exit(progress$close())
+#       
+#       progress$set(message = 'Calculation in progress',
+#                    detail = 'This may take a while...', 
+#                    value=NULL)
+#       
+#       out <- tabelizeBoxplots(measurements=Measurement(),
+#                               measurementVar=input$measurementVar,
+#                               data=dataFiltered(),
+#                               selectedSymptoms=input$selectedSymptoms) 
+#       
+#       return(div(HTML(out),class="shiny-html-output"))
+#     } #}
+# })
+
+# Menu
+output$selectEvaluationTime2 <- renderUI({
+  selectInput(inputId="selectedEvaluationTime2",
+              label="Select evaluation occasion:",
+              choices=if(!is.null(measurementLevels())) {measurementLevels()},
+              selected=if(!is.null(measurementLevels())) {measurementLevels()[1]})
+  
+})
+
 # Boxplot tables
-output$tableforBoxplots <- renderUI({
+output$tableforBoxplots <- renderTable({
   if(!is.null(dataFiltered())) {
     #if(input$treatasBinary==FALSE){
       progress <- Progress$new(session, min=1, max=100)
@@ -679,14 +711,15 @@ output$tableforBoxplots <- renderUI({
                    detail = 'This may take a while...', 
                    value=NULL)
       
-      out <- tabelizeBoxplots(measurements=Measurement(),
+      out <- tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
                               measurementVar=input$measurementVar,
                               data=dataFiltered(),
                               selectedSymptoms=input$selectedSymptoms) 
       
-      return(div(HTML(out),class="shiny-html-output"))
+      return(out)
     } #}
 })
+
 
 
 # TAB - Graphical exploration : by grouping variable ####
