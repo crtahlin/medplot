@@ -682,6 +682,9 @@ output$plotPresence <- renderPlot({
 #                    detail = 'This may take a while...', 
 #                    value=NULL)
 #       
+
+# SERIOUS BUG HERE - the measurements passed to this function is a vector of 
+# all measurements, when it should be only of unique measurement; 
 #       out <- tabelizeBoxplots(measurements=Measurement(),
 #                               measurementVar=input$measurementVar,
 #                               data=dataFiltered(),
@@ -703,7 +706,7 @@ output$selectEvaluationTime2 <- renderUI({
 # Boxplot tables
 output$tableforBoxplots <- renderTable({
   if(!is.null(dataFiltered())) {
-    #if(input$treatasBinary==FALSE){
+    if(input$treatasBinary==FALSE){
       progress <- Progress$new(session, min=1, max=100)
       on.exit(progress$close())
       
@@ -717,9 +720,26 @@ output$tableforBoxplots <- renderTable({
                               selectedSymptoms=input$selectedSymptoms) 
       
       return(out)
-    } #}
+    } }
 })
 
+# Proportions tables
+output$tableforProportions <- renderTable({
+  if(!is.null(dataFilteredwithThreshold())) {
+    if(input$treatasBinary==TRUE){
+    
+      out <- tabelizeProportionsforMeasurement(measurement=input$selectedEvaluationTime2,
+                                            measurementVar=input$measurementVar,
+                                            data=dataFilteredwithThreshold(),
+                                            selectedSymptoms=input$selectedSymptoms) 
+      
+      return(out)
+      
+      
+    }
+  }
+  
+  })
 
 
 # TAB - Graphical exploration : by grouping variable ####

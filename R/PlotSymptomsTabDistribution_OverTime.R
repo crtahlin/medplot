@@ -160,7 +160,6 @@ tabelizeBoxplots <- function(measurements,
                              selectedSymptoms  ) {
   
   tables <- list()
-  
   for (measurement in measurements) {
     table <- tabelizeBoxplotsforMeasurement(measurement=measurement,
                                              measurementVar=measurementVar,
@@ -187,25 +186,25 @@ tabelizeBoxplotsforMeasurement <- function(measurement,
   for (symptom in selectedSymptoms) {
     result[result[,"Variables"]==symptom,"Median"] <-
       median(na.omit(data[ ,symptom]))
-    result[result[,"Variables"]==symptom,"IQR"] <-
-      IQR(na.omit(data[ ,symptom]))
-    result[result[,"Variables"]==symptom,"25th perc."] <-
-      quantile(na.omit(data[ ,symptom]), 0.25)
-    result[result[,"Variables"]==symptom,"75th perc."] <-
-      quantile(na.omit(data[ ,symptom]), 0.75)
-
+    
     calculateMedian <- function(data, indices) {median(data[indices], na.rm=TRUE)}
     temp <- boot(data=data[,symptom], R=2000, statistic=calculateMedian)
     res <- boot.ci(temp, type="perc", conf=c(0.95))
     
-    result[result[,"Variables"]==symptom, "Bootstrap 95% CI for median"] <-
-      paste(format(res$percent[4], nsmall=), "to", format(res$percent[5], nsmall=2) )
-
-    result[result[,"Variables"]==symptom, "# of NA values"] <-
-      sum(is.na(data[,symptom]))
+    result[result[,"Variables"]==symptom, "95% CI (bootstrap)"] <-
+      paste(format(res$percent[4], nsmall=2, digits=2), "to", format(res$percent[5], nsmall=2, digits=2) )
     
-
-
+    result[result[,"Variables"]==symptom,"IQR"] <-
+      IQR(na.omit(data[ ,symptom]))
+    
+    result[result[,"Variables"]==symptom,"25th perc."] <-
+      quantile(na.omit(data[ ,symptom]), 0.25)
+    
+    result[result[,"Variables"]==symptom,"75th perc."] <-
+      quantile(na.omit(data[ ,symptom]), 0.75)
+    
+    result[result[,"Variables"]==symptom, "# NAs"] <-
+      sum(is.na(data[,symptom]))
   }
   return(result)  
 }
@@ -216,30 +215,22 @@ tabelizeProportionsforMeasurement <- function(measurement,
                                             data,
                                             selectedSymptoms) {
   
-  result <- data.frame("Variables"=selectedSymptoms, "Median"=NA)
+  result <- data.frame("Variables"=selectedSymptoms, "Positive"=NA)
   data <- data[data[,measurementVar]==measurement, ]
   
   for (symptom in selectedSymptoms) {
-    result[result[,"Variables"]==symptom,"Median"] <-
-      median(na.omit(data[ ,symptom]))
-    result[result[,"Variables"]==symptom,"IQR"] <-
-      IQR(na.omit(data[ ,symptom]))
-    result[result[,"Variables"]==symptom,"25th perc."] <-
-      quantile(na.omit(data[ ,symptom]), 0.25)
-    result[result[,"Variables"]==symptom,"75th perc."] <-
-      quantile(na.omit(data[ ,symptom]), 0.75)
+    positive <- sum(na.omit(data[ ,symptom]))
+    all <- length(data[ ,symptom])
+    res <- prop.test(x=positive, n=all, conf.level=0.95)
     
-    calculateMedian <- function(data, indices) {median(data[indices], na.rm=TRUE)}
-    temp <- boot(data=data[,symptom], R=2000, statistic=calculateMedian)
-    res <- boot.ci(temp, type="perc", conf=c(0.95))
+    result[result[,"Variables"]==symptom,"Positive"] <- positive
     
-    result[result[,"Variables"]==symptom, "Bootstrap 95% CI for median"] <-
-      paste(format(res$percent[4], nsmall=), "to", format(res$percent[5], nsmall=2) )
+    result[result[,"Variables"]==symptom,"All"] <- all      
     
-    result[result[,"Variables"]==symptom, "# of NA values"] <-
-      sum(is.na(data[,symptom]))
+    result[result[,"Variables"]==symptom,"Proportion"] <- res$estimate
     
-    
+    result[result[,"Variables"]==symptom, "95% CI for proportion"] <-
+      paste(format(res$conf.int[1], nsmall=2, digits=2), "to", format(res$conf.int[2], nsmall=2, digits=2) )
     
   }
   return(result)  
