@@ -111,6 +111,7 @@ shinyUI(pageWithSidebar(
       tabPanel(title="Summary tables : grouping variable",
                textOutput("messageNotAppropriate10"),
                uiOutput("UIpropTable"),
+               uiOutput("UIdoPvalueAdjustments"),
                
                tableOutput("tablePropGroups"),
                uiOutput("textTablePropGroups"),

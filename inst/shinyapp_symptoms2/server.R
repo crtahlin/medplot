@@ -870,11 +870,20 @@ output$UIpropTable = renderUI({
   }
 })
 
+output$UIdoPvalueAdjustments <- renderUI({
+  if(!is.null(measurementLevels())){
+    if(input$treatasBinary==TRUE){
+      checkboxInput(inputId="doPValueAdjustments",
+                    label="Calculate P value adjustments? (It may take a long time.)",
+                    value=FALSE)
+      
+    }}
+  
+  })
+
 # Tables
 # Table of proportions of patients in a group with a symptom ####
 output$tablePropGroups <- renderTable ({
-  
-  
   
   if(!(is.null(dataFiltered()) || is.null(input$thresholdValue)  )){
     if(input$treatasBinary==TRUE){
@@ -885,18 +894,20 @@ output$tablePropGroups <- renderTable ({
                    detail = 'This will take a while...', 
                    value=NULL)
       
+      on.exit(progress$close())
+      
       out <- tablePropWithSymptoms(data=dataFiltered(),
                             groupingVar=input$groupingVar,
                             measurementVar=input$measurementVar,
                             forMeasurement=input$measurementSelectedprop,
                             symptomsNames=input$selectedSymptoms,
-                            thresholdValue=input$thresholdValue)
-      on.exit(progress$close())
+                            thresholdValue=input$thresholdValue,
+                            doPValueAdjustments=input$doPValueAdjustments
+                            )
+      
       return(out)
-    }
-  }
-  
-})
+    }}
+  })
 
 # text - explaining tablePropGroups
 output$textTablePropGroups <- renderUI({
@@ -922,13 +933,16 @@ output$tableMedianGroups <- renderTable ({
                    detail = 'This will take a while...', 
                    value=NULL)
       
+      on.exit(progress$close())
+      
       tableMediansWithSymptoms(data=dataFiltered(),
                                groupingVar=input$groupingVar,
                                measurementVar=input$measurementVar,
                                forMeasurement=input$measurementSelectedprop,
                                symptomsNames=input$selectedSymptoms,
-                               thresholdValue=input$thresholdValue)
-      on.exit(progress$close())
+                               thresholdValue=input$thresholdValue,
+                               doPValueAdjustments=input$doPValueAdjustments)
+      
     }
   }
 })

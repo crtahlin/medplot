@@ -116,7 +116,8 @@ tablePropWithSymptoms <- function (data,
                                    measurementVar,
                                    forMeasurement,
                                    symptomsNames,
-                                   thresholdValue=0) {
+                                   thresholdValue=0,
+                                   doPValueAdjustments) {
   
   
   # removing entries with missing data for groupingVar
@@ -134,9 +135,11 @@ tablePropWithSymptoms <- function (data,
   column4Name <- paste("Positive/all for ", groupingLevels[2])
   column5Name <- paste("P value")
   column6Name <- paste("95% CI for the difference")
-  column7Name <- paste("cor. P value (Holm-Bonferroni)")
+  if (doPValueAdjustments==TRUE) {
+  column7Name <- paste("Adj. P value (Holm-Bonferroni)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
-  column9Name <- paste("cor. P value (permutations)")
+  column9Name <- paste("Adj. P value (permutations)")
+  }
   
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
@@ -169,6 +172,8 @@ tablePropWithSymptoms <- function (data,
             format(results$conf.int[[2]], digits=2), sep=" to ")
     
   }
+
+  if (doPValueAdjustments==TRUE) {
   
   # add a Holm-Bonferoni corrected P value column
   tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
@@ -206,7 +211,7 @@ for (symptom in symptomsNames) {
   tableData[tableData["Variable"]==symptom, column9Name ] <- 
     permutationCorectedPValue[symptom]
 }
-
+}
 
 
 return(tableData)
@@ -223,7 +228,8 @@ tableMediansWithSymptoms <- function (data,
                                       measurementVar,
                                       forMeasurement,
                                       symptomsNames,
-                                      thresholdValue=0) {
+                                      thresholdValue=0,
+                                      doPValueAdjustments) {
   
   # removing entries with missing data for groupingVar
   data <- data[!is.na(data[groupingVar]),]
@@ -244,9 +250,12 @@ tableMediansWithSymptoms <- function (data,
   column4Name <- paste("IQR for ", groupingLevels[2])
   column5Name <- paste("P value")
   # column6Name <- paste("Conf. int. for diff. of prop. ")
-  column7Name <- paste("cor. P value (Holm-Bonferroni)")
+  
+  if (doPValueAdjustments==TRUE) {
+  column7Name <- paste("Adj. P value (Holm-Bonferroni)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
-  column9Name <- paste("Permutation based P value")
+  column9Name <- paste("Adj. P value (permutations)")
+  }
   
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
   # group1Data[, symptomsNames] <- (group1Data[,symptomsNames]>thresholdValue)
@@ -278,6 +287,7 @@ tableMediansWithSymptoms <- function (data,
     
   }
   
+  if (doPValueAdjustments==TRUE) {
   # add a Holm-Bonferoni corrected P value column
   tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
   # add a Benjamini-Yekutieli Q-value - see ?p.adjust
@@ -311,7 +321,7 @@ for (symptom in symptomsNames) {
   tableData[tableData["Variable"]==symptom, column9Name ] <- 
     permutationCorectedPValue[symptom]
 }
-
+}
 
   return(tableData)
 }
