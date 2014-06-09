@@ -66,6 +66,8 @@ mixedModel <- function(data,               # dataFiltered()
     # build the model depending on whether the response is binary or not
     if (treatasBinary==TRUE) {
       model <- glmer(formula, family=binomial,  na.action=na.omit, data=data)
+   
+      
       
       # results for the grouping variable
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "OR"] <- 
@@ -132,55 +134,88 @@ mixedModel <- function(data,               # dataFiltered()
     if(treatasBinary==FALSE) {
       model <- lmerTest::lmer(formula, na.action=na.omit, data=data)
     
-      # results for the grouping variable
+      
+      #####
+      returnResultsLmer <- function(model,
+                                    variateName) {
+      Estimate <- summary(model)$coef[variateName, "Estimate"]
+      confIntervals <- confint(model)[variateName, c("2.5 %", "97.5 %")]
+      CILower <- confIntervals[1]
+      CIUpper <- confIntervals[2]
+      PValue <- lmerTest::summary(model)$coef[variateName, "Pr(>|t|)"]
+      return(list(Estimate=Estimate, CILower=CILower, CIUpper=CIUpper, PValue=PValue))
+      }
+      #####
+      # results for the coVariate1st variable
+      tempResult <- returnResultsLmer(model, coVariate1stCoefName)
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "beta"] <-
-        summary(model)$coef[coVariate1stCoefName, "Estimate"]
+        tempResult[["Estimate"]]
+        #summary(model)$coef[coVariate1stCoefName, "Estimate"]
       
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaCILower"] <-
-        confint(model)[coVariate1stCoefName, "2.5 %"]
+        tempResult[["CILower"]]
+        #confint(model)[coVariate1stCoefName, "2.5 %"]
       
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaCIUpper"] <-
-        confint(model)[coVariate1stCoefName, "97.5 %"]
+        tempResult[["CIUpper"]]
+        #confint(model)[coVariate1stCoefName, "97.5 %"]
       
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaPValue"] <-
-        lmerTest::summary(model)$coef[coVariate1stCoefName, "Pr(>|t|)"]
+        tempResult[["PValue"]]
+        #lmerTest::summary(model)$coef[coVariate1stCoefName, "Pr(>|t|)"]
+      rm(tempResult)
       
       if (selectedModel=="MMmeasurement") {
         # results for the measurement variable
         for (measurement in nonReferenceMeasurements) {
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
+        tempResult <- returnResultsLmer(model, paste0(measurementVar,measurement))
+          
+          resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
                                 resultsMeasurementVar["Measurement"]==measurement,
                               "beta"] <-
-          summary(model)$coef[paste0(measurementVar,measurement), "Estimate"]
+          tempResult[["Estimate"]]
+         # summary(model)$coef[paste0(measurementVar,measurement), "Estimate"]
         
         resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
                                 resultsMeasurementVar["Measurement"]==measurement,
                               "betaCILower"] <-
-          confint(model)[paste0(measurementVar,measurement), "2.5 %"]
+          tempResult[["CILower"]]
+        
+          # confint(model)[paste0(measurementVar,measurement), "2.5 %"]
         
         resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
                                 resultsMeasurementVar["Measurement"]==measurement,
                               "betaCIUpper"] <-
-          confint(model)[paste0(measurementVar,measurement), "97.5 %"]
+          tempResult[["CIUpper"]]
+          #confint(model)[paste0(measurementVar,measurement), "97.5 %"]
         
         resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
                                 resultsMeasurementVar["Measurement"]==measurement, "betaPValue"] <-
-          lmerTest::summary(model)$coef[paste0(measurementVar,measurement), "Pr(>|t|)"]
+          tempResult[["PValue"]]
+          #lmerTest::summary(model)$coef[paste0(measurementVar,measurement), "Pr(>|t|)"]
+        rm(tempResult)
       }}
       
       if (selectedModel=="MMtimeSinceInclusion") {
         # results for the days since inclusion variable
+        tempResult <- returnResultsLmer(model, time)
+        
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "beta"] <-
-          summary(model)$coef[time, "Estimate"]
+          tempResult[["Estimate"]]
+                  #summary(model)$coef[time, "Estimate"]
         
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCILower"] <-
-          confint(model)[time, "2.5 %"]
+          tempResult[["CILower"]]
+                  #confint(model)[time, "2.5 %"]
         
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaCIUpper"] <-
-          confint(model)[time, "97.5 %"]
+          tempResult[["CIUpper"]]
+        #          confint(model)[time, "97.5 %"]
        
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaPValue"] <-
-          lmerTest::summary(model)$coef[time, "Pr(>|t|)"]
+          tempResult[["PValue"]]
+                  #lmerTest::summary(model)$coef[time, "Pr(>|t|)"]
+        rm(tempResult)
       }
     }
   }
