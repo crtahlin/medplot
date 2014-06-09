@@ -1351,7 +1351,7 @@ mixedModelResults <- reactive({
                value=NULL)
   on.exit(progress$close())
   
-  mixedModel(data=dataFiltered(),
+  mixedModel(data=dataExtended(),
              selectedSymptoms=input$selectedSymptoms,
              coVariate1st=input$selectedCovariate1st,
              subjectIDVar=input$patientIDVar,
