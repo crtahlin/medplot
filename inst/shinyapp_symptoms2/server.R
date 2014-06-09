@@ -255,7 +255,7 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
       #       symptoms <- importSymptomsData(datafile=templateLocation,
       #                                      format="Excel")
       #       data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
-      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEMShort.txt")
+      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEM.txt")
       data <- importSymptomsData(datafile=templateLocation,
                                  format="TSV")
       return(data)
@@ -1319,6 +1319,13 @@ output$tableRCS <- renderTable({
 
 # TAB - Regression model : all evaluations ####
 # Menu
+output$selectCovariate1st <- renderUI({
+  selectInput(inputId="selectedCovariate1st",
+              label="Select covariate for analysis:",
+              choices=dataVariableNames(),
+              selected=input$groupingVar)
+  })
+
 output$selectMixedModelType <- renderUI({
   selectInput(inputId="selectedMixedModelType",
               label="Select a mixed model type:",
@@ -1332,6 +1339,8 @@ output$selectMixedModelType <- renderUI({
               selected="MMsimple")
 })
 
+
+
 # Results
 mixedModelResults <- reactive({
   
@@ -1344,7 +1353,7 @@ mixedModelResults <- reactive({
   
   mixedModel(data=dataFiltered(),
              selectedSymptoms=input$selectedSymptoms,
-             coVariate1st=input$groupingVar,
+             coVariate1st=input$selectedCovariate1st,
              subjectIDVar=input$patientIDVar,
              measurementVar=input$measurementVar,
              dateVar=input$dateVar,
@@ -1359,7 +1368,7 @@ output$mixedModelTable1 <- renderUI({
     results <- mixedModelResults()[["coVariate1st"]] 
     
     out <- print(xtable(results, caption=paste("Fixed effects of",
-                                               input$groupingVar,
+                                               input$selectedCovariate1st,
                                                "for", 
                                                mixedModelResults()[["coVariate1stComparison"]])),
                  type="html",
@@ -1374,7 +1383,7 @@ output$mixedModelTable1 <- renderUI({
 output$mixedModelGraph1 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     print(plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
-                                        coVariate1st=input$groupingVar,
+                                        coVariate1st=input$selectedCovariate1st,
                                         coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
                                         treatasBinary=input$treatasBinary) 
     )
