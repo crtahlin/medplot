@@ -109,7 +109,7 @@ shinyUI(pageWithSidebar(
       
       # TAB - Summary tables : grouping variable ####
       tabPanel(title="Summary tables : grouping variable",
-               textOutput("messageNotAppropriate10"),
+               #textOutput("messageNotAppropriate10"),
                uiOutput("UIpropTable"),
                uiOutput("UIdoPvalueAdjustments"),
                

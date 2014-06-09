@@ -823,14 +823,14 @@ output$plotPresence <- renderPlot({
 
 
 # TAB - Graphical exploration : by grouping variable ####
-# Proportion by groups (aka Pyramid plot) ####
+
 # Message
-output$messageNotAppropriate5 <- renderText({
-  if(!is.null(input$treatasBinary)){
-    if (input$treatasBinary==FALSE) {
-      "This type of analysis is not appropriate for numerical responses."
-    }}
-})
+# output$messageNotAppropriate5 <- renderText({
+#   if(!is.null(input$treatasBinary)){
+#     if (input$treatasBinary==FALSE) {
+#       "This type of analysis is not appropriate for numerical responses."
+#     }}
+# })
 
 
 
@@ -864,23 +864,23 @@ output$plotPropCIs <- renderPlot ({
 # Menu
 output$UIpropTable = renderUI({
   if(!is.null(measurementLevels())){
-    if(input$treatasBinary==TRUE){
+    #if(input$treatasBinary==TRUE){
       #select the measurement
       selectInput(inputId="measurementSelectedprop",
                   label="Select evaluation occasion:", 
                   choices=measurementLevels(), selected=measurementLevels()[1])
-    }
+    #}
   }
 })
 
 output$UIdoPvalueAdjustments <- renderUI({
   if(!is.null(measurementLevels())){
-    if(input$treatasBinary==TRUE){
+    # if(input$treatasBinary==TRUE){
       checkboxInput(inputId="doPValueAdjustments",
                     label="Calculate P value adjustments? (It may take a long time.)",
                     value=FALSE)
       
-    }}
+    } #}
   
   })
 
@@ -928,7 +928,7 @@ output$textTablePropGroups <- renderUI({
 # Table with medians of symptoms values in a group ####
 output$tableMedianGroups <- renderTable ({
   if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedprop) )){
-    if(input$treatasBinary==TRUE){
+    if(input$treatasBinary==FALSE){
       
       progress <- Progress$new(session, min=1, max=100)
       
@@ -953,7 +953,7 @@ output$tableMedianGroups <- renderTable ({
 # text - explainig tableMedianGroups
 output$textTableMedianGroups <- renderUI({
   if(!is.null(dataFiltered())){
-    if(input$treatasBinary==TRUE){
+    if(input$treatasBinary==FALSE){
       tagList(p("Table displays for each variable the median value for subjects in a
                 certain group, interquantile range for of the variable 
                 (25th to 75th percentile)and P value for the difference of samples (Mann-Whitney test). 
