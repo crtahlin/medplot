@@ -67,66 +67,83 @@ mixedModel <- function(data,               # dataFiltered()
     if (treatasBinary==TRUE) {
       model <- glmer(formula, family=binomial,  na.action=na.omit, data=data)
    
-      
+      #### Returns results from glmer ####
+      returnResultsGlmer <- function (model, variateName) {
+        Estimate <- exp(summary(model)$coef[variateName, "Estimate"])
+        CILower <- exp(summary(model)$coef[variateName, "Estimate"] - 
+                         qnorm(.975)*summary(model)$coef[variateName, "Std. Error"])
+        CIUpper <- exp(summary(model)$coef[variateName, "Estimate"] + 
+                         qnorm(.975)*summary(model)$coef[variateName, "Std. Error"])
+        PValue <- summary(model)$coef[variateName, "Pr(>|z|)"]
+        return(list(Estimate=Estimate, CILower=CILower, CIUpper=CIUpper, PValue=PValue))
+      }
+      ####
       
       # results for the grouping variable
+      tempResult <- returnResultsGlmer(model, coVariate1stCoefName)
+        
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "OR"] <- 
-        exp(summary(model)$coef[coVariate1stCoefName, "Estimate"])
+        tempResult[["Estimate"]] #exp(summary(model)$coef[coVariate1stCoefName, "Estimate"])
       
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORCILower"] <- 
-        exp(summary(model)$coef[coVariate1stCoefName, "Estimate"] - 
-              qnorm(.975)*summary(model)$coef[coVariate1stCoefName, "Std. Error"])
+        tempResult[["CILower"]] # exp(summary(model)$coef[coVariate1stCoefName, "Estimate"] - 
+              #qnorm(.975)*summary(model)$coef[coVariate1stCoefName, "Std. Error"])
       
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORCIUpper"] <- 
-        exp(summary(model)$coef[coVariate1stCoefName, "Estimate"] +
-              qnorm(.975)*summary(model)$coef[coVariate1stCoefName, "Std. Error"])
+        tempResult[["CIUpper"]] # exp(summary(model)$coef[coVariate1stCoefName, "Estimate"] +
+              # qnorm(.975)*summary(model)$coef[coVariate1stCoefName, "Std. Error"])
       
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORPValue"] <- 
-        summary(model)$coef[coVariate1stCoefName, "Pr(>|z|)"]
+        tempResult[["PValue"]] #summary(model)$coef[coVariate1stCoefName, "Pr(>|z|)"]
+      rm(tempResult)
       
       # results for the measurement variable
       if (selectedModel=="MMmeasurement") {
-        
+                
         for (measurement in nonReferenceMeasurements) {
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
+          tempResult <- returnResultsGlmer(model, paste0(measurementVar,measurement))
+          
+          resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
                                 resultsMeasurementVar["Measurement"]==measurement,
                               "OR"] <- 
-          exp(summary(model)$coef[paste0(measurementVar,measurement), "Estimate"])
+            tempResult[["Estimate"]] # exp(summary(model)$coef[paste0(measurementVar,measurement), "Estimate"])
         
         resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
                                 resultsMeasurementVar["Measurement"]==measurement,
                               "ORCILower"] <- 
-          exp(summary(model)$coef[paste0(measurementVar,measurement), "Estimate"] - 
-                qnorm(.975)*summary(model)$coef[paste0(measurementVar,measurement), "Std. Error"])
+          tempResult[["CILower"]] # exp(summary(model)$coef[paste0(measurementVar,measurement), "Estimate"] - 
+               # qnorm(.975)*summary(model)$coef[paste0(measurementVar,measurement), "Std. Error"])
         
         resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
                                 resultsMeasurementVar["Measurement"]==measurement
                               , "ORCIUpper"] <- 
-          exp(summary(model)$coef[paste0(measurementVar,measurement), "Estimate"] +
-                qnorm(.975)*summary(model)$coef[paste0(measurementVar,measurement), "Std. Error"])
+          tempResult[["CIUpper"]] #exp(summary(model)$coef[paste0(measurementVar,measurement), "Estimate"] +
+                # qnorm(.975)*summary(model)$coef[paste0(measurementVar,measurement), "Std. Error"])
         
         resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
                                 resultsMeasurementVar["Measurement"]==measurement,
                               "ORPValue"] <- 
-          summary(model)$coef[paste0(measurementVar,measurement), "Pr(>|z|)"]
+          tempResult[["PValue"]] # summary(model)$coef[paste0(measurementVar,measurement), "Pr(>|z|)"]
+        rm(tempResult)
       }}
       
       # results for the days since inclusion variable
       if (selectedModel=="MMtimeSinceInclusion") {
-        
+        tempResult <- returnResultsGlmer(model, time)
+                
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "OR"] <- 
-          exp(summary(model)$coef[time, "Estimate"])
+          tempResult[["Estimate"]] #exp(summary(model)$coef[time, "Estimate"])
         
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCILower"] <- 
-          exp(summary(model)$coef[time, "Estimate"] - 
-                qnorm(.975)*summary(model)$coef[time, "Std. Error"])
+          tempResult[["CILower"]] # exp(summary(model)$coef[time, "Estimate"] - 
+                #qnorm(.975)*summary(model)$coef[time, "Std. Error"])
         
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORCIUpper"] <- 
-          exp(summary(model)$coef[time, "Estimate"] +
-                qnorm(.975)*summary(model)$coef[time, "Std. Error"])
+          tempResult[["CIUpper"]] # exp(summary(model)$coef[time, "Estimate"] +
+               # qnorm(.975)*summary(model)$coef[time, "Std. Error"])
         
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "ORPValue"] <- 
-          summary(model)$coef[time, "Pr(>|z|)"]
+          tempResult[["PValue"]] #  summary(model)$coef[time, "Pr(>|z|)"]
       }      
     }
     
@@ -135,7 +152,7 @@ mixedModel <- function(data,               # dataFiltered()
       model <- lmerTest::lmer(formula, na.action=na.omit, data=data)
     
       
-      #####
+      ##### Returns results form lmer() ####
       returnResultsLmer <- function(model,
                                     variateName) {
       Estimate <- summary(model)$coef[variateName, "Estimate"]
