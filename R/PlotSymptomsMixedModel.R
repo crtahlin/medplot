@@ -1,6 +1,6 @@
 mixedModel <- function(data,               # dataFiltered()
                        selectedSymptoms,    # input$selectedSymptoms
-                       groupingVar,         # input$groupingVar
+                       coVariate1st,         # input$groupingVar
                        subjectIDVar,        # input$patientIDVar
                        measurementVar,      # input$measurementVar
                        dateVar,             # input$dateVar
@@ -8,18 +8,18 @@ mixedModel <- function(data,               # dataFiltered()
                        treatasBinary,       # input$treatasBinary
                        selectedModel){      # input$selectedMixedModelType
   
-  # make groupingVar binary variable
-  data[, groupingVar] <- as.factor(data[, groupingVar])
+  # make coVariate1st binary variable
+  data[, coVariate1st] <- as.factor(data[, coVariate1st])
   # make measurementVar a factor variable
   data[, measurementVar] <- as.factor(data[, measurementVar])
   
   
   # name of the binary grouping variable coeficient assigned by R
-  groupingVarCoefName <- paste0(groupingVar,levels(data[,groupingVar])[2])
+  coVariate1stCoefName <- paste0(coVariate1st,levels(data[,coVariate1st])[2])
   # reference value is? the second level - the one that gets compared to the first level
-  referenceValue <- levels(data[,groupingVar])[2]
+  referenceValue <- levels(data[,coVariate1st])[2]
   # what are we comparing?
-  groupingVarComparison <- paste(levels(data[,groupingVar])[2], "vs", levels(data[,groupingVar])[1])
+  coVariate1stComparison <- paste(levels(data[,coVariate1st])[2], "vs", levels(data[,coVariate1st])[1])
   # list measurement occasion levels
   measurementLevels <- levels(data[, measurementVar])
   # the measurement level that other are compared to is?
@@ -40,30 +40,12 @@ mixedModel <- function(data,               # dataFiltered()
   }
   
   # prepare data frame for the results, depending on what kind of response variable we have
-  if (treatasBinary==TRUE) {
-    resultsGroupingVar <- 
-      data.frame(expand.grid(Variable=selectedSymptoms),
-                 OR=NA, ORCILower=NA, ORCIUpper=NA, ORPValue=NA)
-    resultsMeasurementVar <- 
-      data.frame(expand.grid(Variable=selectedSymptoms,
-                             Measurement=nonReferenceMeasurements),
-                 OR=NA, ORCILower=NA, ORCIUpper=NA, ORPValue=NA)
-    resultsDaysSinceInclusion <- 
-      data.frame(expand.grid(Variable=selectedSymptoms),
-                 OR=NA, ORCILower=NA, ORCIUpper=NA, ORPValue=NA)
-  }
-  if (treatasBinary==FALSE) {
-    resultsGroupingVar <- 
-      data.frame(expand.grid(Variable=selectedSymptoms),
-                 beta=NA, betaCILower=NA, betaCIUpper=NA, betaPValue=NA)
-    resultsMeasurementVar <- 
-      data.frame(expand.grid(Variable=selectedSymptoms,
-                             Measurement=nonReferenceMeasurements),
-                 beta=NA, betaCILower=NA, betaCIUpper=NA, betaPValue=NA)
-    resultsDaysSinceInclusion <- 
-      data.frame(expand.grid(Variable=selectedSymptoms),
-                 beta=NA, betaCILower=NA, betaCIUpper=NA, betaPValue=NA)
-  }
+  resultscoVariate1st <- data.frame(Variable=selectedSymptoms) 
+  
+  resultsMeasurementVar <- data.frame(expand.grid(Variable=selectedSymptoms,
+                                                    Measurement=nonReferenceMeasurements))
+  resultsDaysSinceInclusion <- data.frame(Variable=selectedSymptoms)
+
   
   # cycle through response variables
   for (symptom in selectedSymptoms) {
@@ -71,13 +53,13 @@ mixedModel <- function(data,               # dataFiltered()
     # choose the right model formula depending on user selected option of model
     # construct the right formula based on selected model
     if (selectedModel=="MMsimple") {
-      formula <- as.formula(paste(symptom, "~", groupingVar, "+(1|", subjectIDVar, ")"))
+      formula <- as.formula(paste(symptom, "~", coVariate1st, "+(1|", subjectIDVar, ")"))
     }
     if (selectedModel=="MMmeasurement") {
-      formula <- as.formula(paste(symptom, "~", as.factor(measurementVar),"+", groupingVar, "+(1|", subjectIDVar, ")"))
+      formula <- as.formula(paste(symptom, "~", as.factor(measurementVar),"+", coVariate1st, "+(1|", subjectIDVar, ")"))
     }
     if (selectedModel=="MMtimeSinceInclusion") {
-      formula <- as.formula(paste(symptom, "~", time,"+", groupingVar, "+(1|", subjectIDVar, ")"))
+      formula <- as.formula(paste(symptom, "~", time,"+", coVariate1st, "+(1|", subjectIDVar, ")"))
     }
     
     
@@ -86,19 +68,19 @@ mixedModel <- function(data,               # dataFiltered()
       model <- glmer(formula, family=binomial,  na.action=na.omit, data=data)
       
       # results for the grouping variable
-      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "OR"] <- 
-        exp(summary(model)$coef[groupingVarCoefName, "Estimate"])
+      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "OR"] <- 
+        exp(summary(model)$coef[coVariate1stCoefName, "Estimate"])
       
-      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "ORCILower"] <- 
-        exp(summary(model)$coef[groupingVarCoefName, "Estimate"] - 
-              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORCILower"] <- 
+        exp(summary(model)$coef[coVariate1stCoefName, "Estimate"] - 
+              qnorm(.975)*summary(model)$coef[coVariate1stCoefName, "Std. Error"])
       
-      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "ORCIUpper"] <- 
-        exp(summary(model)$coef[groupingVarCoefName, "Estimate"] +
-              qnorm(.975)*summary(model)$coef[groupingVarCoefName, "Std. Error"])
+      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORCIUpper"] <- 
+        exp(summary(model)$coef[coVariate1stCoefName, "Estimate"] +
+              qnorm(.975)*summary(model)$coef[coVariate1stCoefName, "Std. Error"])
       
-      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "ORPValue"] <- 
-        summary(model)$coef[groupingVarCoefName, "Pr(>|z|)"]
+      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORPValue"] <- 
+        summary(model)$coef[coVariate1stCoefName, "Pr(>|z|)"]
       
       # results for the measurement variable
       if (selectedModel=="MMmeasurement") {
@@ -151,17 +133,17 @@ mixedModel <- function(data,               # dataFiltered()
       model <- lmerTest::lmer(formula, na.action=na.omit, data=data)
     
       # results for the grouping variable
-      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "beta"] <-
-        summary(model)$coef[groupingVarCoefName, "Estimate"]
+      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "beta"] <-
+        summary(model)$coef[coVariate1stCoefName, "Estimate"]
       
-      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "betaCILower"] <-
-        confint(model)[groupingVarCoefName, "2.5 %"]
+      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaCILower"] <-
+        confint(model)[coVariate1stCoefName, "2.5 %"]
       
-      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "betaCIUpper"] <-
-        confint(model)[groupingVarCoefName, "97.5 %"]
+      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaCIUpper"] <-
+        confint(model)[coVariate1stCoefName, "97.5 %"]
       
-      resultsGroupingVar[resultsGroupingVar["Variable"]==symptom, "betaPValue"] <-
-        lmerTest::summary(model)$coef[groupingVarCoefName, "Pr(>|t|)"]
+      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaPValue"] <-
+        lmerTest::summary(model)$coef[coVariate1stCoefName, "Pr(>|t|)"]
       
       if (selectedModel=="MMmeasurement") {
         # results for the measurement variable
@@ -202,8 +184,8 @@ mixedModel <- function(data,               # dataFiltered()
       }
     }
   }
-  return(list(groupingVar=resultsGroupingVar,
-              groupingVarComparison=groupingVarComparison,
+  return(list(coVariate1st=resultscoVariate1st,
+              coVariate1stComparison=coVariate1stComparison,
               measurementVar=resultsMeasurementVar,
               measurementVarComparison=measurementVarComparison,
               daysSinceInclusion=resultsDaysSinceInclusion ))
@@ -228,11 +210,11 @@ calculateDaysSinceInclusion <- function (data,
   return(data)
 }
 
-plotFixedEffectsofGroupingVar <- function (calculatedStatistics,
-                                           groupingVar,
-                                           groupingVarReferenceValue,
+plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
+                                           coVariate1st,
+                                           coVariate1stReferenceValue,
                                            treatasBinary) {
-  graphTitle <- paste("Fixed effects of", groupingVar)
+  graphTitle <- paste("Fixed effects of", coVariate1st)
   
   # for binary response variable
   if (treatasBinary==TRUE) {

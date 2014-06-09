@@ -208,18 +208,21 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
 
   numRowsMixedModels1 <- function(){if(!is.null(dataFiltered()) &
                                          !is.null(input$selectedMixedModelType)){
-    ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
+    max(ceiling(length(input$selectedSymptoms))*30,
+        300)  }else{return(0)} }
   
   numRowsMixedModels2 <- function(){if(!is.null(dataFiltered()) &
                                                   !is.null(input$selectedMixedModelType)){
     nFacets <- length(unique(Measurement()))-1
     (input$selectedMixedModelType=="MMmeasurement")*
-      ceiling(length(input$selectedSymptoms))*30*nFacets  }else{return(0)} }
+      max(ceiling(length(input$selectedSymptoms))*30*nFacets,
+          300 ) }else{return(0)} }
   
   numRowsMixedModels3 <- function(){if(!is.null(dataFiltered()) &
                                                   !is.null(input$selectedMixedModelType)){
     (input$selectedMixedModelType=="MMtimeSinceInclusion")*
-      ceiling(length(input$selectedSymptoms))*30  }else{return(0)} }
+     max( ceiling(length(input$selectedSymptoms))*30,
+          300  )}else{return(0)} }
   
   NumRows <- function(){if(!is.null(dataFiltered())){
     #if(input$treatasBinary==FALSE){return(0)}
@@ -252,7 +255,7 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
       #       symptoms <- importSymptomsData(datafile=templateLocation,
       #                                      format="Excel")
       #       data <- join(x=symptoms, y=patients, by="PersonID", type="inner")
-      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEM.txt")
+      templateLocation <- paste0(path.package("medplot"),"/extdata/DataEMShort.txt")
       data <- importSymptomsData(datafile=templateLocation,
                                  format="TSV")
       return(data)
@@ -339,13 +342,13 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
                   label="Choose outcome variables to analyse:", 
                   choices=dataVariableNames(),
                   multiple=TRUE,
-                  if (input$dataFileType=="Demo"){selected=c("Fatigue","Malaise",
-                                                             "Arthralgia","Headache",
-                                                             "Myalgia","Back.C",
-                                                             "Dizziness", "Nausea",
-                                                             "Sleepiness", "Forgetfulness",
-                                                             "Concentration", "Paresthesias",
-                                                             "Irritability","Back.L",
+                  if (input$dataFileType=="Demo"){selected=c(# "Fatigue","Malaise",
+                                                             #"Arthralgia","Headache",
+                                                             #"Myalgia","Back.C",
+                                                             #"Dizziness", "Nausea",
+                                                             #"Sleepiness", "Forgetfulness",
+                                                             #"Concentration", "Paresthesias",
+                                                             #"Irritability","Back.L",
                                                              "Back.Th", "Insomnia")})}
   })
   
@@ -1341,7 +1344,7 @@ mixedModelResults <- reactive({
   
   mixedModel(data=dataFiltered(),
              selectedSymptoms=input$selectedSymptoms,
-             groupingVar=input$groupingVar,
+             coVariate1st=input$groupingVar,
              subjectIDVar=input$patientIDVar,
              measurementVar=input$measurementVar,
              dateVar=input$dateVar,
@@ -1353,12 +1356,12 @@ mixedModelResults <- reactive({
 # Table 1 ####
 output$mixedModelTable1 <- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
-    results <- mixedModelResults()[["groupingVar"]] 
+    results <- mixedModelResults()[["coVariate1st"]] 
     
     out <- print(xtable(results, caption=paste("Fixed effects of",
                                                input$groupingVar,
                                                "for", 
-                                               mixedModelResults()[["groupingVarComparison"]])),
+                                               mixedModelResults()[["coVariate1stComparison"]])),
                  type="html",
                  html.table.attributes='class="data table table-bordered table-condensed"',
                  caption.placement="top")
@@ -1370,9 +1373,9 @@ output$mixedModelTable1 <- renderUI({
 # Graph 1 ####
 output$mixedModelGraph1 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
-    print(plotFixedEffectsofGroupingVar(calculatedStatistics=mixedModelResults()[["groupingVar"]],
-                                        groupingVar=input$groupingVar,
-                                        groupingVarReferenceValue=mixedModelResults()[["groupingVarReferenceValue"]],
+    print(plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
+                                        coVariate1st=input$groupingVar,
+                                        coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
                                         treatasBinary=input$treatasBinary) 
     )
   }
