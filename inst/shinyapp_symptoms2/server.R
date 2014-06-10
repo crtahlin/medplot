@@ -748,7 +748,6 @@ output$tableforBoxplots <- renderTable({
 })
 
 # Median plot
-print("lala")
 output$plotMedians <- renderPlot({
   plot <- plotValueswithCIs(data=dataforSummaryNonBinary()[["rawTable"]],
                             variableName="Variables",
@@ -796,6 +795,8 @@ output$plotPresence <- renderPlot({
     }}
 }, height=numRowsPresencePlot)
 
+# TAB - Summary tables : grouping variable ####
+# Graph
 # Proportions by groups with confidence intervals ####
 # Graph
 output$plotPropCIs <- renderPlot ({
@@ -819,8 +820,6 @@ output$plotPropCIs <- renderPlot ({
       }}}, silent=TRUE)
 } ,height=numRowsProportionsCI)
 
-
-# TAB - Summary tables : grouping variable ####
 # Menu
 output$UIpropTable = renderUI({
   if(!is.null(measurementLevels())){

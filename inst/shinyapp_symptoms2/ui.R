@@ -101,15 +101,17 @@ shinyUI(pageWithSidebar(
                
       ),
       
-      # TAB - Graphical exploration : grouping variable ####
-      tabPanel(title="Graphical exploration : grouping variable",
-               textOutput("messageNotAppropriate5"),                            
-               plotOutput("plotPropCIs", height="auto")
-                 ),
+#       # TAB - Graphical exploration : grouping variable ####
+#       tabPanel(title="Graphical exploration : grouping variable",
+#                textOutput("messageNotAppropriate5"),                            
+#                plotOutput("plotPropCIs", height="auto")
+#                  ),
       
       # TAB - Summary tables : grouping variable ####
       tabPanel(title="Summary tables : grouping variable",
                #textOutput("messageNotAppropriate10"),
+               plotOutput("plotPropCIs", height="auto"),
+               
                uiOutput("UIpropTable"),
                uiOutput("UIdoPvalueAdjustments"),
                
