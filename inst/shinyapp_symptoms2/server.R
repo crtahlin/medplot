@@ -154,12 +154,12 @@ shinyServer(function(input, output, session) {
   }
   
   numRowsClustering <- function() {if(!is.null(dataFiltered())){
-    if(input$treatasBinary==TRUE) {return(0)}
+    #if(input$treatasBinary==TRUE) {return(0)}
     max(ceiling(length(input$selectedSymptoms))*40,
         300)}else{return(0)}}
   
   numRowsClustering2 <- function() {if(!is.null(dataFiltered())){
-    if(input$treatasBinary==TRUE) {return(0)}
+    #if(input$treatasBinary==TRUE) {return(0)}
     max(ceiling(length(input$selectedSymptoms))*40,
         300)}else{return(0)}}
   
@@ -925,31 +925,32 @@ output$messageNotAppropriate10 <- renderText({
 # Menu
 output$clusteringUI = renderUI({
   if(!(is.null(measurementLevels()) || is.null(measurementLevels()) )){
-    if(input$treatasBinary==FALSE){
+    #if(input$treatasBinary==FALSE){
       #select the measurement
       selectInput(inputId="selectedMeasurementValue",
                   label="Select evaluation occasion:", 
                   choices=measurementLevels(), selected=measurementLevels()[1])
-    }}
+    }#}
   })
 
 # Graphs
 # Dendrogram plot ####
 output$plotClusterDendrogram=renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$selectedMeasurementValue) )){
-    if(input$treatasBinary==FALSE){
-      plotClusterDendrogram(data=dataFiltered(),
+    #if(input$treatasBinary==FALSE){
+    if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}  
+    plotClusterDendrogram(data=data,
                             variableName=input$measurementVar,
                             variableValue=input$selectedMeasurementValue,
                             selectedSymptoms=input$selectedSymptoms)
-    }}
+    }#}
   },height=numRowsClustering)
 
 
 # Heatmap - Selection of annotation variables
 output$selectClusterAnnotations <- renderUI({
   if(!is.null(dataFiltered())){
-    if(input$treatasBinary==FALSE){
+    #if(input$treatasBinary==FALSE){
       selectedSymptoms <- which(dataVariableNames() %in% input$selectedSymptoms)
       selectInput(inputId="selectedClusterAnnotations",
                   label="Select variables for annotating graph:",
@@ -957,7 +958,7 @@ output$selectClusterAnnotations <- renderUI({
                   choices=dataVariableNames()[-selectedSymptoms],
                   selected=c(input$groupingVar),
                   multiple=TRUE)
-    }}
+    }#}
   })
 
 
@@ -965,22 +966,23 @@ output$selectClusterAnnotations <- renderUI({
 # Heatmap plot ####
 output$plotClusterHeatmap=renderPlot({
   if(!is.null(dataExtended())){
-    if(input$treatasBinary==FALSE){
-      plotClusterHeatmap(data=dataExtended(),
+    #if(input$treatasBinary==FALSE){
+    if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}  
+    plotClusterHeatmap(data=data,
                          #TODO: make dependent on selection
                          variableName=input$measurementVar,
                          variableValue=input$selectedMeasurementValue,
                          selectedSymptoms=input$selectedSymptoms,
                          annotationVars=input$selectedClusterAnnotations) 
-    }}
+    }#}
   },height=numRowsClustering2)
 
-output$messageNotAppropriate6 <- renderText({
-  if(!is.null(input$treatasBinary)){
-    if (input$treatasBinary==TRUE) {
-      "This type of analysis is not appropriate for binary responses."
-    }}
-})
+# output$messageNotAppropriate6 <- renderText({
+#   if(!is.null(input$treatasBinary)){
+#     if (input$treatasBinary==TRUE) {
+#       "This type of analysis is not appropriate for binary responses."
+#     }}
+# })
 
 
 # TAB - Regression model : one evaluation ####

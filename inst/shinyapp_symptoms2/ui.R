@@ -122,7 +122,7 @@ shinyUI(pageWithSidebar(
               
       # TAB - Clustering ####
       tabPanel(title="Clustering",
-               textOutput("messageNotAppropriate6"),
+               #textOutput("messageNotAppropriate6"),
                # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram", height="auto"),
