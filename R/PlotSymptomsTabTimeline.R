@@ -87,7 +87,8 @@ plotSymptomsTimeline <- function (data,
     scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
                     guide="legend",
                     limits=c(1,10),
-                    max_size=10) 
+                    max_size=10) +
+    geom_point(subset=.(value == 0), shape=2, size=1)
   
   # if plotting dates on horizontal axis
   if (displayFormat == "dates") {
