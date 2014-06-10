@@ -137,6 +137,7 @@ tablePropWithSymptoms <- function (data,
   column6Name <- paste("95% CI for the difference")
   if (doPValueAdjustments==TRUE) {
   column7Name <- paste("Adj. P value (Holm-Bonferroni)")
+  column10Name <- paste("Q-value (Benjamini-Hochberg)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
   column9Name <- paste("Adj. P value (permutations)")
   }
@@ -177,9 +178,12 @@ tablePropWithSymptoms <- function (data,
   
   # add a Holm-Bonferoni corrected P value column
   tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
+  # add a Benjamini-Hochberg Q-value
+  tableData[, column10Name] <- p.adjust(p=tableData[, column5Name], method="BH")
   # add a Benjamini-Yekutieli Q-value - see ?p.adjust
   tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
-
+  
+  
   # OBSOLETE CODE FOR PERMUTATION CALCULATED P VALUES (WITHOUT CORRECTION)   
 #   for (symptom in symptomsNames) {
 #     # add a permutation calculated P value
@@ -253,6 +257,7 @@ tableMediansWithSymptoms <- function (data,
   
   if (doPValueAdjustments==TRUE) {
   column7Name <- paste("Adj. P value (Holm-Bonferroni)")
+  column10Name <- paste("Q-value (Benjamini-Hochberg)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
   column9Name <- paste("Adj. P value (permutations)")
   }
@@ -290,6 +295,8 @@ tableMediansWithSymptoms <- function (data,
   if (doPValueAdjustments==TRUE) {
   # add a Holm-Bonferoni corrected P value column
   tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
+  # add a Benjamini-Hochberg Q-value - see ?p.adjust
+  tableData[, column10Name] <- p.adjust(p=tableData[, column5Name], method="BH")
   # add a Benjamini-Yekutieli Q-value - see ?p.adjust
   tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
   
