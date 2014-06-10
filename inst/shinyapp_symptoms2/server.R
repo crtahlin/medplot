@@ -5,11 +5,10 @@
 
 # load library for generation interactive web pages
 library(shiny)
-if(!require(shinyIncubator)) {
+if(!require(shinyIncubator)) { # NOTE!!!: this is not available on CRAN, might not be best to include it?
   devtools::install_github("shiny-incubator", "rstudio")
   library(shinyIncubator)
 }
-# library(shinyIncubator) # NOTE!!!: this is not available on CRAN, might not be best to include it?
 # load library for generating graph scales
 library(scales)
 # load library for melting data
@@ -54,8 +53,7 @@ shinyServer(function(input, output, session) {
   workingDir <- paste0(gsub(pattern="/", replacement="\\\\", x=getwd()))
   
   # FUNCTIONS ####
-  #how much space should be used for the graphical output of the Rcs estimates and others?  
-  # TODO: could drawing graphs be done if(no graph){height=0)?
+  #how much space should be used for the graphical output of different graphs?  
   numRowsTimeline <- function(){if(!is.null(dataFiltered())){
     if(input$selectedGraphOverTime!="timelinePlot") {return(0)} # no space reserved
     if(input$treatasBinary==TRUE) {return(0)} # no graph if not possible to draw
@@ -1039,7 +1037,7 @@ output$messageNotAppropriate6 <- renderText({
 
 
 # TAB - Regression model : one evaluation ####
-# Menu
+# Menus ####
 output$debug10 <- renderText({paste(regressionScenario())})
 
 output$debug9 <- renderText({
@@ -1097,40 +1095,21 @@ regressionScenario <- reactive({
         !is.null(dataFiltered()) &
         !is.null(input$measurementVar) &
         !is.null(input$selectedSymptoms)
-      ) {
-
-  if (input$treatasBinary==TRUE) {
-    if (is.null(input$useFirthCorrection)) {return("scenarioLogist")}
-    if (input$useFirthCorrection==FALSE) {return("scenarioLogist")}
-    if (input$useFirthCorrection==TRUE) {return("scenarioLogistf")}
-  }
-  
-  if (input$treatasBinary==FALSE) {
-    if (is.null(input$useRCSModel) ) {return("scenarioLinearModel")}
-    if (input$useRCSModel==FALSE) {return("scenarioLinearModel")}
-    if (input$useRCSModel==TRUE) {return("scenarioRCSModel")}
-  }
+  ) {
+    
+    if (input$treatasBinary==TRUE) {
+      if (is.null(input$useFirthCorrection)) {return("scenarioLogist")}
+      if (input$useFirthCorrection==FALSE) {return("scenarioLogist")}
+      if (input$useFirthCorrection==TRUE) {return("scenarioLogistf")}
+    }
+    
+    if (input$treatasBinary==FALSE) {
+      if (is.null(input$useRCSModel) ) {return("scenarioLinearModel")}
+      if (input$useRCSModel==FALSE) {return("scenarioLinearModel")}
+      if (input$useRCSModel==TRUE) {return("scenarioRCSModel")}
+    }
   }
 })
-
-
-# reset checkboxes on parameter change
-# observe({input$selectedCovariate
-#          print("Observer triggered")
-#          updateCheckboxInput(session, inputId="useRCSModel",value=FALSE)
-#          updateCheckboxInput(session, inputId="useFirthCorrection",value=FALSE)
-#          print("Observer triggered2")
-#          print(input$useFirthCorrection)
-#          })
-# observe({input$treatasBinary
-#          print("Observer triggered")
-#          updateCheckboxInput(session, inputId="useRCSModel",value=FALSE)
-#          updateCheckboxInput(session, inputId="useFirthCorrection",value=FALSE)
-#          print("Observer triggered2")
-#          print(input$useFirthCorrection)
-# })
-
-# Graph(s)
 
 # Scenario - Logistic regression with Firth correction
 # Create results of Logistic regression with Firth correction
@@ -1145,24 +1124,8 @@ resultsLogistf <- reactive({
                     thresholdValue=input$thresholdValue)
     return(out)
   }}
-  
   })
 
-# plot - logistf ### OBSOLETE
-# output$plotLogistf <- renderPlot({
-#   if(!(is.null(Measurement()) || is.null(input$selectedEvaluationTime) )){
-#     if(input$useFirthCorrection==TRUE) {
-#       if (input$treatasBinary==TRUE) {
-#         plotLogistf(data=dataExtended(),
-#                     data.yn=dataFiltered.yn(),
-#                     measurement=Measurement(),
-#                     measurementSelectedlogistf=input$selectedEvaluationTime,
-#                     logistfIDVar=input$selectedCovariate,
-#                     selectedSymptoms=input$selectedSymptoms,
-#                     numSymptoms=length(input$selectedSymptoms))
-#       }
-#     }}
-# }, height=numRowsLogistf)
 
 # plot - logistf ####
 output$plotLogistf2 <- renderPlot({
@@ -1180,12 +1143,10 @@ output$plotLogistf2 <- renderPlot({
                                            "at evaluation T=",
                                            input$selectedEvaluationTime,
                                            "(using Firth correction)"),
-                          vLine=1)    
-       
+                          vLine=1) 
        print(out)
-      }
-    }
-}, height=numRowsLogistf)
+    }}
+  }, height=numRowsLogistf)
 
 # table - logistf ####
 output$tableLogistf <- renderTable({
@@ -1195,8 +1156,7 @@ output$tableLogistf <- renderTable({
     }}
   })
 
-
-# Scenario - logistic regression (without Firth correction)
+# Scenario - logistic regression (without Firth correction) ####
 resultsLogist <- reactive({
   if(!is.null(regressionScenario()) ){
     if(regressionScenario()=="scenarioLogist") {

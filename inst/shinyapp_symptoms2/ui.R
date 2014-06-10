@@ -138,8 +138,7 @@ shinyUI(pageWithSidebar(
                textOutput("debug9"),
                uiOutput("selectEvaluationTime"),
                uiOutput("selectCovariate"),
-               conditionalPanel(condition="input.treatasBinary=='TRUE'",
-                                uiOutput("checkUseFirthCorrection")),
+               uiOutput("checkUseFirthCorrection"),
                uiOutput("checkUseRCSModel"),
                
                # Graphs
