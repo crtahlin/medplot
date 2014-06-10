@@ -85,18 +85,18 @@ shinyServer(function(input, output, session) {
   }
   
   
-#   selectInput(inputId="selectedFacetingType",
-#               label="Select faceting type:",
-#               choices=c("Variables ~ Measurement occasions"="variablesOnYaxis",
-#                         "Measurement occasions ~ Variables"="variablesOnXaxis")
-#   
+  #   selectInput(inputId="selectedFacetingType",
+  #               label="Select faceting type:",
+  #               choices=c("Variables ~ Measurement occasions"="variablesOnYaxis",
+  #                         "Measurement occasions ~ Variables"="variablesOnXaxis")
+  #   
   numRowsTimelineBoxplots <- function(){if(!is.null(dataFiltered())){
     if(input$selectedGraphOverTime!="boxPlot") {return(0)}
     if (input$selectedFacetingType=="variablesOnYaxis") {
-    if(input$treatasBinary==TRUE) {return(0)} 
-    tmp <- max(ceiling(length(input$selectedSymptoms))*200,
-               300) # minumum reserved space
-    return(tmp)}
+      if(input$treatasBinary==TRUE) {return(0)} 
+      tmp <- max(ceiling(length(input$selectedSymptoms))*200,
+                 300) # minumum reserved space
+      return(tmp)}
     
     if (input$selectedFacetingType=="variablesOnXaxis") {
       if(input$treatasBinary==TRUE) {return(0)} 
@@ -104,39 +104,39 @@ shinyServer(function(input, output, session) {
                  300) # minumum reserved space
       return(tmp)}
     
-    }else{return(0)} # height of plot when no data available
+  }else{return(0)} # height of plot when no data available
   }
   
   
   numRowsProportions <- function(){
     if(!is.null(dataFilteredwithThreshold())){
-    if(input$treatasBinary==FALSE) {return(0)} 
-    max(ceiling(length(input$selectedSymptoms))*40,
-        # if there are less than cca. 4 measurement occasions,
-        # each symptom should get aprox. 40 lines
-        length(input$selectedSymptoms)*length(measurementLevels())*15,
-        # for more than 4 measurement occasions,
-        # this should give extra vertical space for 
-        # measurements to be visible
-        300 # minumum reserved space
-    )}else{return(0)} # height of plot when no data available
+      if(input$treatasBinary==FALSE) {return(0)} 
+      max(ceiling(length(input$selectedSymptoms))*40,
+          # if there are less than cca. 4 measurement occasions,
+          # each symptom should get aprox. 40 lines
+          length(input$selectedSymptoms)*length(measurementLevels())*15,
+          # for more than 4 measurement occasions,
+          # this should give extra vertical space for 
+          # measurements to be visible
+          300 # minumum reserved space
+      )}else{return(0)} # height of plot when no data available
     
     
   }
   
   numRowsProportionsCI<- function(){
     try({
-    if(!is.null(dataFilteredwithThreshold())){
-    if(input$treatasBinary==FALSE) {return(0)} 
-    max(ceiling(length(input$selectedSymptoms))*80,
-        # if there are less than cca. 4 measurement occasions,
-        # each symptom should get aprox. 40 lines
-        length(input$selectedSymptoms)*length(measurementLevels())*20,
-        # for more than 4 measurement occasions,
-        # this should give extra vertical space for 
-        # measurements to be visible
-        300 # minumum reserved space
-    )}else{return(0)} # height of plot when no data available
+      if(!is.null(dataFilteredwithThreshold())){
+        if(input$treatasBinary==FALSE) {return(0)} 
+        max(ceiling(length(input$selectedSymptoms))*80,
+            # if there are less than cca. 4 measurement occasions,
+            # each symptom should get aprox. 40 lines
+            length(input$selectedSymptoms)*length(measurementLevels())*20,
+            # for more than 4 measurement occasions,
+            # this should give extra vertical space for 
+            # measurements to be visible
+            300 # minumum reserved space
+        )}else{return(0)} # height of plot when no data available
     }, silent=TRUE)
   }
   
@@ -144,23 +144,23 @@ shinyServer(function(input, output, session) {
     try({
       if(!is.null(input$selectedEvaluationTime2)) {
         if(input$treatasBinary==TRUE) {
-        max(ceiling(length(input$selectedSymptoms))*30,
-            300 # minumum reserved space
-        )
+          max(ceiling(length(input$selectedSymptoms))*30,
+              300 # minumum reserved space
+          )
         }}else{return(0)} # height of plot when no data available
     }, silent=TRUE)
   }
   
-numRowsMedianPlot <- function(){
-  try({
-    if(!is.null(input$selectedEvaluationTime2)) {
-      if(input$treatasBinary==FALSE) {
-        max(ceiling(length(input$selectedSymptoms))*30,
-            300 # minumum reserved space
-        )
-      }}else{return(0)} # height of plot when no data available
-  }, silent=TRUE)
-}
+  numRowsMedianPlot <- function(){
+    try({
+      if(!is.null(input$selectedEvaluationTime2)) {
+        if(input$treatasBinary==FALSE) {
+          max(ceiling(length(input$selectedSymptoms))*30,
+              300 # minumum reserved space
+          )
+        }}else{return(0)} # height of plot when no data available
+    }, silent=TRUE)
+  }
   
   numRowsClustering <- function() {if(!is.null(dataFiltered())){
     if(input$treatasBinary==TRUE) {return(0)}
@@ -182,45 +182,45 @@ numRowsMedianPlot <- function(){
     max(ceiling(length(input$selectedSymptoms))*30,
         300)}else{return(0)}}
   
-numRowsLogist <- function() {if(!is.null(regressionScenario())){
-  if(regressionScenario()!="scenarioLogist") {return(0)}
-  max(ceiling(length(input$selectedSymptoms))*30,
-      300)}else{return(0)}}
-
-numRowsLinear <- function() {if(!is.null(regressionScenario())){
-  if(regressionScenario()!="scenarioLinearModel") {return(0)}
-  max(ceiling(length(input$selectedSymptoms))*30,
-      300)}else{return(0)}}
-
-numRowsProportion <- function(){
-  if(!(is.null(dataFiltered.yn()) || is.null(input$selectedMeasurementForPresencePlot) )){
-    if(input$treatasBinary==TRUE){
-      ceiling(length(input$selectedSymptoms))*30  
-    }} else {return(0)}
-}
-
-numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
-  if(regressionScenario()!="scenarioRCSModel") {return(0)}
-  max(ceiling(length(input$selectedSymptoms))*100,
-      300)}else{return(0)}}
-
+  numRowsLogist <- function() {if(!is.null(regressionScenario())){
+    if(regressionScenario()!="scenarioLogist") {return(0)}
+    max(ceiling(length(input$selectedSymptoms))*30,
+        300)}else{return(0)}}
+  
+  numRowsLinear <- function() {if(!is.null(regressionScenario())){
+    if(regressionScenario()!="scenarioLinearModel") {return(0)}
+    max(ceiling(length(input$selectedSymptoms))*30,
+        300)}else{return(0)}}
+  
+  numRowsProportion <- function(){
+    if(!(is.null(dataFiltered.yn()) || is.null(input$selectedMeasurementForPresencePlot) )){
+      if(input$treatasBinary==TRUE){
+        ceiling(length(input$selectedSymptoms))*30  
+      }} else {return(0)}
+  }
+  
+  numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
+    if(regressionScenario()!="scenarioRCSModel") {return(0)}
+    max(ceiling(length(input$selectedSymptoms))*100,
+        300)}else{return(0)}}
+  
   numRowsMixedModels1 <- function(){if(!is.null(dataFiltered()) &
                                          !is.null(input$selectedMixedModelType)){
     max(ceiling(length(input$selectedSymptoms))*30,
         300)  }else{return(0)} }
   
   numRowsMixedModels2 <- function(){if(!is.null(dataFiltered()) &
-                                                  !is.null(input$selectedMixedModelType)){
+                                         !is.null(input$selectedMixedModelType)){
     nFacets <- length(unique(Measurement()))-1
     (input$selectedMixedModelType=="MMmeasurement")*
       max(ceiling(length(input$selectedSymptoms))*30*nFacets,
           300 ) }else{return(0)} }
   
   numRowsMixedModels3 <- function(){if(!is.null(dataFiltered()) &
-                                                  !is.null(input$selectedMixedModelType)){
+                                         !is.null(input$selectedMixedModelType)){
     (input$selectedMixedModelType=="MMtimeSinceInclusion")*
-     max( ceiling(length(input$selectedSymptoms))*30,
-          300  )}else{return(0)} }
+      max( ceiling(length(input$selectedSymptoms))*30,
+           300  )}else{return(0)} }
   
   NumRows <- function(){if(!is.null(dataFiltered())){
     #if(input$treatasBinary==FALSE){return(0)}
@@ -341,13 +341,13 @@ numRowsRCSModel <- function() {if(!is.null(regressionScenario())){
                   choices=dataVariableNames(),
                   multiple=TRUE,
                   if (input$dataFileType=="Demo"){selected=c(# "Fatigue","Malaise",
-                                                             #"Arthralgia","Headache",
-                                                             #"Myalgia","Back.C",
-                                                             #"Dizziness", "Nausea",
-                                                             #"Sleepiness", "Forgetfulness",
-                                                             #"Concentration", "Paresthesias",
-                                                             #"Irritability","Back.L",
-                                                             "Back.Th", "Insomnia")})}
+                    #"Arthralgia","Headache",
+                    #"Myalgia","Back.C",
+                    #"Dizziness", "Nausea",
+                    #"Sleepiness", "Forgetfulness",
+                    #"Concentration", "Paresthesias",
+                    #"Irritability","Back.L",
+                    "Back.Th", "Insomnia")})}
   })
   
   # GUI - selecting Date variable ####
@@ -440,19 +440,19 @@ output$dataSummary <- renderPrint({
 # TAB - Graphical exploration over time ####
 output$selectGraphOverTime <- renderUI({
   if (!is.null(dataFiltered())) {
-  selectInput(inputId="selectedGraphOverTime",
-              label="Select type of graph:",
-              choices= if (input$treatasBinary==TRUE) {
-                c("Lasagna plots"="lasagnaPlot",
-                  "Barplots with proportions"="presencePlot"
+    selectInput(inputId="selectedGraphOverTime",
+                label="Select type of graph:",
+                choices= if (input$treatasBinary==TRUE) {
+                  c("Lasagna plots"="lasagnaPlot",
+                    "Barplots with proportions"="presencePlot"
                   )} else {
                     c("Profile plots"="profilePlot",
                       "Lasagna plots"="lasagnaPlot",
                       "Boxplots"="boxPlot",
                       "Timeline"="timelinePlot" 
-                        )},
-              selected= if (input$treatasBinary==TRUE) {"presencePlot"} else {"timelinePlot"},
-              multiple=FALSE)
+                    )},
+                selected= if (input$treatasBinary==TRUE) {"presencePlot"} else {"timelinePlot"},
+                multiple=FALSE)
   }  
 })
 
@@ -462,44 +462,44 @@ output$selectGraphOverTime <- renderUI({
 output$selectGraphType <- renderUI({
   if(!is.null(input$selectedGraphOverTime)) {
     if (input$selectedGraphOverTime=="profilePlot") {
-    if(input$treatasBinary==FALSE){
-      selectInput(inputId="selectedGraphType",
-                  label="Select type of graphs to plot:",
-                  choices=c("All subjects on one graph"="oneGraph",
-                            "Random selection of subjects on one graph"="randomSample",
-                            "Multiple graphs per outcome variable"="multipleGraphs"),
-                  selected="randomSample",
-                  multiple=FALSE)
-    }}}
+      if(input$treatasBinary==FALSE){
+        selectInput(inputId="selectedGraphType",
+                    label="Select type of graphs to plot:",
+                    choices=c("All subjects on one graph"="oneGraph",
+                              "Random selection of subjects on one graph"="randomSample",
+                              "Multiple graphs per outcome variable"="multipleGraphs"),
+                    selected="randomSample",
+                    multiple=FALSE)
+      }}}
 })
 
 output$selectRandomSampleSize <- renderUI({
   if(!is.null(input$selectedGraphType)) {
     if (input$selectedGraphOverTime=="profilePlot") {
-    if (input$selectedGraphType=="randomSample") {
-      if(input$treatasBinary==FALSE){
-        numericInput(inputId="sampleSize",
-                     label="Select number of randomly selected subjects:",
-                     value=10,
-                     min=1,
-                     max=100,
-                     step=5)
-      }}}}
+      if (input$selectedGraphType=="randomSample") {
+        if(input$treatasBinary==FALSE){
+          numericInput(inputId="sampleSize",
+                       label="Select number of randomly selected subjects:",
+                       value=10,
+                       min=1,
+                       max=100,
+                       step=5)
+        }}}}
 })
 
 
 output$selectMaxGroupSize <- renderUI({
   if(!is.null(input$selectedGraphType)) {
     if (input$selectedGraphOverTime=="profilePlot") {
-    if (input$selectedGraphType=="multipleGraphs") {
-      if(input$treatasBinary==FALSE){
-        numericInput(inputId="groupSize",
-                     label="Select the maximum number of subjects on one graph:",
-                     value=25,
-                     min=10,
-                     max=100,
-                     step=5)
-      }}}}
+      if (input$selectedGraphType=="multipleGraphs") {
+        if(input$treatasBinary==FALSE){
+          numericInput(inputId="groupSize",
+                       label="Select the maximum number of subjects on one graph:",
+                       value=25,
+                       min=10,
+                       max=100,
+                       step=5)
+        }}}}
 })
 
 # Graph
@@ -531,65 +531,7 @@ output$plotTimelineProfiles <- renderPlot({
 # Graph
 output$plotLasagna <- renderUI({
   if (!is.null(input$selectedGraphOverTime)) {
-  if (input$selectedGraphOverTime=="lasagnaPlot") {
-  
-    progress <- Progress$new(session, min=1, max=100)
-    on.exit(progress$close())
-    
-    progress$set(message = 'Calculation in progress',
-                 detail = 'This may take a while...', 
-                 value=NULL)
-    
-    
-  filenames <- vector()
-  
-  # generate as many files as there are plots
-  for (symptom in input$selectedSymptoms) {
-    filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"\\www\\temp"), fileext=".png")
-   
-  # plot graph for each symptom
-  #for(symptom in input$selectedSymptoms) {
-        
-    png(paste0(filenames[symptom]))
-    plotLasagna(if (input$treatasBinary==FALSE) {dataFiltered()}else{dataFilteredwithThreshold()}, 
-                  treatasBinary=input$treatasBinary, 
-                  symptom=symptom,
-                  dateVar=input$dateVar, 
-                  personIDVar=input$patientIDVar, 
-                  measurementVar=input$measurementVar,
-                  groupingVar=input$groupingVar,  
-                  thresholdValue=input$thresholdValue) 
-    dev.off()
-  }
-  
-
-out <- pastePlotFilenames(filenames)
-  
-return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
-}}
-})
-
-
-# Boxplots ####
-# Menu
-output$selectFacetingType <- renderUI({
-  if(!is.null(input$selectedGraphType)) {
-    if (input$selectedGraphOverTime=="boxPlot") {
-  selectInput(inputId="selectedFacetingType",
-              label="Select faceting type:",
-              choices=c("Variables ~ Evaluation occasions"="variablesOnYaxis",
-                        "Evaluation occasions ~ Variables"="variablesOnXaxis")
-              )
-    }}
-  })
-   
-
-# Graph
-output$plotTimelineBoxplots <- renderPlot({
-  if(!is.null(dataFiltered())) {
-    if(input$selectedGraphOverTime=="boxPlot") {
-      
-    if(input$treatasBinary==FALSE){
+    if (input$selectedGraphOverTime=="lasagnaPlot") {
       
       progress <- Progress$new(session, min=1, max=100)
       on.exit(progress$close())
@@ -598,13 +540,71 @@ output$plotTimelineBoxplots <- renderPlot({
                    detail = 'This may take a while...', 
                    value=NULL)
       
-      print(plotTimelineBoxplots(data=dataFiltered(),
-                                 personIDVar=input$patientIDVar,
-                                 measurementVar=input$measurementVar,
-                                 selectedSymptoms=input$selectedSymptoms,
-                                 faceting=input$selectedFacetingType)
+      
+      filenames <- vector()
+      
+      # generate as many files as there are plots
+      for (symptom in input$selectedSymptoms) {
+        filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"\\www\\temp"), fileext=".png")
+        
+        # plot graph for each symptom
+        #for(symptom in input$selectedSymptoms) {
+        
+        png(paste0(filenames[symptom]))
+        plotLasagna(if (input$treatasBinary==FALSE) {dataFiltered()}else{dataFilteredwithThreshold()}, 
+                    treatasBinary=input$treatasBinary, 
+                    symptom=symptom,
+                    dateVar=input$dateVar, 
+                    personIDVar=input$patientIDVar, 
+                    measurementVar=input$measurementVar,
+                    groupingVar=input$groupingVar,  
+                    thresholdValue=input$thresholdValue) 
+        dev.off()
+      }
+      
+      
+      out <- pastePlotFilenames(filenames)
+      
+      return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
+    }}
+})
+
+
+# Boxplots ####
+# Menu
+output$selectFacetingType <- renderUI({
+  if(!is.null(input$selectedGraphType)) {
+    if (input$selectedGraphOverTime=="boxPlot") {
+      selectInput(inputId="selectedFacetingType",
+                  label="Select faceting type:",
+                  choices=c("Variables ~ Evaluation occasions"="variablesOnYaxis",
+                            "Evaluation occasions ~ Variables"="variablesOnXaxis")
       )
     }}
+})
+
+
+# Graph
+output$plotTimelineBoxplots <- renderPlot({
+  if(!is.null(dataFiltered())) {
+    if(input$selectedGraphOverTime=="boxPlot") {
+      
+      if(input$treatasBinary==FALSE){
+        
+        progress <- Progress$new(session, min=1, max=100)
+        on.exit(progress$close())
+        
+        progress$set(message = 'Calculation in progress',
+                     detail = 'This may take a while...', 
+                     value=NULL)
+        
+        print(plotTimelineBoxplots(data=dataFiltered(),
+                                   personIDVar=input$patientIDVar,
+                                   measurementVar=input$measurementVar,
+                                   selectedSymptoms=input$selectedSymptoms,
+                                   faceting=input$selectedFacetingType)
+        )
+      }}
   } else {return()}
 },height=numRowsTimelineBoxplots)
 
@@ -630,37 +630,37 @@ output$selectDisplayFormat <- renderUI({
 output$plotTimeline <- renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
     if(input$selectedGraphOverTime=="timelinePlot") {
-    if (input$treatasBinary==FALSE) {
-      
-      progress <- Progress$new(session, min=1, max=100)
-      on.exit(progress$close())
-      
-      progress$set(message = 'Calculation in progress',
-                   detail = 'This may take a while...', 
-                   value=NULL)
-      
-      data=dataFiltered()
-      # observe({dataFiltered()})
-      # if no symbols are selected, do not plot
-      #if (dim(dataFiltered())[1]>0) {
-      print(plotSymptomsTimeline(data=data,
-                                 date=input$dateVar,
-                                 personID=input$patientIDVar,
-                                 measurement=input$measurementVar,
-                                 symptoms=input$selectedSymptoms,
-                                 displayFormat = input$displayFormat)
-      )}} }  
+      if (input$treatasBinary==FALSE) {
+        
+        progress <- Progress$new(session, min=1, max=100)
+        on.exit(progress$close())
+        
+        progress$set(message = 'Calculation in progress',
+                     detail = 'This may take a while...', 
+                     value=NULL)
+        
+        data=dataFiltered()
+        # observe({dataFiltered()})
+        # if no symbols are selected, do not plot
+        #if (dim(dataFiltered())[1]>0) {
+        print(plotSymptomsTimeline(data=data,
+                                   date=input$dateVar,
+                                   personID=input$patientIDVar,
+                                   measurement=input$measurementVar,
+                                   symptoms=input$selectedSymptoms,
+                                   displayFormat = input$displayFormat)
+        )}} }  
 }, height=numRowsTimeline)
 
 #Presence of symptoms graph ####
 #Menu
 output$selectMeasurementForPresencePlot <- renderUI({
   if(!is.null(input$selectedGraphOverTime)) {
-  if(input$selectedGraphOverTime=="presencePlot") {
-    selectInput(inputId="selectedMeasurementForPresencePlot",
-                label="Select evaluation occasion:",
-                choices=measurementLevels(), selected=measurementLevels()[1])
-  }}
+    if(input$selectedGraphOverTime=="presencePlot") {
+      selectInput(inputId="selectedMeasurementForPresencePlot",
+                  label="Select evaluation occasion:",
+                  choices=measurementLevels(), selected=measurementLevels()[1])
+    }}
 })
 
 
@@ -748,12 +748,12 @@ dataforSummaryNonBinary <- reactive({
                    detail = 'This may take a while...', 
                    value=NULL)
       
-  tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
-                                 measurementVar=input$measurementVar,
-                                 data=dataFiltered(),
-                                 selectedSymptoms=input$selectedSymptoms)
+      tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
+                                     measurementVar=input$measurementVar,
+                                     data=dataFiltered(),
+                                     selectedSymptoms=input$selectedSymptoms)
     }}
-  })
+})
 
 # Median tables
 output$tableforBoxplots <- renderTable({
@@ -761,12 +761,12 @@ output$tableforBoxplots <- renderTable({
     if(input$treatasBinary==FALSE){
       return(dataforSummaryNonBinary()[["printableTable"]])
       
-#       out <- tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
-#                               measurementVar=input$measurementVar,
-#                               data=dataFiltered(),
-#                               selectedSymptoms=input$selectedSymptoms)[["printableTable"]] 
-#       
-#       return(out)
+      #       out <- tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
+      #                               measurementVar=input$measurementVar,
+      #                               data=dataFiltered(),
+      #                               selectedSymptoms=input$selectedSymptoms)[["printableTable"]] 
+      #       
+      #       return(out)
     } }
 })
 
@@ -789,14 +789,14 @@ output$plotMedians <- renderPlot({
 output$tableforProportions <- renderTable({
   if(!is.null(dataFilteredwithThreshold())) {
     if(input$treatasBinary==TRUE){
-    
+      
       out <- tabelizeProportionsforMeasurement(measurement=input$selectedEvaluationTime2,
-                                            measurementVar=input$measurementVar,
-                                            data=dataFilteredwithThreshold(),
-                                            selectedSymptoms=input$selectedSymptoms) 
+                                               measurementVar=input$measurementVar,
+                                               data=dataFilteredwithThreshold(),
+                                               selectedSymptoms=input$selectedSymptoms) 
       return(out)
-      }}
-  })
+    }}
+})
 
 # Proportions graph
 output$plotPresence <- renderPlot({
@@ -863,10 +863,10 @@ output$plotPropCIs <- renderPlot ({
 output$UIpropTable = renderUI({
   if(!is.null(measurementLevels())){
     #if(input$treatasBinary==TRUE){
-      #select the measurement
-      selectInput(inputId="measurementSelectedprop",
-                  label="Select evaluation occasion:", 
-                  choices=measurementLevels(), selected=measurementLevels()[1])
+    #select the measurement
+    selectInput(inputId="measurementSelectedprop",
+                label="Select evaluation occasion:", 
+                choices=measurementLevels(), selected=measurementLevels()[1])
     #}
   }
 })
@@ -874,13 +874,13 @@ output$UIpropTable = renderUI({
 output$UIdoPvalueAdjustments <- renderUI({
   if(!is.null(measurementLevels())){
     # if(input$treatasBinary==TRUE){
-      checkboxInput(inputId="doPValueAdjustments",
-                    label="Calculate P value adjustments? (It may take a long time.)",
-                    value=FALSE)
-      
-    } #}
+    checkboxInput(inputId="doPValueAdjustments",
+                  label="Calculate P value adjustments? (It may take a long time.)",
+                  value=FALSE)
+    
+  } #}
   
-  })
+})
 
 # Tables
 # Table of proportions of patients in a group with a symptom ####
@@ -898,17 +898,17 @@ output$tablePropGroups <- renderTable ({
       on.exit(progress$close())
       
       out <- tablePropWithSymptoms(data=dataFiltered(),
-                            groupingVar=input$groupingVar,
-                            measurementVar=input$measurementVar,
-                            forMeasurement=input$measurementSelectedprop,
-                            symptomsNames=input$selectedSymptoms,
-                            thresholdValue=input$thresholdValue,
-                            doPValueAdjustments=input$doPValueAdjustments
-                            )
+                                   groupingVar=input$groupingVar,
+                                   measurementVar=input$measurementVar,
+                                   forMeasurement=input$measurementSelectedprop,
+                                   symptomsNames=input$selectedSymptoms,
+                                   thresholdValue=input$thresholdValue,
+                                   doPValueAdjustments=input$doPValueAdjustments
+      )
       
       return(out)
     }}
-  })
+})
 
 # text - explaining tablePropGroups
 output$textTablePropGroups <- renderUI({
@@ -920,8 +920,8 @@ output$textTablePropGroups <- renderUI({
                 Data with missing values for grouping variable 
                 are removed from analysis.", br(), br()))
     }
-    }
-    })
+  }
+})
 
 # Table with medians of symptoms values in a group ####
 output$tableMedianGroups <- renderTable ({
@@ -958,8 +958,8 @@ output$textTableMedianGroups <- renderUI({
                 Data with missing values for grouping variable 
                 are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
     }
-    }
-    })
+  }
+})
 
 
 output$messageNotAppropriate10 <- renderText({
@@ -1046,7 +1046,7 @@ output$debug9 <- renderText({
         "treatasBinary:",ifelse(is.null(input$treatasBinary), "NULL", input$treatasBinary),
         "useFirthCorrection:", ifelse(is.null(input$useFirthCorrection), "NULL", input$useFirthCorrection),
         "useRCSModel:", ifelse(is.null(input$useRCSModel), "NULL", input$useRCSModel))
-  })
+})
 
 output$selectEvaluationTime <- renderUI({
   selectInput(inputId="selectedEvaluationTime",
@@ -1054,25 +1054,25 @@ output$selectEvaluationTime <- renderUI({
               choices=if(!is.null(measurementLevels())) {measurementLevels()},
               selected=if(!is.null(measurementLevels())) {measurementLevels()[1]})
   
-  })
+})
 
 output$selectCovariate <- renderUI({
   selectInput(inputId="selectedCovariate",
               label="Select covariate for analysis:",
               choices=dataVariableNames(),
               selected=input$groupingVar)
-  })
+})
 
 output$checkUseFirthCorrection <- renderUI({
   if (!is.null(input$treatasBinary)) {
     if (input$treatasBinary==TRUE) {
-    #if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="binary") {
+      #if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="binary") {
       checkboxInput(inputId="useFirthCorrection",
                     label="Use Firth correction?",
                     value=FALSE)
-  # }
-  }}
-  })
+      # }
+    }}
+})
 
 output$checkUseRCSModel <- renderUI({
   if (!is.null(input$treatasBinary) & !is.null(input$selectedCovariate)) {
@@ -1080,10 +1080,10 @@ output$checkUseRCSModel <- renderUI({
       if (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["nLevels"]]=="multilevel" &
             (determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["type"]]=="integer" |
                determineTypeofVariable(dataExtended()[,input$selectedCovariate])[["type"]]=="numeric")
-          ) {
+      ) {
         checkboxInput(inputId="useRCSModel", label="Use flexible model of the association of the selected
                 variables with the numerical covariate?",
-                value=FALSE)
+                      value=FALSE)
       }}}
 })
 
@@ -1115,38 +1115,38 @@ regressionScenario <- reactive({
 # Create results of Logistic regression with Firth correction
 resultsLogistf <- reactive({
   if(!is.null(regressionScenario())) {
-  if(regressionScenario()=="scenarioLogistf") {
-    out <- tabelizeLogistf(data=dataExtended(),
-                    measurementVar=input$measurementVar,
-                    selectedMeasurement=input$selectedEvaluationTime,
-                    covariate=input$selectedCovariate,
-                    selectedSymptoms=input$selectedSymptoms,
-                    thresholdValue=input$thresholdValue)
-    return(out)
-  }}
-  })
+    if(regressionScenario()=="scenarioLogistf") {
+      out <- tabelizeLogistf(data=dataExtended(),
+                             measurementVar=input$measurementVar,
+                             selectedMeasurement=input$selectedEvaluationTime,
+                             covariate=input$selectedCovariate,
+                             selectedSymptoms=input$selectedSymptoms,
+                             thresholdValue=input$thresholdValue)
+      return(out)
+    }}
+})
 
 
 # plot - logistf ####
 output$plotLogistf2 <- renderPlot({
   if(!is.null(resultsLogistf()) ){
     if(regressionScenario()=="scenarioLogistf") {
-       out <- plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
-                          variableName="Variable",
-                          valueName="OR",
-                          CILowerName="CILower",
-                          CIUpperName="CIUpper",
-                          xLabel="Odds ratios",
-                          yLabel="Variables",
-                          graphTitle=paste("Odds ratios and confidence intervals for",
-                                           resultsLogistf()[["referenceValue"]], 
-                                           "at evaluation T=",
-                                           input$selectedEvaluationTime,
-                                           "(using Firth correction)"),
-                          vLine=1) 
-       print(out)
+      out <- plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
+                               variableName="Variable",
+                               valueName="OR",
+                               CILowerName="CILower",
+                               CIUpperName="CIUpper",
+                               xLabel="Odds ratios",
+                               yLabel="Variables",
+                               graphTitle=paste("Odds ratios and confidence intervals for",
+                                                resultsLogistf()[["referenceValue"]], 
+                                                "at evaluation T=",
+                                                input$selectedEvaluationTime,
+                                                "(using Firth correction)"),
+                               vLine=1) 
+      print(out)
     }}
-  }, height=numRowsLogistf)
+}, height=numRowsLogistf)
 
 # table - logistf ####
 output$tableLogistf <- renderTable({
@@ -1154,7 +1154,7 @@ output$tableLogistf <- renderTable({
     if(regressionScenario()=="scenarioLogistf") {
       resultsLogistf()[["printableResultsTable"]]
     }}
-  })
+})
 
 # Scenario - logistic regression (without Firth correction) ####
 resultsLogist <- reactive({
@@ -1168,7 +1168,7 @@ resultsLogist <- reactive({
                             thresholdValue=input$thresholdValue)
       return(out)
     }}
-  })
+})
 
 
 # table - logist ####
@@ -1177,29 +1177,29 @@ output$tableLogist <- renderTable({
     if(regressionScenario()=="scenarioLogist") {
       resultsLogist()[["printableResultsTable"]]
     }}
-  })
+})
 
 
 # plot - logist ####
 output$plotLogist <- renderPlot({
   if(!(is.null(resultsLogist()))){
     if(regressionScenario()=="scenarioLogist") {
-        out <- plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
-                                 variableName="Variable",
-                                 valueName="OR",
-                                 CILowerName="CILower",
-                                 CIUpperName="CIUpper",
-                                 xLabel="Odds ratios",
-                                 yLabel="Variables",
-                                 graphTitle=paste("Odds ratios and confidence intervals for",
-                                                  resultsLogist()[["referenceValue"]], 
-                                                  "at evaluation T=",
-                                                  input$selectedEvaluationTime),
-                                 vLine=1)    
-        
-        print(out)
+      out <- plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
+                               variableName="Variable",
+                               valueName="OR",
+                               CILowerName="CILower",
+                               CIUpperName="CIUpper",
+                               xLabel="Odds ratios",
+                               yLabel="Variables",
+                               graphTitle=paste("Odds ratios and confidence intervals for",
+                                                resultsLogist()[["referenceValue"]], 
+                                                "at evaluation T=",
+                                                input$selectedEvaluationTime),
+                               vLine=1)    
+      
+      print(out)
     }}
-  }, height=numRowsLogist)
+}, height=numRowsLogist)
 
 
 # Scenario - linear regression
@@ -1221,27 +1221,27 @@ output$tableLinear <- renderTable({
     if (regressionScenario()=="scenarioLinearModel") {
       resultsLinear()[["printableResultsTable"]]
     }}
-  })
+})
 
 # plot - linear ####
 output$plotLinear <- renderPlot({
   if(!is.null(resultsLinear())){
     if (regressionScenario()=="scenarioLinearModel") {
-        out <- plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
-                                 variableName="Variable",
-                                 valueName="beta",
-                                 CILowerName="CILower",
-                                 CIUpperName="CIUpper",
-                                 xLabel="Beta (slope) coefficient",
-                                 yLabel="Variables",
-                                 graphTitle=paste("Beta coefficients and confidence intervals for effects of",
-                                                  input$selectedCovariate, 
-                                                  "on selected variables at evaluation T=",
-                                                  input$selectedEvaluationTime),
-                                 vLine=0)  
-        print(out)
+      out <- plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
+                               variableName="Variable",
+                               valueName="beta",
+                               CILowerName="CILower",
+                               CIUpperName="CIUpper",
+                               xLabel="Beta (slope) coefficient",
+                               yLabel="Variables",
+                               graphTitle=paste("Beta coefficients and confidence intervals for effects of",
+                                                input$selectedCovariate, 
+                                                "on selected variables at evaluation T=",
+                                                input$selectedEvaluationTime),
+                               vLine=0)  
+      print(out)
     }}
-  }, height=numRowsLinear) 
+}, height=numRowsLinear) 
 
 # Scenario - modeling with Restricted Cubic Splines
 
@@ -1251,14 +1251,14 @@ output$plotRCS=renderPlot({
   if(!is.null(regressionScenario())){
     if (regressionScenario()=="scenarioRCSModel") {
       
-    plotRCS(data.all=dataExtended(),
-            data.yn=dataFiltered.yn(),
-            measurement=Measurement(),
-            selectedSymptoms=input$selectedSymptoms,
-            measurementSelectedrcs=input$selectedEvaluationTime,
-            rcsIDVar=input$selectedCovariate,
-            binaryVar=input$treatasBinary)   
-  }}
+      plotRCS(data.all=dataExtended(),
+              data.yn=dataFiltered.yn(),
+              measurement=Measurement(),
+              selectedSymptoms=input$selectedSymptoms,
+              measurementSelectedrcs=input$selectedEvaluationTime,
+              rcsIDVar=input$selectedCovariate,
+              binaryVar=input$treatasBinary)   
+    }}
 }, height=numRowsRCSModel)
 
 # table - RCS table ####
@@ -1266,15 +1266,15 @@ output$tableRCS <- renderTable({
   
   if(!is.null(regressionScenario())){
     if (regressionScenario()=="scenarioRCSModel") {
-    tabelizeRCS(data.all=dataExtended(),
-                data.yn=dataFiltered.yn(),
-                measurement=Measurement(),
-                selectedSymptoms=input$selectedSymptoms,
-                measurementSelectedrcs=input$selectedEvaluationTime,
-                rcsIDVar=input$selectedCovariate, 
-                binaryVar=input$treatasBinary
-    )
-  }}
+      tabelizeRCS(data.all=dataExtended(),
+                  data.yn=dataFiltered.yn(),
+                  measurement=Measurement(),
+                  selectedSymptoms=input$selectedSymptoms,
+                  measurementSelectedrcs=input$selectedEvaluationTime,
+                  rcsIDVar=input$selectedCovariate, 
+                  binaryVar=input$treatasBinary
+      )
+    }}
 })
 
 # TAB - Regression model : all evaluations ####
@@ -1284,7 +1284,7 @@ output$selectCovariate1st <- renderUI({
               label="Select covariate for analysis:",
               choices=dataVariableNames(),
               selected=input$groupingVar)
-  })
+})
 
 output$selectMixedModelType <- renderUI({
   selectInput(inputId="selectedMixedModelType",
@@ -1326,7 +1326,7 @@ mixedModelResults <- reactive({
 output$mixedModelTable1 <- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     results <- mixedModelResults()[["coVariate1st"]] 
-
+    
     out <- print(xtable(results, caption=paste("Fixed effects of",
                                                input$selectedCovariate1st,
                                                "for", 
@@ -1343,9 +1343,9 @@ output$mixedModelTable1 <- renderUI({
 output$mixedModelGraph1 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     print(plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
-                                        coVariate1st=input$selectedCovariate1st,
-                                        coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
-                                        treatasBinary=input$treatasBinary) 
+                                         coVariate1st=input$selectedCovariate1st,
+                                         coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
+                                         treatasBinary=input$treatasBinary) 
     )
   }
 }, height=numRowsMixedModels1)
@@ -1576,9 +1576,9 @@ output$data <- renderDataTable({
 output$proportionUI = renderUI({
   if(!(is.null(measurementLevels()) || is.null(measurementLevels())  )){ 
     if(input$treatasBinary==TRUE){
-    selectInput(inputId="measurementSelectedProportion",
-                label="Select evaluation occasion:", 
-                choices=measurementLevels(), selected=measurementLevels()[1])
+      selectInput(inputId="measurementSelectedProportion",
+                  label="Select evaluation occasion:", 
+                  choices=measurementLevels(), selected=measurementLevels()[1])
     }
   }
 })
@@ -1587,13 +1587,13 @@ output$proportionUI = renderUI({
 output$selectPosOnly <- renderUI({
   if(!is.null(dataFiltered())){
     if(input$treatasBinary==TRUE){
-    tagList(
-      checkboxInput(inputId="posOnly",
-                    "Display the distribution only for patients with variable values
+      tagList(
+        checkboxInput(inputId="posOnly",
+                      "Display the distribution only for patients with variable values
                   above the selected threshold of positivity?",
-                    value = FALSE),
-      br(), br()
-    )
+                      value = FALSE),
+        br(), br()
+      )
     }
   }
 })
@@ -1615,13 +1615,13 @@ output$plotBoxplot=renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$posOnly)  )){
     if(input$treatasBinary==TRUE){
       
-    plotDistributionBoxplot(data=dataFiltered(),
-                            data.yn=dataFiltered.yn(),
-                            selectedSymptoms=input$selectedSymptoms,
-                            selectedProportion=input$measurementSelectedProportion,
-                            measurements=Measurement(),
-                            posOnly=input$posOnly,
-                            threshold=input$thresholdValue)
+      plotDistributionBoxplot(data=dataFiltered(),
+                              data.yn=dataFiltered.yn(),
+                              selectedSymptoms=input$selectedSymptoms,
+                              selectedProportion=input$measurementSelectedProportion,
+                              measurements=Measurement(),
+                              posOnly=input$posOnly,
+                              threshold=input$thresholdValue)
     }
   }
 }, height=numRowsDistributions)
@@ -1634,10 +1634,10 @@ output$plotCI <- renderPlot({
          is.null(input$selectedSymptoms) )){
     if(input$treatasBinary==TRUE){
       
-    plotCI(data.yn=dataFiltered.yn(),
-           measurements=Measurement(),
-           selectedSymptoms=input$selectedSymptoms,
-           selectedProportion=input$measurementSelectedProportion)
+      plotCI(data.yn=dataFiltered.yn(),
+             measurements=Measurement(),
+             selectedSymptoms=input$selectedSymptoms,
+             selectedProportion=input$measurementSelectedProportion)
     }
   }
 }, height=numRowsDistributions)
@@ -1647,11 +1647,11 @@ output$tablePropMedian <- renderTable({
   if(!( is.null(dataFiltered()) || is.null(input$measurementSelectedProportion) )){
     if(input$treatasBinary==TRUE){
       
-    tableAllWithSymptoms(data=dataFiltered(),
-                         measurementVar=input$measurementVar,
-                         forMeasurement=input$measurementSelectedProportion,
-                         symptomsNames=input$selectedSymptoms,
-                         thresholdValue=input$thresholdValue)
+      tableAllWithSymptoms(data=dataFiltered(),
+                           measurementVar=input$measurementVar,
+                           forMeasurement=input$measurementSelectedProportion,
+                           symptomsNames=input$selectedSymptoms,
+                           thresholdValue=input$thresholdValue)
     }
   }
 })
@@ -1661,7 +1661,7 @@ output$textTablePropMedian <- renderUI({
   if(!is.null(dataFiltered())){
     if(input$treatasBinary==TRUE){
       
-    tagList(p("The table displays for each variable the proportion and number of subject with
+      tagList(p("The table displays for each variable the proportion and number of subject with
             positive values for each variable, and the 95% confidence interval for the proportion (based on binomial distribution).  
             For numerical variables: the table displays the median value and interquantile
             range for of the variable (25th to 75th percentile) and the 95% confidence interval for the median (evaluated using 
@@ -1792,7 +1792,7 @@ output$messageNotAppropriate4 <- renderText({
 # ui - user interface to select a numerical variable to associate with the presence of symptom ###
 output$rcsUI= renderUI({
   if(!is.null(dataFiltered())){
-   
+    
     selectInput(inputId="rcsIDVar",
                 label="Numerical variable:", 
                 choices=dataVariableNames(),
@@ -1805,12 +1805,12 @@ output$rcsUI= renderUI({
 # ui - user interface to select which measurments to cluster ###
 output$rcsUI2 = renderUI({
   if(!is.null(measurementLevels())){
-   
+    
     #select the measurement
     selectInput(inputId="measurementSelectedrcs",
                 label="Select evaluation occasion:", 
                 choices=measurementLevels(), selected=measurementLevels()[1])
-   
+    
   }
 })
 
@@ -1859,10 +1859,10 @@ output$messageNotAppropriate7 <- renderText({
 output$logistfUI = renderUI({
   if(!is.null(measurementLevels())){
     if (input$treatasBinary==TRUE) {
-    #select the measurement
-    selectInput(inputId="measurementSelectedlogistf",
-                label="Select evaluation occasion:", 
-                choices=measurementLevels(), selected=measurementLevels()[1])
+      #select the measurement
+      selectInput(inputId="measurementSelectedlogistf",
+                  label="Select evaluation occasion:", 
+                  choices=measurementLevels(), selected=measurementLevels()[1])
     }
   }
 })
@@ -1872,10 +1872,10 @@ output$logistfUI = renderUI({
 output$logistfUI2= renderUI({
   if(!is.null(dataFiltered())){
     if (input$treatasBinary==TRUE) {
-    selectInput(inputId="logistfIDVar",
-                label="Select a variable to associate with presence of symptoms:", 
-                choices=dataVariableNames(),
-                if (input$dataFileType=="Demo"){selected=c("Sex")})
+      selectInput(inputId="logistfIDVar",
+                  label="Select a variable to associate with presence of symptoms:", 
+                  choices=dataVariableNames(),
+                  if (input$dataFileType=="Demo"){selected=c("Sex")})
     }
   }
 })
