@@ -56,7 +56,7 @@ shinyServer(function(input, output, session) {
   #how much space should be used for the graphical output of different graphs?  
   numRowsTimeline <- function(){if(!is.null(dataFiltered())){
     if(input$selectedGraphOverTime!="timelinePlot") {return(0)} # no space reserved
-    if(input$treatasBinary==TRUE) {return(0)} # no graph if not possible to draw
+    # if(input$treatasBinary==TRUE) {return(0)} # no graph if not possible to draw
     max(ceiling(length(input$selectedSymptoms))*40, # so that legend is visible
         (dim(dataFiltered()[1])*0.75), # to not compress patient axis too much
         400) # at least this size
@@ -185,6 +185,7 @@ shinyServer(function(input, output, session) {
   
   numRowsProportion <- function(){
     if(!(is.null(dataFiltered.yn()) || is.null(input$selectedMeasurementForPresencePlot) )){
+      if(input$selectedGraphOverTime!="presencePlot") {return(0)}
       if(input$treatasBinary==TRUE){
         max(ceiling(length(input$selectedSymptoms))*30,
             300)
@@ -429,7 +430,8 @@ output$selectGraphOverTime <- renderUI({
                 label="Select type of graph:",
                 choices= if (input$treatasBinary==TRUE) {
                   c("Lasagna plots"="lasagnaPlot",
-                    "Barplots with proportions"="presencePlot"
+                    "Barplots with proportions"="presencePlot",
+                    "Timeline"="timelinePlot"
                   )} else {
                     c("Profile plots"="profilePlot",
                       "Lasagna plots"="lasagnaPlot",
@@ -597,7 +599,6 @@ output$plotTimelineBoxplots <- renderPlot({
 output$selectDisplayFormat <- renderUI({
   if(!is.null(dataFiltered())){
     if(input$selectedGraphOverTime=="timelinePlot") {
-      if(input$treatasBinary==FALSE){
         selectInput(inputId="displayFormat",
                     label="Choose what to display on the horizontal axis:",
                     choices=c("Dates" = "dates",
@@ -605,14 +606,13 @@ output$selectDisplayFormat <- renderUI({
                               "Evaluation occasions" = "measurementOccasions"),
                     selected="dates",
                     multiple=FALSE)
-      }}}
+      }}
 })
 
 # Graph
 output$plotTimeline <- renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
     if(input$selectedGraphOverTime=="timelinePlot") {
-      if (input$treatasBinary==FALSE) {
         
         progress <- Progress$new(session, min=1, max=100)
         on.exit(progress$close())
@@ -620,8 +620,9 @@ output$plotTimeline <- renderPlot({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        
-        data=dataFiltered()
+        if (input$treatasBinary == TRUE) { 
+          data=dataFilteredwithThreshold()
+        } else { data=dataFiltered() }
         # observe({dataFiltered()})
         # if no symbols are selected, do not plot
         #if (dim(dataFiltered())[1]>0) {
@@ -632,7 +633,7 @@ output$plotTimeline <- renderPlot({
                                    symptoms=input$selectedSymptoms,
                                    displayFormat = input$displayFormat)
         )
-      }}}  
+      }}  
 }, height=numRowsTimeline)
 
 #Barplots with proportions ####

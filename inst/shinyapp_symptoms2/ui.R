@@ -119,9 +119,7 @@ shinyUI(pageWithSidebar(
                tableOutput("tableMedianGroups"),
                uiOutput("textTableMedianGroups")
                ),
-      
-      
-        
+              
       # TAB - Clustering ####
       tabPanel(title="Clustering",
                textOutput("messageNotAppropriate6"),
