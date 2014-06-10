@@ -326,12 +326,12 @@ shinyServer(function(input, output, session) {
                   choices=dataVariableNames(),
                   multiple=TRUE,
                   if (input$dataFileType=="Demo"){selected=c(# "Fatigue","Malaise",
-                    #"Arthralgia","Headache",
-                    #"Myalgia","Back.C",
-                    #"Dizziness", "Nausea",
-                    #"Sleepiness", "Forgetfulness",
-                    #"Concentration", "Paresthesias",
-                    #"Irritability","Back.L",
+                    "Arthralgia","Headache",
+                    "Myalgia","Back.C",
+                    "Dizziness", "Nausea",
+                    "Sleepiness", "Forgetfulness",
+                    "Concentration", "Paresthesias",
+                    "Irritability","Back.L",
                     "Back.Th", "Insomnia")})}
   })
   
