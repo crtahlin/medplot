@@ -7,7 +7,6 @@ mixedModel <- function(data,
                        thresholdValue,      
                        treatasBinary,       
                        selectedModel){      
-  browser()
   # if response variable is binary, do a data transformation based on the thresholdvalue
   if (treatasBinary==TRUE) {data[, selectedSymptoms] <- 
                               ifelse(data[,selectedSymptoms]>thresholdValue, 1, 0)                            
@@ -40,7 +39,7 @@ mixedModel <- function(data,
     referenceLevel <- levels[1]
     nonReferenceLevels <- levels[-1]
     comparisonString <- paste0(variable, nonReferenceLevels)
-    comparisonText <- paste (nonReferenceLevels, "vs", referenceLevel)
+    comparisonText <- paste ("reference level:", referenceLevel)
     
     return(list(levels=levels,
                 referenceLevel=referenceLevel,
@@ -68,9 +67,9 @@ mixedModel <- function(data,
   # the other measurement levels
   nonReferenceMeasurements <- describeComparison(data, measurementVar)[["nonReferenceLevels"]]
    
-  
+  browser()
   # prepare data frame for the results, depending on what kind of response variable we have
-  if (is.factor(data[,coVariate1st] & length(levels(data[,coVariate1st])>2) )) { 
+  if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) { 
     # if 1st covariate is multilevel factor
     resultscoVariate1st <- data.frame(expand.grid(Variable=selectedSymptoms,
                                                   CovariateLevel=referenceValue))
@@ -121,21 +120,21 @@ mixedModel <- function(data,
       ####
       
       # results for the grouping variable if it is multilevel factor ####
-      if (is.factor(data[,coVariate1st] & length(levels(data[,coVariate1st])>2) )) {
+      if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) {
       for (level in referenceValue) {
         tempResult <- returnResultsGlmer(model, paste0(coVariate1st,level))
         
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["CovariateLevel"]==level,
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                              resultscoVariate1st["CovariateLevel"]==level,
                               "OR"] <- tempResult[["Estimate"]] 
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom & 
-                                resultsMeasurementVar["CovariateLevel"]==level,
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom & 
+                              resultscoVariate1st["CovariateLevel"]==level,
                               "ORCILower"] <- tempResult[["CILower"]] 
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["CovariateLevel"]==level,
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                              resultscoVariate1st["CovariateLevel"]==level,
                               "ORCIUpper"] <- tempResult[["CIUpper"]] 
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["CovariateLevel"]==level,
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                              resultscoVariate1st["CovariateLevel"]==level,
                               "ORPValue"] <- 
           tempResult[["PValue"]] 
         rm(tempResult)
@@ -202,7 +201,7 @@ mixedModel <- function(data,
     }
     
     
-    if(treatasBinary==FALSE) {
+    if(treatasBinary==FALSE) { #####
       model <- lmerTest::lmer(formula, na.action=na.omit, data=data)
     
       
@@ -217,6 +216,28 @@ mixedModel <- function(data,
       return(list(Estimate=Estimate, CILower=CILower, CIUpper=CIUpper, PValue=PValue))
       }
       #####
+ 
+      # results if coVariate1st multilevel factor
+      if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) {
+        for (level in referenceValue) {
+            tempResult <- returnResultsLmer(model, paste0(coVariate1st,level))
+            
+            resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                  resultscoVariate1st["CovariateLevel"]==level,
+                                "beta"] <- tempResult[["Estimate"]] 
+            resultscoVariate1st[resultscoVariate1st["Variable"]==symptom & 
+                                  resultscoVariate1st["CovariateLevel"]==level,
+                                "betaCILower"] <- tempResult[["CILower"]] 
+            resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                  resultscoVariate1st["CovariateLevel"]==level,
+                                "betaCIUpper"] <- tempResult[["CIUpper"]] 
+            resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                  resultscoVariate1st["CovariateLevel"]==level,
+                                "betaPValue"] <- 
+              tempResult[["PValue"]] 
+            rm(tempResult)
+        }
+        } else {
       # results for the coVariate1st variable
       tempResult <- returnResultsLmer(model, coVariate1stCoefName)
       resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "beta"] <-
@@ -232,6 +253,7 @@ mixedModel <- function(data,
         tempResult[["PValue"]]
         
       rm(tempResult)
+        }
       
       if (selectedModel=="MMmeasurement") {
         # results for the measurement variable
@@ -283,7 +305,6 @@ mixedModel <- function(data,
 calculateDaysSinceInclusion <- function (data,
                                          subjectIDVar,
                                          dateVar) {
-  browser()
   # find the day of inclusion in the study for each person
   uniquePeople <- as.data.frame(unique(data[subjectIDVar]))
   colnames(uniquePeople) <- subjectIDVar
@@ -317,7 +338,8 @@ plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
                      height=0.2, size=1) +
       geom_point(data=calculatedStatistics, 
                  mapping=aes(y=Variable, x=OR), size=4, shape=21, fill="white") +
-      geom_vline(xintercept=1)
+      geom_vline(xintercept=1) +
+      if ("CovariateLevel" %in% colnames(calculatedStatistics)) {facet_grid(CovariateLevel ~ .)}
   }
   
   # for continious response variable
@@ -329,7 +351,8 @@ plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
                      height=0.2, size=1) +
       geom_point(data=calculatedStatistics, 
                  mapping=aes(y=Variable, x=beta), size=4, shape=21, fill="white") +
-      geom_vline(xintercept=0)
+      geom_vline(xintercept=0) + 
+      if ("CovariateLevel" %in% colnames(calculatedStatistics)) {facet_grid(CovariateLevel ~ .)}
   }
   
   plot <- plot + theme_bw() + labs(title=graphTitle,

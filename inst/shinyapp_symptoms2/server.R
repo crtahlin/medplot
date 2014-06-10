@@ -1329,11 +1329,11 @@ output$selectCovariate1st <- renderUI({
 output$selectMixedModelType <- renderUI({
   selectInput(inputId="selectedMixedModelType",
               label="Select a mixed model type:",
-              choices=c("Model response with fixed effect of grouping variable and
+              choices=c("Model response with fixed effect of chosen covariate and
                         random intercept for every subject"="MMsimple",
-                        "Model response with fixed effects of grouping variable,
+                        "Model response with fixed effects of chosen covariate,
                         evaluation occasion and random intercept for every subject"="MMmeasurement",
-                        "Model response with fixed effect of grouping variable,
+                        "Model response with fixed effect of chosen covariate,
                         time from inclusion in study and 
                         random intercept for every subject"="MMtimeSinceInclusion"),
               selected="MMsimple")
@@ -1366,7 +1366,7 @@ mixedModelResults <- reactive({
 output$mixedModelTable1 <- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     results <- mixedModelResults()[["coVariate1st"]] 
-    
+    browser()
     out <- print(xtable(results, caption=paste("Fixed effects of",
                                                input$selectedCovariate1st,
                                                "for", 
