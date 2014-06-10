@@ -1366,7 +1366,7 @@ mixedModelResults <- reactive({
 output$mixedModelTable1 <- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     results <- mixedModelResults()[["coVariate1st"]] 
-    browser()
+
     out <- print(xtable(results, caption=paste("Fixed effects of",
                                                input$selectedCovariate1st,
                                                "for", 

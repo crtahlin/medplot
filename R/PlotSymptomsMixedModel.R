@@ -67,7 +67,6 @@ mixedModel <- function(data,
   # the other measurement levels
   nonReferenceMeasurements <- describeComparison(data, measurementVar)[["nonReferenceLevels"]]
    
-  browser()
   # prepare data frame for the results, depending on what kind of response variable we have
   if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) { 
     # if 1st covariate is multilevel factor
