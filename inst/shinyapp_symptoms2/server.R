@@ -325,7 +325,7 @@ shinyServer(function(input, output, session) {
                   label="Choose outcome variables to analyse:", 
                   choices=dataVariableNames(),
                   multiple=TRUE,
-                  if (input$dataFileType=="Demo"){selected=c(# "Fatigue","Malaise",
+                  if (input$dataFileType=="Demo"){selected=c("Fatigue","Malaise",
                     "Arthralgia","Headache",
                     "Myalgia","Back.C",
                     "Dizziness", "Nausea",
