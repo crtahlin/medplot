@@ -393,7 +393,7 @@ shinyServer(function(input, output, session) {
                      "Threshold for positivity of the outcome variables:",
                      value=0,
                      min=0,
-                     max=10)
+                     max=9)
       }}
   })
   
