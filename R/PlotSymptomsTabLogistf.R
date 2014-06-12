@@ -103,11 +103,11 @@ tabelizeLogistf <- function (data,
   for (symptom in selectedSymptoms) {
     model <- logistf(data[,symptom] ~ data[,covariate], family="binomial")
     table[table["Variable"]==symptom, "Odds ratio"] <- 
-      exp(model$coef[2])
+      format(exp(model$coef[2]), digits=2)
     table[table["Variable"]==symptom, "95% conf. interval"] <- 
-      paste(format(exp(model$ci.lower[2]), nsmall=2, digits=2),
+      paste(format(exp(model$ci.lower[2]), digits=2),
             " to ",
-            format(exp(model$ci.upper[2]), nsmall=2, digits=2))
+            format(exp(model$ci.upper[2]), digits=2))
     table2[table2["Variable"]==symptom, "OR"] <- exp(model$coef[2])
     table2[table2["Variable"]==symptom, "CILower"] <- exp(model$ci.lower[2])
     table2[table2["Variable"]==symptom, "CIUpper"] <- exp(model$ci.upper[2])

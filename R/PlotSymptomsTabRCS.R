@@ -117,7 +117,7 @@ tabelizeRCS <- function(data.all,
     table[table[,"Variable"]==symptom, "P value"] <- 
       ifelse(anova(model, test="Chi")[2,5]<0.001,
              "P<0.001", 
-             paste(round(anova(model, test="Chi")[2,5],4)))
+             paste(format(round(anova(model, test="Chi")[2,5],4), digits=2)))
   }
   return(table)
 }

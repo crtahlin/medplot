@@ -31,11 +31,11 @@ tabelizeLogist <- function(data,
   for (symptom in selectedSymptoms) {
     model <- glm(data[,symptom] ~ data[,covariate], family=binomial())
     table[table["Variable"]==symptom, "Odds ratio"] <- 
-      exp(model$coef[2])
+      format(exp(model$coef[2]), digits=2)
     table[table["Variable"]==symptom, "95% conf. interval"] <- 
-      paste(format(exp(confint(model)[2,1]), nsmall=2, digits=2),
+      paste(format(exp(confint(model)[2,1]), digits=2),
             " to ",
-            format(exp(confint(model)[2,2]), nsmall=2, digits=2))
+            format(exp(confint(model)[2,2]), digits=2))
     table2[table2["Variable"]==symptom, "OR"] <- exp(model$coef[2])
     table2[table2["Variable"]==symptom, "CILower"] <- exp(confint(model)[2,1])
     table2[table2["Variable"]==symptom, "CIUpper"] <- exp(confint(model)[2,2])

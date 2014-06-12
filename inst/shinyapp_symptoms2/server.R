@@ -762,7 +762,7 @@ output$plotMedians <- renderPlot({
 }, height=numRowsMedianPlot)
 
 # Proportions tables
-output$tableforProportions <- renderTable({
+output$tableforProportions <- renderDataTable({
   if(!is.null(dataFilteredwithThreshold())) {
     if(input$treatasBinary==TRUE){
       
@@ -772,7 +772,7 @@ output$tableforProportions <- renderTable({
                                                selectedSymptoms=input$selectedSymptoms) 
       return(out)
     }}
-})
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Proportions graph
 output$plotPresence <- renderPlot({
@@ -840,7 +840,7 @@ output$UIdoPvalueAdjustments <- renderUI({
 
 # Tables
 # Table of proportions of patients in a group with a symptom ####
-output$tablePropGroups <- renderTable ({  
+output$tablePropGroups <- renderDataTable ({  
   if(!(is.null(dataFiltered()) || is.null(input$thresholdValue))){
     if(input$treatasBinary==TRUE){
       
@@ -862,7 +862,7 @@ output$tablePropGroups <- renderTable ({
       )
       return(out)
     }}
-  })
+  }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # text - explaining tablePropGroups
 output$textTablePropGroups <- renderUI({
@@ -877,7 +877,7 @@ output$textTablePropGroups <- renderUI({
 })
 
 # Table with medians of symptoms values in a group ####
-output$tableMedianGroups <- renderTable ({
+output$tableMedianGroups <- renderDataTable ({
   if(!(is.null(dataFiltered()) || is.null(input$measurementSelectedprop) )){
     if(input$treatasBinary==FALSE){
       
@@ -897,7 +897,7 @@ output$tableMedianGroups <- renderTable ({
                                thresholdValue=input$thresholdValue,
                                doPValueAdjustments=input$doPValueAdjustments)
       }}
-  })
+  }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # text - explainig tableMedianGroups
 output$textTableMedianGroups <- renderUI({
@@ -1094,12 +1094,12 @@ output$plotLogistf2 <- renderPlot({
 }, height=numRowsLogistf)
 
 # table - logistf ####
-output$tableLogistf <- renderTable({
+output$tableLogistf <- renderDataTable({
   if(!is.null(resultsLogistf()) ){
     if(regressionScenario()=="scenarioLogistf") {
       resultsLogistf()[["printableResultsTable"]]
     }}
-})
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Scenario - logistic regression (without Firth correction) ####
 resultsLogist <- reactive({
@@ -1117,12 +1117,12 @@ resultsLogist <- reactive({
 
 
 # table - logist ####
-output$tableLogist <- renderTable({
+output$tableLogist <- renderDataTable({
   if(!is.null(resultsLogist()) ){
     if(regressionScenario()=="scenarioLogist") {
       resultsLogist()[["printableResultsTable"]]
     }}
-})
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 
 # plot - logist ####
@@ -1161,12 +1161,12 @@ resultsLinear <- reactive({
 })
 
 # table - linear ####
-output$tableLinear <- renderTable({
+output$tableLinear <- renderDataTable({
   if(!is.null(resultsLinear())){
     if (regressionScenario()=="scenarioLinearModel") {
       resultsLinear()[["printableResultsTable"]]
     }}
-})
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # plot - linear ####
 output$plotLinear <- renderPlot({
@@ -1207,7 +1207,7 @@ output$plotRCS=renderPlot({
 }, height=numRowsRCSModel)
 
 # table - RCS table ####
-output$tableRCS <- renderTable({
+output$tableRCS <- renderDataTable({
   
   if(!is.null(regressionScenario())){
     if (regressionScenario()=="scenarioRCSModel") {
@@ -1220,7 +1220,7 @@ output$tableRCS <- renderTable({
                   binaryVar=input$treatasBinary
       )
     }}
-})
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # TAB - Regression model : all evaluations ####
 # Menu
@@ -1270,6 +1270,7 @@ mixedModelResults <- reactive({
 # Table 1 ####
 output$mixedModelTable1 <- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
+    #results <- mixedModelResults()[["printablecoVariate1st"]] 
     results <- mixedModelResults()[["coVariate1st"]] 
     
     out <- print(xtable(results, caption=paste("Fixed effects of",
@@ -1298,6 +1299,7 @@ output$mixedModelGraph1 <- renderPlot({
 output$mixedModelTable2 <- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
+      #results <- mixedModelResults()[["printablemeasurementVar"]] 
       results <- mixedModelResults()[["measurementVar"]] 
       
       out <- print(xtable(results, caption=paste("Fixed effects of",
@@ -1327,6 +1329,7 @@ output$mixedModelGraph2 <- renderPlot({
 output$mixedModelTable3 <- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+      #results <- mixedModelResults()[["printabledaysSinceInclusion"]] 
       results <- mixedModelResults()[["daysSinceInclusion"]] 
       
       out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),

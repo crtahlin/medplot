@@ -95,7 +95,7 @@ shinyUI(pageWithSidebar(
                plotOutput("plotPyramid", height="auto"),
                uiOutput("selectEvaluationTime2"),
                dataTableOutput("tableforBoxplots"),
-               tableOutput("tableforProportions"),
+               dataTableOutput("tableforProportions"),
                plotOutput("plotPresence", height="auto"),
                plotOutput("plotMedians", height="auto")
                
@@ -115,10 +115,10 @@ shinyUI(pageWithSidebar(
                uiOutput("UIpropTable"),
                uiOutput("UIdoPvalueAdjustments"),
                
-               tableOutput("tablePropGroups"),
+               dataTableOutput("tablePropGroups"),
                uiOutput("textTablePropGroups"),
                
-               tableOutput("tableMedianGroups"),
+               dataTableOutput("tableMedianGroups"),
                uiOutput("textTableMedianGroups")
                ),
               
@@ -145,19 +145,19 @@ shinyUI(pageWithSidebar(
                # Logistic regression with Firth correction
                # plotOutput("plotLogistf", height="auto"),
                plotOutput("plotLogistf2", height="auto"),
-               tableOutput("tableLogistf"),
+               dataTableOutput("tableLogistf"),
                
                # Logistic regression 
                plotOutput("plotLogist", height="auto"),
-               tableOutput("tableLogist"),
+               dataTableOutput("tableLogist"),
                
                # Linear regression
                plotOutput("plotLinear", height="auto"),
-               tableOutput("tableLinear"),
+               dataTableOutput("tableLinear"),
                
                # RCS regression
                plotOutput("plotRCS", height="100%"),
-               tableOutput("tableRCS")
+               dataTableOutput("tableRCS")
         ),
       
       # TAB - Regression model : all evaluation times ####

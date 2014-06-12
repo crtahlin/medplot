@@ -72,12 +72,16 @@ mixedModel <- function(data,
     # if 1st covariate is multilevel factor
     resultscoVariate1st <- data.frame(expand.grid(Variable=selectedSymptoms,
                                                   CovariateLevel=referenceValue))
+    
     } else { # if the 1st covariate is binary factor or numerical
       resultscoVariate1st <- data.frame(Variable=selectedSymptoms) 
+      
     }
   resultsMeasurementVar <- data.frame(expand.grid(Variable=selectedSymptoms,
                                                   Measurement=nonReferenceMeasurements))
+
   resultsDaysSinceInclusion <- data.frame(Variable=selectedSymptoms)
+  
 
   # The logic ####
   # cycle through response variables
@@ -125,17 +129,19 @@ mixedModel <- function(data,
         
         resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
                               resultscoVariate1st["CovariateLevel"]==level,
-                              "OR"] <- tempResult[["Estimate"]] 
+                              "OR"] <- tempResult[["Estimate"]]
+        
         resultscoVariate1st[resultscoVariate1st["Variable"]==symptom & 
                               resultscoVariate1st["CovariateLevel"]==level,
                               "ORCILower"] <- tempResult[["CILower"]] 
         resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
                               resultscoVariate1st["CovariateLevel"]==level,
                               "ORCIUpper"] <- tempResult[["CIUpper"]] 
+        
         resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
                               resultscoVariate1st["CovariateLevel"]==level,
-                              "ORPValue"] <- 
-          tempResult[["PValue"]] 
+                              "ORPValue"] <-  tempResult[["PValue"]] 
+       
         rm(tempResult)
       
       }
@@ -294,11 +300,51 @@ mixedModel <- function(data,
       }
     }
   }
+  
+  # generate printable results tables
+  # for outcome non-binary
+  if (treatasBinary==FALSE) {
+  # for covariate1st
+    # TODO: for scenario with multilevel categorical
+    # TODO: all scenarios for binary variables
+  printableResultsCoVariate1st <- cbind(format(resultscoVariate1st$Variable, digits=2),
+                                        format(resultscoVariate1st$beta, digits=2),
+                                        paste(format(resultscoVariate1st$betaCILower, digits=2),
+                                              "to",
+                                              format(resultscoVariate1st$betaCIUpper, digits=2)),
+                                        format(resultscoVariate1st$betaPValue, digits=2))
+  colnames(printableResultsCoVariate1st) <- c("Variable", "Beta", "95% conf. interval", "P Value" )
+  # for evaluation occasion
+  printableResultsMeasurementVar <- cbind(format(resultsMeasurementVar$Variable, digits=2),
+                                          format(resultsMeasurementVar$Measurement, digits=2),
+                                          format(resultsMeasurementVar$beta, digits=2),
+                                          paste(format(resultsMeasurementVar$betaCILower, digits=2),
+                                                "to",
+                                                format(resultsMeasurementVar$betaCIUpper, digits=2)),
+                                          format(resultsMeasurementVar$betaPValue, digits=2))
+  colnames(printableResultsMeasurementVar) <- c("Variable","Measurement" ,"Beta",
+                                                "95% conf. interval", "P Value" )
+  # for timesinceinclusion
+  printableResultsDaysSinceInclusion <- cbind(format(resultsDaysSinceInclusion$Variable, digits=2),
+                                              format(resultsDaysSinceInclusion$beta, digits=2),
+                                              paste(format(resultsDaysSinceInclusion$betaCILower, digits=2),
+                                                    "to",
+                                                    format(resultsDaysSinceInclusion$betaCIUpper, digits=2)),
+                                              format(resultsDaysSinceInclusion$betaPValue, digits=2))
+  colnames(printableResultsDaysSinceInclusion) <- c("Variable","Beta", "95% conf. interval", "P Value" )
+  
+  
+  }
+  
+  
   return(list(coVariate1st=resultscoVariate1st,
+              printablecoVariate1st=printableResultsCoVariate1st,
               coVariate1stComparison=coVariate1stComparison,
               measurementVar=resultsMeasurementVar,
+              printablemeasurementVar=printableResultsMeasurementVar,
               measurementVarComparison=measurementVarComparison,
-              daysSinceInclusion=resultsDaysSinceInclusion ))
+              daysSinceInclusion=resultsDaysSinceInclusion,
+              printabledaysSinceInclusion=printableResultsDaysSinceInclusion))
 }
 
 calculateDaysSinceInclusion <- function (data,

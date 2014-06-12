@@ -31,11 +31,11 @@ tabelizeLinear <- function(data,
   for (symptom in selectedSymptoms) {
     model <- glm(data[,symptom] ~ data[,covariate], family=gaussian())
     table[table["Variable"]==symptom, "Beta (slope)"] <- 
-      (model$coef[2])
+      format(model$coef[2], digits=2)
     table[table["Variable"]==symptom, "95% conf. interval"] <- 
-      paste(format((confint(model)[2,1]), nsmall=2, digits=2),
+      paste(format((confint(model)[2,1]), digits=2),
             " to ",
-            format((confint(model)[2,2]), nsmall=2, digits=2))
+            format((confint(model)[2,2]), digits=2))
     table2[table2["Variable"]==symptom, "beta"] <- (model$coef[2])
     table2[table2["Variable"]==symptom, "CILower"] <- (confint(model)[2,1])
     table2[table2["Variable"]==symptom, "CIUpper"] <- (confint(model)[2,2])

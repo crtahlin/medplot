@@ -195,7 +195,7 @@ tabelizeBoxplotsforMeasurement <- function(measurement,
     res <- boot.ci(temp, type="perc", conf=c(0.95))
     
     result[result[,"Variables"]==symptom, "95% CI (bootstrap)"] <-
-      paste(format(res$percent[4], nsmall=2, digits=2), "to", format(res$percent[5], nsmall=2, digits=2) )
+      paste(format(res$percent[4], digits=2), "to", format(res$percent[5], digits=2) )
     result2[result2[,"Variables"]==symptom,"CILower"] <- res$percent[4]
     result2[result2[,"Variables"]==symptom,"CIUpper"] <- res$percent[5]
     
@@ -232,10 +232,10 @@ tabelizeProportionsforMeasurement <- function(measurement,
     
     result[result[,"Variables"]==symptom,"All"] <- all      
     
-    result[result[,"Variables"]==symptom,"Proportion"] <- res$estimate
+    result[result[,"Variables"]==symptom,"Proportion"] <- format(res$estimate, digits=2)
     
     result[result[,"Variables"]==symptom, "95% CI for proportion"] <-
-      paste(format(res$conf.int[1], nsmall=2, digits=2), "to", format(res$conf.int[2], nsmall=2, digits=2) )
+      paste(format(res$conf.int[1], digits=2), "to", format(res$conf.int[2], digits=2) )
     
     result[result[,"Variables"]==symptom, "# NAs"] <-
       sum(is.na(data[,symptom]))

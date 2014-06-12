@@ -159,11 +159,11 @@ tablePropWithSymptoms <- function (data,
     results <- prop.test(testMatrix)
     
     tableData[tableData["Variable"]==symptom, column1Name ] <- 
-      results$estimate[1]
+      format(results$estimate[1], digits=2)
     tableData[tableData["Variable"]==symptom, column2Name ] <- 
       paste(group1Positive, "/", group1Positive+group1Negative)
     tableData[tableData["Variable"]==symptom, column3Name ] <- 
-      results$estimate[2]
+      format(results$estimate[2], digits=2)
     tableData[tableData["Variable"]==symptom, column4Name ] <- 
       paste(group2Positive, "/", group2Positive+group2Negative)
     tableData[tableData["Variable"]==symptom, column5Name ] <- 
@@ -177,11 +177,11 @@ tablePropWithSymptoms <- function (data,
   if (doPValueAdjustments==TRUE) {
   
   # add a Holm-Bonferoni corrected P value column
-  tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
+  tableData[, column7Name] <- format(p.adjust(p=tableData[, column5Name], method="holm"), digits=2)
   # add a Benjamini-Hochberg Q-value
-  tableData[, column10Name] <- p.adjust(p=tableData[, column5Name], method="BH")
+  tableData[, column10Name] <- format(p.adjust(p=tableData[, column5Name], method="BH"), digits=2)
   # add a Benjamini-Yekutieli Q-value - see ?p.adjust
-  tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
+  tableData[, column8Name] <- format(p.adjust(p=tableData[, column5Name], method="BY"), digits=2)
   
   
   # OBSOLETE CODE FOR PERMUTATION CALCULATED P VALUES (WITHOUT CORRECTION)   
@@ -213,7 +213,7 @@ permutationCorectedPValue <- permCorrPValue(data=data,
 for (symptom in symptomsNames) {
   # add a permutation calculated corrected P value
   tableData[tableData["Variable"]==symptom, column9Name ] <- 
-    permutationCorectedPValue[symptom]
+    format(permutationCorectedPValue[symptom], digits=2)
 }
 }
 
@@ -280,11 +280,11 @@ tableMediansWithSymptoms <- function (data,
     
     result <- wilcox.test(x=group1Data[,symptom], y=group2Data[,symptom])
     
-    tableData[tableData["Variable"]==symptom, column1Name ] <- group1Median
+    tableData[tableData["Variable"]==symptom, column1Name ] <- format(group1Median, digits=2)
     tableData[tableData["Variable"]==symptom, column2Name ] <- paste(group1IQR[1], " to ", group1IQR[2])
-    tableData[tableData["Variable"]==symptom, column3Name ] <- group2Median
+    tableData[tableData["Variable"]==symptom, column3Name ] <- format(group2Median, digits=2)
     tableData[tableData["Variable"]==symptom, column4Name ] <- paste(group2IQR[1], " to ", group2IQR[2])
-    tableData[tableData["Variable"]==symptom, column5Name ] <- format(result$p.value, digits=2)
+    tableData[tableData["Variable"]==symptom, column5Name ] <- format(result$p.value, digits=2, nsmall=2)
     # tableData[tableData["Variable"]==symptom, column6Name ] <- 
     #   paste(format(results$conf.int[[1]], digits=2),
     #         format(results$conf.int[[2]], digits=2), sep=";")
@@ -294,11 +294,11 @@ tableMediansWithSymptoms <- function (data,
   
   if (doPValueAdjustments==TRUE) {
   # add a Holm-Bonferoni corrected P value column
-  tableData[, column7Name] <- p.adjust(p=tableData[, column5Name], method="holm")
+  tableData[, column7Name] <- format(p.adjust(p=tableData[, column5Name], method="holm"), digits=2, nsmall=2)
   # add a Benjamini-Hochberg Q-value - see ?p.adjust
-  tableData[, column10Name] <- p.adjust(p=tableData[, column5Name], method="BH")
+  tableData[, column10Name] <- format(p.adjust(p=tableData[, column5Name], method="BH"), digits=2, nsmall=2)
   # add a Benjamini-Yekutieli Q-value - see ?p.adjust
-  tableData[, column8Name] <- p.adjust(p=tableData[, column5Name], method="BY")
+  tableData[, column8Name] <- format(p.adjust(p=tableData[, column5Name], method="BY"), digits=2, nsmall=2)
   
 #   for (symptom in symptomsNames) {
 #     tableData[tableData["Variable"]==symptom, column9Name ] <- 
@@ -326,7 +326,7 @@ permutationCorectedPValue <- permCorrPValue(data=data,
 for (symptom in symptomsNames) {
   # add a permutation calculated corrected P value
   tableData[tableData["Variable"]==symptom, column9Name ] <- 
-    permutationCorectedPValue[symptom]
+    format(permutationCorectedPValue[symptom], digits=2, nsmall=2)
 }
 }
 
