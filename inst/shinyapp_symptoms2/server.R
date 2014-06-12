@@ -714,7 +714,7 @@ output$plotPyramid <- renderPlot ({
       }}}, silent=TRUE)
 } ,height=numRowsProportions)
 
-# calculate data for tables of medians & CI plots
+# calculate data for tables of medians & CI plots ####
 dataforSummaryNonBinary <- reactive({
   if(!is.null(dataFiltered())) {
     if(input$treatasBinary==FALSE){
@@ -732,8 +732,8 @@ dataforSummaryNonBinary <- reactive({
     }}
 })
 
-# Median tables
-output$tableforBoxplots <- renderTable({
+# Median tables ####
+output$tableforBoxplots <- renderDataTable({
   if(!is.null(dataFiltered())) {
     if(input$treatasBinary==FALSE){
       return(dataforSummaryNonBinary()[["printableTable"]])
@@ -745,7 +745,7 @@ output$tableforBoxplots <- renderTable({
       #       
       #       return(out)
     } }
-})
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Median plot
 output$plotMedians <- renderPlot({

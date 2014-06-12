@@ -94,7 +94,7 @@ shinyUI(pageWithSidebar(
                #uiOutput("tableforBoxplots")
                plotOutput("plotPyramid", height="auto"),
                uiOutput("selectEvaluationTime2"),
-               tableOutput("tableforBoxplots"),
+               dataTableOutput("tableforBoxplots"),
                tableOutput("tableforProportions"),
                plotOutput("plotPresence", height="auto"),
                plotOutput("plotMedians", height="auto")
