@@ -1268,21 +1268,32 @@ mixedModelResults <- reactive({
 })
 
 # Table 1 ####
-output$mixedModelTable1 <- renderUI({
+output$mixedModelTable1Caption <- renderText(
   if(!is.null(input$selectedMixedModelType)) {
-    #results <- mixedModelResults()[["printablecoVariate1st"]] 
-    results <- mixedModelResults()[["coVariate1st"]] 
     
-    out <- print(xtable(results, caption=paste("Fixed effects of",
-                                               input$selectedCovariate1st,
-                                               "for", 
-                                               mixedModelResults()[["coVariate1stComparison"]])),
-                 type="html",
-                 html.table.attributes='class="data table table-bordered table-condensed"',
-                 caption.placement="top")
-    return(div(HTML(out),class="shiny-html-output"))
-  }
+  paste("Fixed effects of",
+        input$selectedCovariate1st,
+        "for", 
+        mixedModelResults()[["coVariate1stComparison"]])
   })
+
+output$mixedModelTable1 <- renderDataTable({
+#<- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
+    results <- mixedModelResults()[["printablecoVariate1st"]] 
+    #results <- mixedModelResults()[["coVariate1st"]] 
+    
+#     out <- print(xtable(results, caption=paste("Fixed effects of",
+#                                                input$selectedCovariate1st,
+#                                                "for", 
+#                                                mixedModelResults()[["coVariate1stComparison"]])),
+#                  type="html",
+#                  html.table.attributes='class="data table table-bordered table-condensed"',
+#                  caption.placement="top")
+#     return(div(HTML(out),class="shiny-html-output"))
+    return(results)
+  }
+  }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 1 ####
 output$mixedModelGraph1 <- renderPlot({
@@ -1296,23 +1307,36 @@ output$mixedModelGraph1 <- renderPlot({
 }, height=numRowsMixedModels1)
 
 # Table 2 ####
-output$mixedModelTable2 <- renderUI({
+output$mixedModelTable2Caption <- renderText(
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMmeasurement") {
+      paste("Fixed effects of",
+            input$measurementVar,
+            "for T=",
+            mixedModelResults()[["measurementVarComparison"]],
+            "used as reference")
+    }}
+  )
+
+output$mixedModelTable2 <- renderDataTable({
+  #renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
       #results <- mixedModelResults()[["printablemeasurementVar"]] 
       results <- mixedModelResults()[["measurementVar"]] 
       
-      out <- print(xtable(results, caption=paste("Fixed effects of",
-                                                 input$measurementVar,
-                                                 "for T=",
-                                                 mixedModelResults()[["measurementVarComparison"]],
-                                                 "used as reference")),
-                   type="html",
-                   html.table.attributes='class="data table table-bordered table-condensed"',
-                   caption.placement="top")
-      return(div(HTML(out),class="shiny-html-output"))
+#       out <- print(xtable(results, caption=paste("Fixed effects of",
+#                                                  input$measurementVar,
+#                                                  "for T=",
+#                                                  mixedModelResults()[["measurementVarComparison"]],
+#                                                  "used as reference")),
+#                    type="html",
+#                    html.table.attributes='class="data table table-bordered table-condensed"',
+#                    caption.placement="top")
+#       return(div(HTML(out),class="shiny-html-output"))
+      return(results)
     }}
-  })
+  }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 2 ####
 output$mixedModelGraph2 <- renderPlot({
@@ -1326,19 +1350,28 @@ output$mixedModelGraph2 <- renderPlot({
 }, height=numRowsMixedModels2)
 
 # Table 3 ####
-output$mixedModelTable3 <- renderUI({
+output$mixedModelTable3Caption <- renderText(
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+  paste("Fixed effects of time since inclusion in the study")
+    }}
+  )
+
+output$mixedModelTable3 <- renderDataTable({
+  #renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
       #results <- mixedModelResults()[["printabledaysSinceInclusion"]] 
       results <- mixedModelResults()[["daysSinceInclusion"]] 
       
-      out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
-                   type="html",
-                   html.table.attributes='class="data table table-bordered table-condensed"',
-                   caption.placement="top")
-      return(div(HTML(out),class="shiny-html-output"))
+#       out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
+#                    type="html",
+#                    html.table.attributes='class="data table table-bordered table-condensed"',
+#                    caption.placement="top")
+#       return(div(HTML(out),class="shiny-html-output"))
+      return(results)
     }}
-  })
+  }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 3 ####
 output$mixedModelGraph3 <- renderPlot({

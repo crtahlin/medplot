@@ -301,42 +301,152 @@ mixedModel <- function(data,
     }
   }
   
-  # generate printable results tables
-  # for outcome non-binary
-  if (treatasBinary==FALSE) {
-  # for covariate1st
-    # TODO: for scenario with multilevel categorical
-    # TODO: all scenarios for binary variables
-  printableResultsCoVariate1st <- cbind(format(resultscoVariate1st$Variable, digits=2),
-                                        format(resultscoVariate1st$beta, digits=2),
-                                        paste(format(resultscoVariate1st$betaCILower, digits=2),
-                                              "to",
-                                              format(resultscoVariate1st$betaCIUpper, digits=2)),
-                                        format(resultscoVariate1st$betaPValue, digits=2))
-  colnames(printableResultsCoVariate1st) <- c("Variable", "Beta", "95% conf. interval", "P Value" )
-  # for evaluation occasion
-  printableResultsMeasurementVar <- cbind(format(resultsMeasurementVar$Variable, digits=2),
-                                          format(resultsMeasurementVar$Measurement, digits=2),
-                                          format(resultsMeasurementVar$beta, digits=2),
-                                          paste(format(resultsMeasurementVar$betaCILower, digits=2),
-                                                "to",
-                                                format(resultsMeasurementVar$betaCIUpper, digits=2)),
-                                          format(resultsMeasurementVar$betaPValue, digits=2))
-  colnames(printableResultsMeasurementVar) <- c("Variable","Measurement" ,"Beta",
-                                                "95% conf. interval", "P Value" )
-  # for timesinceinclusion
-  printableResultsDaysSinceInclusion <- cbind(format(resultsDaysSinceInclusion$Variable, digits=2),
-                                              format(resultsDaysSinceInclusion$beta, digits=2),
-                                              paste(format(resultsDaysSinceInclusion$betaCILower, digits=2),
-                                                    "to",
-                                                    format(resultsDaysSinceInclusion$betaCIUpper, digits=2)),
-                                              format(resultsDaysSinceInclusion$betaPValue, digits=2))
-  colnames(printableResultsDaysSinceInclusion) <- c("Variable","Beta", "95% conf. interval", "P Value" )
-  
-  
-  }
-  
-  
+#   # generate printable results tables
+#   # for outcome non-binary
+#   if (treatasBinary==FALSE) {
+#   # for covariate1st
+#     # TODO: for scenario with multilevel categorical
+#     # TODO: all scenarios for binary variables
+#   printableResultsCoVariate1st <- cbind(format(resultscoVariate1st$Variable, digits=2),
+#                                         format(resultscoVariate1st$beta, digits=2),
+#                                         paste(format(resultscoVariate1st$betaCILower, digits=2),
+#                                               "to",
+#                                               format(resultscoVariate1st$betaCIUpper, digits=2)),
+#                                         format(resultscoVariate1st$betaPValue, digits=2))
+#   colnames(printableResultsCoVariate1st) <- c("Variable", "Beta", "95% conf. interval", "P Value" )
+#   # for evaluation occasion
+#   printableResultsMeasurementVar <- cbind(format(resultsMeasurementVar$Variable, digits=2),
+#                                           format(resultsMeasurementVar$Measurement, digits=2),
+#                                           format(resultsMeasurementVar$beta, digits=2),
+#                                           paste(format(resultsMeasurementVar$betaCILower, digits=2),
+#                                                 "to",
+#                                                 format(resultsMeasurementVar$betaCIUpper, digits=2)),
+#                                           format(resultsMeasurementVar$betaPValue, digits=2))
+#   colnames(printableResultsMeasurementVar) <- c("Variable","Measurement" ,"Beta",
+#                                                 "95% conf. interval", "P Value" )
+#   # for timesinceinclusion
+#   printableResultsDaysSinceInclusion <- cbind(format(resultsDaysSinceInclusion$Variable, digits=2),
+#                                               format(resultsDaysSinceInclusion$beta, digits=2),
+#                                               paste(format(resultsDaysSinceInclusion$betaCILower, digits=2),
+#                                                     "to",
+#                                                     format(resultsDaysSinceInclusion$betaCIUpper, digits=2)),
+#                                               format(resultsDaysSinceInclusion$betaPValue, digits=2))
+#   colnames(printableResultsDaysSinceInclusion) <- c("Variable","Beta", "95% conf. interval", "P Value" )
+#   
+#   
+#   }
+ # browser()
+
+# printable results for coVariate1st ####
+if ("OR" %in% colnames(resultscoVariate1st) ) { # OR scenario ####
+if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
+    printableResultsCoVariate1st <- data.frame("Variable"=resultscoVariate1st$Variable,
+                                               "Levels"= resultscoVariate1st$CovariateLevel,
+                                               "OR"=format(resultscoVariate1st$OR, digits=2),
+                                               "95% conf. interval"= paste(format(resultscoVariate1st$ORCILower, digits=2),
+                                                                           "to",
+                                                                           format(resultscoVariate1st$ORCIUpper, digits=2)),
+                                               "P Value"=format(resultscoVariate1st$ORPValue, digits=2), check.names=FALSE)
+
+} else { # non multilevel factor
+  printableResultsCoVariate1st <- data.frame("Variable"=resultscoVariate1st$Variable,
+                                             "OR"=format(resultscoVariate1st$OR, digits=2),
+                                             "95% conf. interval"= paste(format(resultscoVariate1st$ORCILower, digits=2),
+                                                                         "to",
+                                                                         format(resultscoVariate1st$ORCIUpper, digits=2)),
+                                             "P Value"=format(resultscoVariate1st$ORPValue, digits=2), check.names=FALSE)
+}}
+if ("beta" %in% colnames(resultscoVariate1st) ) { # beta scenario ####
+  if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
+    printableResultsCoVariate1st <- data.frame("Variable"=resultscoVariate1st$Variable,
+                                               "Levels"= resultscoVariate1st$CovariateLevel,
+                                               "Beta"=format(resultscoVariate1st$beta, digits=2),
+                                               "95% conf. interval"= paste(format(resultscoVariate1st$betaCILower, digits=2),
+                                                                           "to",
+                                                                           format(resultscoVariate1st$betaCIUpper, digits=2)),
+                                               "P Value"=format(resultscoVariate1st$betaPValue, digits=2), check.names=FALSE)
+    
+  } else { # non multilevel factor
+    printableResultsCoVariate1st <- data.frame("Variable"=resultscoVariate1st$Variable,
+                                               "Beta"=format(resultscoVariate1st$beta, digits=2),
+                                               "95% conf. interval"= paste(format(resultscoVariate1st$betaCILower, digits=2),
+                                                                           "to",
+                                                                           format(resultscoVariate1st$betaCIUpper, digits=2)),
+                                               "P Value"=format(resultscoVariate1st$betaPValue, digits=2), check.names=FALSE)
+  }}
+
+# printableResultsCoVariate1st <- data.frame()
+#   printableResultsCoVariate1st <- data.frame("Variable" = resultscoVariate1st$Variable,
+#                                              "Level" = as.character(tryCatch(signif(resultscoVariate1st$CovariateLevel, digits=2), silent=TRUE)),
+#                                         "Beta" = tryCatch(signif(resultscoVariate1st$beta, digits=2), finally=return("a")))
+#                                         
+#                                         ,
+#                                         "OR" = try(signif(resultscoVariate1st$OR, digits=2), silent=TRUE),
+#                                         "95% conf. interval"=paste(try(signif(resultscoVariate1st$betaCILower, digits=2), silent=TRUE),
+#                                                                    "to",
+#                                                                    try(signif(resultscoVariate1st$betaCIUpper, digits=2), silent=TRUE)),
+#                                         "95% conf. interval"=paste(try(signif(resultscoVariate1st$ORCILower, digits=2), silent=TRUE),
+#                                                                    "to",
+#                                                                    try(signif(resultscoVariate1st$ORCIUpper, digits=2), silent=TRUE)),
+#                                         "P Value"=try(signif(resultscoVariate1st$betaPValue, digits=2), silent=TRUE))
+
+# is.numeric(printableResultsCoVariate1st[,"Beta"])
+# str(printableResultsCoVariate1st[,"Beta"])
+# str(printableResultsCoVariate1st)
+# class(printableResultsCoVariate1st)
+
+
+printableResultsMeasurementVar <- data.frame()
+printableResultsDaysSinceInclusion <- data.frame()
+
+# printable results for MeasurementVar ####
+if ("OR" %in% colnames(resultsMeasurementVar) ) { # OR scenario ####
+        printableResultsMeasurementVar <-
+          data.frame("Variable"=resultsMeasurementVar$Variable,
+                     "Levels"= resultsMeasurementVar$Measurement,
+                     "OR"=format(resultsMeasurementVar$OR, digits=2),
+                     "95% conf. interval"= paste(format(resultsMeasurementVar$ORCILower, digits=2),
+                                                 "to",
+                                                 format(resultsMeasurementVar$ORCIUpper, digits=2)),
+                     "P Value"=format(resultsMeasurementVar$ORPValue, digits=2), check.names=FALSE)
+}
+
+if ("beta" %in% colnames(resultscoVariate1st) ) { # beta scenario ####
+         printableResultsMeasurementVar <- 
+           data.frame("Variable"=resultsMeasurementVar$Variable,
+                      "Levels"= resultsMeasurementVar$Measurement,
+                      "Beta"=format(resultsMeasurementVar$beta, digits=2),
+                      "95% conf. interval"= paste(format(resultsMeasurementVar$betaCILower, digits=2),
+                                                  "to",
+                                                  format(resultsMeasurementVar$betaCIUpper, digits=2)),
+                      "P Value"=format(resultsMeasurementVar$betaPValue, digits=2), check.names=FALSE)
+}
+
+
+# printable results for daysSinceInclusion ####
+if ("OR" %in% colnames(resultsDaysSinceInclusion) ) { # OR scenario ####
+      printableResultsDaysSinceInclusion <-
+        data.frame("Variable"=resultsDaysSinceInclusion$Variable,
+                   "Levels"= resultsDaysSinceInclusion$Measurement,
+                   "OR"=format(resultsDaysSinceInclusion$OR, digits=2),
+                   "95% conf. interval"= paste(format(resultsDaysSinceInclusion$ORCILower, digits=2),
+                                               "to",
+                                               format(resultsDaysSinceInclusion$ORCIUpper, digits=2)),
+                   "P Value"=format(resultsDaysSinceInclusion$ORPValue, digits=2), check.names=FALSE)
+}
+
+if ("beta" %in% colnames(resultsDaysSinceInclusion) ) { # beta scenario ####
+      printableResultsDaysSinceInclusion <- 
+        data.frame("Variable"=resultsDaysSinceInclusion$Variable,
+                   "Levels"= resultsDaysSinceInclusion$Measurement,
+                   "Beta"=format(resultsDaysSinceInclusion$beta, digits=2),
+                   "95% conf. interval"= paste(format(resultsDaysSinceInclusion$betaCILower, digits=2),
+                                               "to",
+                                               format(resultsDaysSinceInclusion$betaCIUpper, digits=2)),
+                   "P Value"=format(resultsDaysSinceInclusion$betaPValue, digits=2), check.names=FALSE)
+}
+
+
   return(list(coVariate1st=resultscoVariate1st,
               printablecoVariate1st=printableResultsCoVariate1st,
               coVariate1stComparison=coVariate1stComparison,
@@ -369,9 +479,9 @@ calculateDaysSinceInclusion <- function (data,
 }
 
 plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
-                                           coVariate1st,
-                                           coVariate1stReferenceValue,
-                                           treatasBinary) {
+                                            coVariate1st,
+                                            coVariate1stReferenceValue,
+                                            treatasBinary) {
   graphTitle <- paste("Fixed effects of", coVariate1st)
   
   # for binary response variable
