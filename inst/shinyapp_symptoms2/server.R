@@ -44,6 +44,12 @@ file.remove(list.files(paste0(x=getwd(), "/www/temp"), full.names=TRUE))
 # set number of processors for boot package
 options(boot.ncpus=Sys.getenv('NUMBER_OF_PROCESSORS'))
 
+#define a ggplot2 theme
+myTheme <- theme_bw() + 
+  theme(
+  text = element_text(size=18)
+  )
+
 # Main function -----------------------------------------------------------
 
 shinyServer(function(input, output, session) {
