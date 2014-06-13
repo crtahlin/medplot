@@ -63,7 +63,7 @@ shinyUI(pageWithSidebar(
                verbatimTextOutput("dataSummary")), 
       
       # TAB - Graphical exploration over time ####
-      tabPanel(title="Graphical exploration : time",
+      tabPanel(title="Graphical exploration",
                uiOutput("selectGraphOverTime"),
                
                # Profile plots
