@@ -21,27 +21,27 @@ summarizeData <- function(data,
   
   #how many measurement occasions
   num.measurement.occasions=length(unique(data[,measurementVar]))
-  cat(paste("Number of measurement occasions: ", num.measurement.occasions, "\n"))
+  cat(paste("Number of evaluation occasions: ", num.measurement.occasions, "\n"))
   
   #how many subjects were measured at each measurement occasion, treated as a data frame for better display
   num.measurement.per.occasion= as.data.frame(table(data[,measurementVar]))
-  dimnames(num.measurement.per.occasion)[[2]]=c("Measurement occasion",
+  dimnames(num.measurement.per.occasion)[[2]]=c("Evaluation occasion",
                                                 "Number of subjects")
   
-  cat("\nNumber of observations per measurement occasion \n")
+  cat("\nNumber of observations per evaluation occasion \n")
   
   #print(as.table(num.measurement.per.occasion))
   print(num.measurement.per.occasion)
   
   #how many times was a single subject measured
   num.measurement.per.patient=as.data.frame(table(table(data[,personIDVar]))  )
-  dimnames(num.measurement.per.patient)[[2]]=c("Number of measurements",
+  dimnames(num.measurement.per.patient)[[2]]=c("Number of evaluation",
                                                "Number of subjects")
   
-  cat("\nNumber of measurements per subject\n")
+  cat("\nNumber of evaluations per subject\n")
   print(num.measurement.per.patient)
   
-  cat("\nNumber of subjects with missing values (by measurement occasion, for the evaluated subjects) \n")
+  cat("\nNumber of subjects with missing values (by evaluation occasion, for the evaluated subjects) \n")
   #gets a table with the number of missing values for each variable, at each occasion
   num.missing.values.occ=addmargins((t(apply(data[,selectedSymptoms], 2, function(symptom) {tapply(symptom, INDEX=data[,measurementVar], FUN=function(x) sum(is.na(x)))}))))
   
@@ -68,7 +68,7 @@ summarizeData <- function(data,
   dimnames(summary.grouping.variable.occ2)[[2]]=levels.grouping
   dimnames(summary.grouping.variable.occ2)[[1]]=sort(unique(data[,measurementVar]))
   
-  cat("\nSummary of grouping variable data (per measurement occasion) \n")
+  cat("\nSummary of grouping variable data (per evaluation occasion) \n")
   print(addmargins(summary.grouping.variable.occ2))
   
 }
