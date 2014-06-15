@@ -45,7 +45,7 @@ plot <- ggplot() +
                      labels=abs(seq(0,1,by=0.2)),
                      minor_breaks=((seq(0,1, by=0.1)))) +
   # geom_vline(xintercept=0)+
-  myTheme + labs(title="Proportions of positive variables (with confidence intervals)",
+  myTheme() + labs(title="Proportions of positive variables (with confidence intervals)",
                     x= "Proportions")
 
 

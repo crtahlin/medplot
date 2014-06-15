@@ -489,7 +489,7 @@ plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
       if ("CovariateLevel" %in% colnames(calculatedStatistics)) {facet_grid(CovariateLevel ~ .)}
   }
   
-  plot <- plot + myTheme + labs(title=graphTitle,
+  plot <- plot + myTheme() + labs(title=graphTitle,
                                    x= xlabLabel)
   return(plot)  
 }
@@ -527,7 +527,7 @@ plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
       facet_grid(Measurement ~ .)  
   }
   
-  plot <- plot + myTheme + labs(title=graphTitle,
+  plot <- plot + myTheme() + labs(title=graphTitle,
                                    x= xlabLabel)
   return(plot)  
 }
@@ -562,7 +562,7 @@ plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
       geom_vline(xintercept=0)
   }
   
-  plot <- plot + myTheme + labs(title=graphTitle,
+  plot <- plot + myTheme() + labs(title=graphTitle,
                                    x= xlabLabel)
   return(plot)  
 }

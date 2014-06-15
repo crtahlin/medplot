@@ -369,7 +369,7 @@ plotPropWithSymptomsCI <- function (data,
                        labels=abs(seq(-1,1,by=0.2)),
                        minor_breaks=((seq(-1,1, by=0.1)))) +
     geom_vline(xintercept=0)+
-    myTheme + labs(title="Proportions of positive values (with confidence intervals)",
+    myTheme() + labs(title="Proportions of positive values (with confidence intervals)",
                       x= "Proportions")
   
   

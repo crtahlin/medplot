@@ -80,7 +80,7 @@ plotTimelineProfiles <- function (data,
     # create the plot object
     p <- ggplot(data=dataMelted, aes(x=Measurement, y=value, group=PersonID, colour=PersonID)) +
       # draw points, draw lines, facet by symptom, use black & white theme
-      geom_point() + geom_line() +  facet_grid(variable + MemberOfGroup ~ .) + myTheme +
+      geom_point() + geom_line() +  facet_grid(variable + MemberOfGroup ~ .) + myTheme() +
       # add summary statistics at each point
       stat_summary(aes(group=1), geom="point", fun.y=median, shape=16, size=5, colour="red") 
     return(p)
@@ -90,7 +90,7 @@ plotTimelineProfiles <- function (data,
   # create the plot object
   p <- ggplot(data=dataMelted, aes(x=Measurement, y=value, group=PersonID, colour=PersonID)) +
     # draw points, draw lines, facet by symptom, use black & white theme
-    geom_point() + geom_line() +  facet_grid(variable~.) + myTheme +
+    geom_point() + geom_line() +  facet_grid(variable~.) + myTheme() +
     # add summary statistics at each point
     stat_summary(aes(group=1), geom="point", fun.y=median, shape=16, size=5, colour="red") 
   return(p)
@@ -130,7 +130,7 @@ p <- ggplot(data=dataMelted, aes(x=Measurement, y=value)) +
   geom_boxplot(width=0.5) +
   geom_jitter(alpha=I(1/5)) +
   facet_grid(variable ~.) +
-  myTheme +
+  myTheme() +
   ylab("Value") + xlab("Measurement occasion")
 }
 
@@ -140,7 +140,7 @@ if (faceting=="variablesOnXaxis") {
     geom_boxplot(width=0.5) +
     geom_jitter(alpha=I(1/5)) +   
     facet_grid(Measurement ~.) +
-    myTheme +
+    myTheme() +
     theme(axis.text.x=element_text(angle=90, hjust=1)) +
     ylab("Value") + xlab("Variable")
 }

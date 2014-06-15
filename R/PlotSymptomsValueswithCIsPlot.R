@@ -16,7 +16,7 @@ plotValueswithCIs <- function (data,
              mapping=aes_string(y=variableName, x=valueName),
              size=4, shape=21, fill="white") +
   #theme_bw() + 
-    myTheme +
+    myTheme() +
   labs(title=graphTitle, x= xLabel, y=yLabel) + 
     geom_vline(xintercept = vLine)
 

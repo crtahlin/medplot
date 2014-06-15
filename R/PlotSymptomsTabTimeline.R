@@ -83,7 +83,7 @@ plotSymptomsTimeline <- function (data,
  
   # Ploting function ####
   plot <-  ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value, colour = variable)) +
-    geom_point(shape = 1) + myTheme + 
+    geom_point(shape = 1) + myTheme() + 
     scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
                     guide="legend",
                     limits=c(1,10),
