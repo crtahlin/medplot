@@ -137,9 +137,9 @@ tablePropWithSymptoms <- function (data,
   column6Name <- paste("95% CI for the difference")
   if (doPValueAdjustments==TRUE) {
   column7Name <- paste("Adj. P value (Holm-Bonferroni)")
+  column9Name <- paste("Adj. P value (permutations)")
   column10Name <- paste("Q-value (Benjamini-Hochberg)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
-  column9Name <- paste("Adj. P value (permutations)")
   }
   
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
@@ -152,7 +152,7 @@ tablePropWithSymptoms <- function (data,
     group1Negative <- sum(!group1Data[,symptom], na.rm=TRUE)
     group2Positive <- sum(group2Data[,symptom], na.rm=TRUE)
     group2Negative <- sum(!group2Data[,symptom], na.rm=TRUE)
-    
+
     testMatrix <- matrix(c(group1Positive, group1Negative,
                            group2Positive, group2Negative),
                          byrow=TRUE, ncol=2)
@@ -257,9 +257,10 @@ tableMediansWithSymptoms <- function (data,
   
   if (doPValueAdjustments==TRUE) {
   column7Name <- paste("Adj. P value (Holm-Bonferroni)")
+  column9Name <- paste("Adj. P value (permutations)")
   column10Name <- paste("Q-value (Benjamini-Hochberg)")
   column8Name <- paste("Q-value (Benjamini-Yekutieli)")
-  column9Name <- paste("Adj. P value (permutations)")
+  
   }
   
   group1Data <- data[data[groupingVar]==groupingLevels[1],]
