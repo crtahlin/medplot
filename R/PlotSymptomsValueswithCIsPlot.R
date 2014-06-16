@@ -6,7 +6,8 @@ plotValueswithCIs <- function (data,
                                xLabel,
                                yLabel,
                                graphTitle,
-                               vLine=NULL) {
+                               vLine=NULL,
+                               variableOrder=NULL) {
   
   plot <- ggplot() +
   geom_errorbarh(data=data,
@@ -18,7 +19,8 @@ plotValueswithCIs <- function (data,
   #theme_bw() + 
     myTheme() +
   labs(title=graphTitle, x= xLabel, y=yLabel) + 
-    geom_vline(xintercept = vLine)
+    geom_vline(xintercept = vLine) +
+    scale_y_discrete(limits=rev(variableOrder))
 
 return(plot)  
 

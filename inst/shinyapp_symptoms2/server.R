@@ -756,8 +756,9 @@ output$plotMedians <- renderPlot({
                             CIUpperName="CIUpper",
                             xLabel="Medians",
                             yLabel="Variable",
-                            graphTitle="Medians of variables (with confidence intervals)",
-                            vLine=NULL)
+                            graphTitle="Medians of variables \n(with 95% confidence intervals)",
+                            vLine=NULL,
+                            variableOrder=input$selectedSymptoms)
   print(plot)
 }, height=numRowsMedianPlot)
 
@@ -1085,10 +1086,11 @@ output$plotLogistf2 <- renderPlot({
                                yLabel="Variables",
                                graphTitle=paste("Odds ratios and confidence intervals for",
                                                 resultsLogistf()[["referenceValue"]], 
-                                                "at evaluation T=",
+                                                "\n at evaluation T=",
                                                 input$selectedEvaluationTime,
                                                 "(using Firth correction)"),
-                               vLine=1) 
+                               vLine=1,
+                               variableOrder=input$selectedSymptoms) 
       print(out)
     }}
 }, height=numRowsLogistf)
@@ -1138,9 +1140,10 @@ output$plotLogist <- renderPlot({
                                yLabel="Variables",
                                graphTitle=paste("Odds ratios and confidence intervals for",
                                                 resultsLogist()[["referenceValue"]], 
-                                                "at evaluation T=",
+                                                "\n at evaluation T=",
                                                 input$selectedEvaluationTime),
-                               vLine=1)    
+                               vLine=1,
+                               variableOrder=input$selectedSymptoms)    
       
       print(out)
     }}
@@ -1181,9 +1184,10 @@ output$plotLinear <- renderPlot({
                                yLabel="Variables",
                                graphTitle=paste("Beta coefficients and confidence intervals for effects of",
                                                 input$selectedCovariate, 
-                                                "on selected variables at evaluation T=",
+                                                "\n on selected variables at evaluation T=",
                                                 input$selectedEvaluationTime),
-                               vLine=0)  
+                               vLine=0,
+                               variableOrder=input$selectedSymptoms)  
       print(out)
     }}
   }, height=numRowsLinear) 
