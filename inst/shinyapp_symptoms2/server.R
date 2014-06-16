@@ -50,7 +50,8 @@ shinyServer(function(input, output, session) {
   
   # VARIABLES ####
   # the working directory
-  workingDir <- paste0(gsub(pattern="/", replacement="\\\\", x=getwd()))
+  # workingDir <- paste0(gsub(pattern="/", replacement="\\\\", x=getwd()))
+  workingDir <- getwd()
   
   # FUNCTIONS ####
   #how much space should be used for the graphical output of different graphs?  
@@ -532,7 +533,8 @@ output$plotLasagna <- renderUI({
       
       # generate as many files as there are plots
       for (symptom in input$selectedSymptoms) {
-        filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"\\www\\temp"), fileext=".png")
+        #filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"\\www\\temp"), fileext=".png")
+        filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"/www/temp"), fileext=".png")
         
         # plot graph for each symptom
         #for(symptom in input$selectedSymptoms) {
