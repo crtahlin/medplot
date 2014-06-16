@@ -168,10 +168,10 @@ shinyUI(pageWithSidebar(
                dataTableOutput("mixedModelTable1"),
                plotOutput("mixedModelGraph1", height="auto"),               
                textOutput("mixedModelTable2Caption"),
-               tableOutput("mixedModelTable2"),
+               dataTableOutput("mixedModelTable2"),
                plotOutput("mixedModelGraph2", height="auto"),
                textOutput("mixedModelTable3Caption"),               
-               tableOutput("mixedModelTable3"),
+               dataTableOutput("mixedModelTable3"),
                plotOutput("mixedModelGraph3", height="auto")
       ),
       

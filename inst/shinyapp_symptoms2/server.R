@@ -1275,7 +1275,7 @@ mixedModelResults <- reactive({
 output$mixedModelTable1Caption <- renderText(
   if(!is.null(input$selectedMixedModelType)) {
     
-  paste("Fixed effects of",
+  paste("Table: Fixed effects of",
         input$selectedCovariate1st,
         "for", 
         mixedModelResults()[["coVariate1stComparison"]])
@@ -1284,6 +1284,7 @@ output$mixedModelTable1Caption <- renderText(
 output$mixedModelTable1 <- renderDataTable({
 #<- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
+    
     results <- mixedModelResults()[["printablecoVariate1st"]] 
     #results <- mixedModelResults()[["coVariate1st"]] 
     
@@ -1305,7 +1306,8 @@ output$mixedModelGraph1 <- renderPlot({
     print(plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
                                          coVariate1st=input$selectedCovariate1st,
                                          coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
-                                         treatasBinary=input$treatasBinary) 
+                                         treatasBinary=input$treatasBinary,
+                                         variableOrder=input$selectedSymptoms) 
     )
   }
 }, height=numRowsMixedModels1)
@@ -1314,7 +1316,7 @@ output$mixedModelGraph1 <- renderPlot({
 output$mixedModelTable2Caption <- renderText(
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
-      paste("Fixed effects of",
+      paste("Table: Fixed effects of",
             input$measurementVar,
             "for T=",
             mixedModelResults()[["measurementVarComparison"]],
@@ -1326,8 +1328,8 @@ output$mixedModelTable2 <- renderDataTable({
   #renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
-      #results <- mixedModelResults()[["printablemeasurementVar"]] 
-      results <- mixedModelResults()[["measurementVar"]] 
+      results <- mixedModelResults()[["printablemeasurementVar"]] 
+      #results <- mixedModelResults()[["measurementVar"]] 
       
 #       out <- print(xtable(results, caption=paste("Fixed effects of",
 #                                                  input$measurementVar,
@@ -1348,7 +1350,8 @@ output$mixedModelGraph2 <- renderPlot({
     if (input$selectedMixedModelType=="MMmeasurement") {
       print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
                                              measurementVar=input$measurementVar,
-                                             treatasBinary=input$treatasBinary) 
+                                             treatasBinary=input$treatasBinary,
+                                             variableOrder=input$selectedSymptoms) 
       )
     }}
 }, height=numRowsMixedModels2)
@@ -1357,7 +1360,7 @@ output$mixedModelGraph2 <- renderPlot({
 output$mixedModelTable3Caption <- renderText(
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
-  paste("Fixed effects of time since inclusion in the study")
+  paste("Table: Fixed effects of time since inclusion in the study")
     }}
   )
 
@@ -1365,8 +1368,8 @@ output$mixedModelTable3 <- renderDataTable({
   #renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
-      #results <- mixedModelResults()[["printabledaysSinceInclusion"]] 
-      results <- mixedModelResults()[["daysSinceInclusion"]] 
+      results <- mixedModelResults()[["printabledaysSinceInclusion"]] 
+      #results <- mixedModelResults()[["daysSinceInclusion"]] 
       
 #       out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
 #                    type="html",
@@ -1382,7 +1385,8 @@ output$mixedModelGraph3 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
       print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
-                                                 treatasBinary=input$treatasBinary) 
+                                                 treatasBinary=input$treatasBinary,
+                                                 variableOrder=input$selectedSymptoms) 
       )
     }}
 }, height=numRowsMixedModels3)

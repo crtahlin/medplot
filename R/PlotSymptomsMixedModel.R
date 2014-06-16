@@ -460,7 +460,8 @@ calculateDaysSinceInclusion <- function (data,
 plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
                                             coVariate1st,
                                             coVariate1stReferenceValue,
-                                            treatasBinary) {
+                                            treatasBinary, 
+                                            variableOrder) {
   graphTitle <- paste("Fixed effects of", coVariate1st)
   
   # for binary response variable
@@ -490,14 +491,16 @@ plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
   }
   
   plot <- plot + myTheme() + labs(title=graphTitle,
-                                   x= xlabLabel)
+                                   x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
+    
   return(plot)  
 }
 
 
 plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
                                               measurementVar,
-                                              treatasBinary) {
+                                              treatasBinary, 
+                                              variableOrder) {
   
   graphTitle <- paste("Fixed effects of", measurementVar)
   
@@ -528,13 +531,14 @@ plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
   }
   
   plot <- plot + myTheme() + labs(title=graphTitle,
-                                   x= xlabLabel)
+                                   x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
   return(plot)  
 }
 
 
 plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
-                                                  treatasBinary) {
+                                                  treatasBinary, 
+                                                  variableOrder) {
   
   graphTitle <- paste("Fixed effects of days since inclusion in the study")
   
@@ -563,6 +567,6 @@ plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
   }
   
   plot <- plot + myTheme() + labs(title=graphTitle,
-                                   x= xlabLabel)
+                                   x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
   return(plot)  
 }
