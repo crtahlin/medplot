@@ -42,7 +42,7 @@ pastePlotFilenames <- function(filenames) {
   out <- vector()
   for (file in filenames) {
     #data <- readPNG(file, native=TRUE)
-    out <- paste(out, img(src=paste0("/temp/",basename(file))))
+    out <- paste(out, img(src=paste0("./temp/",basename(file))))
     #out <- paste(out, (img(src=data)))
   }
   return(out)
