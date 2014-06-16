@@ -226,7 +226,9 @@ tabelizeProportionsforMeasurement <- function(measurement,
   for (symptom in selectedSymptoms) {
     positive <- sum(na.omit(data[ ,symptom]))
     all <- length(data[ ,symptom])
-    res <- prop.test(x=positive, n=all, conf.level=0.95)
+
+    #res <- prop.test(x=positive, n=all, conf.level=0.95)
+    res <- binom.test(x=positive, n=all, conf.level=0.95)
     
     result[result[,"Variables"]==symptom,"Positive"] <- positive
     
