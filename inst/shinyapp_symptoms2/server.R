@@ -1240,13 +1240,9 @@ output$selectCovariate1st <- renderUI({
 output$selectMixedModelType <- renderUI({
   selectInput(inputId="selectedMixedModelType",
               label="Select a mixed model type:",
-              choices=c("Model response with fixed effect of chosen covariate and
-                        random intercept for every subject"="MMsimple",
-                        "Model response with fixed effects of chosen covariate,
-                        evaluation occasion and random intercept for every subject"="MMmeasurement",
-                        "Model response with fixed effect of chosen covariate,
-                        time from inclusion in study and 
-                        random intercept for every subject"="MMtimeSinceInclusion"),
+              choices=c("Outcome ~ Covariate + Subject (random effect)"="MMsimple",
+                        "Outcome ~ Covariate + Evaluation occasion + Subject (random effect)"="MMmeasurement",
+                        "Outcome ~ Covariate + Time from inclusion + Subject (random effect)"="MMtimeSinceInclusion"),
               selected="MMsimple")
 })
 
