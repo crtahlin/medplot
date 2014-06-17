@@ -14,9 +14,12 @@ plotDistribution <- function (data, selectedSymptoms, selectedProportion, measur
   tmp=barplot(prop.with.symptoms[my.order.symptoms],
               hor=TRUE, names.arg=selectedSymptoms[my.order.symptoms],
               las=1, xlim=c(0,1),
-              xlab="Proportion of patients")
+              xlab="Proportion of subjects")
   abline(v=seq(0, 1, by=.1), col="light gray", lty=3)
-  title(paste0("T = ", selectedProportion, "; presence of symptoms"))
+  title(paste0("Presence of outcome variables\n",
+               "at evaluation occasion T = ",
+               selectedProportion
+               ))
 }
 
 

@@ -14,7 +14,8 @@ plotSymptomsTimeline <- function (data,
                                   personID,
                                   measurement,
                                   symptoms, 
-                                  displayFormat = "dates") {
+                                  displayFormat = "dates",
+                                  treatasBinary=FALSE) {
   
   
   # Scenario - timeFromInclusion
@@ -82,13 +83,22 @@ plotSymptomsTimeline <- function (data,
   #colnames(data)[which(colnames(data)==measurement)] <- "Measurement"
  
   # Ploting function ####
-  plot <-  ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value, colour = variable)) +
+  if (treatasBinary==FALSE) {
+    plot <-  ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value, colour = variable)) +
     geom_point(shape = 1) + myTheme() + 
-    scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
-                    guide="legend",
-                    limits=c(1,10),
-                    max_size=10) +
-    geom_point(subset=.(value == 0), shape=2, size=1)
+    geom_point(subset=.(value == 0), shape=2, size=1) + 
+      scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
+                      guide="legend",
+                      limits=c(1,10),
+                      max_size=10)}
+  
+  if (treatasBinary==TRUE) {
+    data[,"value"] <- ifelse(data[,"value"]==1, "PRESENT", "ABSENT")
+    plot <- ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value,
+                             colour = variable)) +
+      geom_point(shape=1) + myTheme() + scale_size_manual(values=c(1,5))
+      
+  }
   
   # if plotting dates on horizontal axis
   if (displayFormat == "dates") {

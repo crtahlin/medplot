@@ -633,7 +633,8 @@ output$plotTimeline <- renderPlot({
                                    personID=input$patientIDVar,
                                    measurement=input$measurementVar,
                                    symptoms=input$selectedSymptoms,
-                                   displayFormat = input$displayFormat)
+                                   displayFormat = input$displayFormat,
+                                   treatasBinary=input$treatasBinary)
         )
       }}  
 }, height=numRowsTimeline)
