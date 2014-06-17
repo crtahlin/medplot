@@ -30,7 +30,7 @@ plotLasagna <- function(data, # dataFiltered()
     pheatmap(results, cluster_cols=FALSE, main=symptom, show_rownames=FALSE, 
              legend_breaks=c(0,1),
              legend_labels=c(0,1),
-             color=c('red','blue'),
+             color=c('blue','red'),
              drop_levels=TRUE)
     } else {
     pheatmap(results, cluster_cols=FALSE, main=symptom, show_rownames=FALSE)

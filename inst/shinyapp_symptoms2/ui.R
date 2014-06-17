@@ -128,8 +128,11 @@ shinyUI(pageWithSidebar(
                # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram", height="auto"),
+               plotOutput("plotClusterCorrelations", height="auto"),
                uiOutput("selectClusterAnnotations"),
-               plotOutput("plotClusterHeatmap"), height="auto"),
+               plotOutput("plotClusterHeatmap", height="auto")
+               
+               ),
     
       # TAB - Regression model : one evaluation time ####
       tabPanel(title="Regression model : one evaluation time",

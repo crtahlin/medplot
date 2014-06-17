@@ -164,6 +164,11 @@ shinyServer(function(input, output, session) {
     max(ceiling(length(input$selectedSymptoms))*40,
         300)}else{return(0)}}
   
+  numRowsClustering3 <- function() {if(!is.null(dataFiltered())){
+    #if(input$treatasBinary==TRUE) {return(0)}
+    max(ceiling(length(input$selectedSymptoms))*40,
+        300)}else{return(0)}}
+  
   numRowsDistributions <- function() {if(!(is.null(dataFiltered()) || is.null(input$posOnly)) ){
     if(input$treatasBinary==FALSE){return(0)}
     max(ceiling(length(input$selectedSymptoms))*30,
@@ -279,6 +284,17 @@ shinyServer(function(input, output, session) {
                              )]
       # try to convert dates into R format
       try(expr={data[input$dateVar] <- as.Date(data[,input$dateVar], format="%d.%m.%Y")}, silent=TRUE)
+      return(data)
+    }
+  })
+  
+  # dataExtendedwithThreshold() - all data with threshold value honored ####
+  # sets all symptom values below threshold value to zero
+  dataExtendedwithThreshold <- reactive ({
+    if(!(is.null(dataExtended()) || is.null(input$thresholdValue)  )){
+      data <- dataExtended()
+      data[,input$selectedSymptoms] <- 
+        ifelse(data[, input$selectedSymptoms]>input$thresholdValue, 1, 0)
       return(data)
     }
   })
@@ -943,11 +959,12 @@ output$plotClusterDendrogram=renderPlot({
     #if(input$treatasBinary==FALSE){
     if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}  
     plotClusterDendrogram(data=data,
-                            variableName=input$measurementVar,
-                            variableValue=input$selectedMeasurementValue,
-                            selectedSymptoms=input$selectedSymptoms)
-    }#}
-  },height=numRowsClustering)
+                          variableName=input$measurementVar,
+                          variableValue=input$selectedMeasurementValue,
+                          selectedSymptoms=input$selectedSymptoms,
+                          treatasBinary=input$treatasBinary)
+  }#}
+},height=numRowsClustering)
 
 
 # Heatmap - Selection of annotation variables
@@ -970,15 +987,33 @@ output$selectClusterAnnotations <- renderUI({
 output$plotClusterHeatmap=renderPlot({
   if(!is.null(dataExtended())){
     #if(input$treatasBinary==FALSE){
-    if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}  
+    if (input$treatasBinary==TRUE) {data=dataExtendedwithThreshold()} else {data=dataExtended()}  
     plotClusterHeatmap(data=data,
                          #TODO: make dependent on selection
                          variableName=input$measurementVar,
                          variableValue=input$selectedMeasurementValue,
                          selectedSymptoms=input$selectedSymptoms,
-                         annotationVars=input$selectedClusterAnnotations) 
+                         annotationVars=input$selectedClusterAnnotations,
+                       treatasBinary=input$treatasBinary) 
     }#}
   },height=numRowsClustering2)
+
+# Correlation plot ####
+output$plotClusterCorrelations <- renderPlot({
+  if(!is.null(dataExtended())){
+    if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}
+    
+    plotClusterCorrelations(data=data,
+                            variableName=input$measurementVar,
+                            variableValue=input$selectedMeasurementValue,
+                            selectedSymptoms=input$selectedSymptoms,
+                            treatasBinary=input$treatasBinary)
+    
+  }
+  },height=numRowsClustering3)
+
+
+
 
 # output$messageNotAppropriate6 <- renderText({
 #   if(!is.null(input$treatasBinary)){
