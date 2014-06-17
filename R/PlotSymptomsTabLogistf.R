@@ -111,7 +111,7 @@ tabelizeLogistf <- function (data,
     table2[table2["Variable"]==symptom, "OR"] <- exp(model$coef[2])
     table2[table2["Variable"]==symptom, "CILower"] <- exp(model$ci.lower[2])
     table2[table2["Variable"]==symptom, "CIUpper"] <- exp(model$ci.upper[2])
-    
+    table[table["Variable"]==symptom, "P value"] <- format(model$prob[2], digits=2)
   }
   return(list(printableResultsTable=table, rawResultsTable=table2, referenceValue=oddsFor))
 }

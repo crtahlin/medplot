@@ -39,6 +39,8 @@ tabelizeLogist <- function(data,
     table2[table2["Variable"]==symptom, "OR"] <- exp(model$coef[2])
     table2[table2["Variable"]==symptom, "CILower"] <- exp(confint(model)[2,1])
     table2[table2["Variable"]==symptom, "CIUpper"] <- exp(confint(model)[2,2])
+    table[table["Variable"]==symptom, "P value"] <- 
+      format(summary(model)$coefficients[2,"Pr(>|z|)"],digits=2)
   }
   return(list(printableResultsTable=table, rawResultsTable=table2, referenceValue=oddsFor))
 

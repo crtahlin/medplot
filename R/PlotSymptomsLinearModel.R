@@ -39,6 +39,8 @@ tabelizeLinear <- function(data,
     table2[table2["Variable"]==symptom, "beta"] <- (model$coef[2])
     table2[table2["Variable"]==symptom, "CILower"] <- (confint(model)[2,1])
     table2[table2["Variable"]==symptom, "CIUpper"] <- (confint(model)[2,2])
+    table[table["Variable"]==symptom, "P value"] <-
+      format(summary(model)$coefficients[2,"Pr(>|t|)"],digits=2)
   }
   return(list(printableResultsTable=table, rawResultsTable=table2))
   
