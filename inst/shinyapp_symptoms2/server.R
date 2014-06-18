@@ -132,26 +132,24 @@ shinyServer(function(input, output, session) {
     }, silent=TRUE)
   }
   
-  numRowsPresencePlot <- function(){
-    try({
+  numRowsPresencePlot <- function(){    
       if(!is.null(input$selectedEvaluationTime2)) {
+        if (input$treatasBinary==FALSE) {return(0)}
         if(input$treatasBinary==TRUE) {
           max(ceiling(length(input$selectedSymptoms))*30,
               300 # minumum reserved space
           )
-        }}else{return(0)} # height of plot when no data available
-    }, silent=TRUE)
+        }}else{return(0)} # height of plot when no data available    
   }
   
-  numRowsMedianPlot <- function(){
-    try({
+  numRowsMedianPlot <- function(){    
       if(!is.null(input$selectedEvaluationTime2)) {
+        if (input$treatasBinary==TRUE) {return(0)}
         if(input$treatasBinary==FALSE) {
           max(ceiling(length(input$selectedSymptoms))*30,
               300 # minumum reserved space
           )
-        }}else{return(0)} # height of plot when no data available
-    }, silent=TRUE)
+        }}else{return(0)} # height of plot when no data available    
   }
   
   numRowsClustering <- function() {if(!is.null(dataFiltered())){

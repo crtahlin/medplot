@@ -131,7 +131,7 @@ p <- ggplot(data=dataMelted, aes(x=Measurement, y=value)) +
   geom_jitter(alpha=I(1/5)) +
   facet_grid(variable ~.) +
   myTheme() +
-  ylab("Value") + xlab("Measurement occasion")
+  ylab("Value") + xlab("Evaluation occasion")
 }
 
 if (faceting=="variablesOnXaxis") {
@@ -166,7 +166,7 @@ tabelizeBoxplots <- function(measurements,
                                              data=data,
                                              selectedSymptoms=selectedSymptoms)
     tables[[as.character(measurement)]] <- 
-      print(xtable(table, caption=paste("Measurement occasion:", measurement)),
+      print(xtable(table, caption=paste("Evaluation occasion:", measurement)),
             type="html",
             html.table.attributes='class="data table table-bordered table-condensed"',
             caption.placement="top")
