@@ -1,0 +1,14 @@
+\name{tableRCS}
+\alias{tableRCS}
+\title{Restricted cubic spline P values in tabular form}
+\usage{
+tableRCS(data.all, data.yn, measurement, selectedSymptoms,
+  measurementSelectedrcs, rcsIDVar, binaryVar = TRUE)
+}
+\arguments{
+  \item{TODO}{}
+}
+\description{
+TODO
+}
+
