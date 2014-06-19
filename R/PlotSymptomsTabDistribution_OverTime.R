@@ -161,7 +161,7 @@ tabelizeBoxplots <- function(measurements,
   
   tables <- list()
   for (measurement in measurements) {
-    table <- tabelizeBoxplotsforMeasurement(measurement=measurement,
+    table <- tableMedians(measurement=measurement,
                                              measurementVar=measurementVar,
                                              data=data,
                                              selectedSymptoms=selectedSymptoms)
@@ -175,7 +175,7 @@ tabelizeBoxplots <- function(measurements,
 }
 
 # helper function for tabelizeBoxplots
-tabelizeBoxplotsforMeasurement <- function(measurement,
+tableMedians <- function(measurement,
                                             measurementVar,
                                             data,
                                             selectedSymptoms) {
@@ -215,7 +215,7 @@ tabelizeBoxplotsforMeasurement <- function(measurement,
 }
 
 # construct a table of proportions
-tabelizeProportionsforMeasurement <- function(measurement,
+tableProportions <- function(measurement,
                                             measurementVar,
                                             data,
                                             selectedSymptoms) {

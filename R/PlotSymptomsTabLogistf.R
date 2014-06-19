@@ -70,7 +70,7 @@
 #' @description TODO
 #' 
 #' @param TODO
-tabelizeLogistf <- function (data,
+tableLogistf <- function (data,
                              measurementVar,
                              selectedMeasurement,
                              covariate,

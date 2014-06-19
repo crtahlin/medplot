@@ -9,7 +9,7 @@
 #' @param symptoms Vector of variable names representing measured symptoms. 
 #' 
 #' for ggplot() (see melt()). Returns a ggplot object that has to be plotted via print().
-plotSymptomsTimeline <- function (data,
+plotTimeline <- function (data,
                                   date,
                                   personID,
                                   measurement,

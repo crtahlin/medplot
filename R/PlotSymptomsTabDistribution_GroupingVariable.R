@@ -6,7 +6,7 @@
 #' @param grouping The column name of the binary grouping variable used to define the groups on the plot.
 #' @param measurements The column name of the variable containing measurement occasions. 
 #' @param symptomsNames A vector of column names containing the symptom severity.
-plotPropWithSymptoms <- function (data,
+plotPropPositive <- function (data,
                                   grouping="Sex",
                                   measurements="Measurement",
                                   symptomsNames) {
@@ -111,7 +111,7 @@ plotPropWithSymptoms <- function (data,
 #' @description TODO
 #' 
 #' @param TODO
-tablePropWithSymptoms <- function (data,
+tablePropPosGroups <- function (data,
                                    groupingVar="Sex",
                                    measurementVar,
                                    forMeasurement,
@@ -227,7 +227,7 @@ return(tableData)
 #' @description TODO Ignores threshold value.
 #' 
 #' @param TODO
-tableMediansWithSymptoms <- function (data,
+tableMeGroups <- function (data,
                                       groupingVar="Sex",
                                       measurementVar,
                                       forMeasurement,
@@ -338,7 +338,7 @@ for (symptom in symptomsNames) {
 #' 
 #' @description TODO
 #' @param TODO 
-plotPropWithSymptomsCI <- function (data,
+plotPropPositiveCI <- function (data,
                                     groupingVar,
                                     measurementVar,
                                     selectedSymptoms) {

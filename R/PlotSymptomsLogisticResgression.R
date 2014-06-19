@@ -1,4 +1,4 @@
-tabelizeLogist <- function(data,
+tableLogist <- function(data,
                            measurementVar,
                            selectedMeasurement,
                            covariate,

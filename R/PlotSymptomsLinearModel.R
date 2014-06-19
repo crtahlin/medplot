@@ -1,4 +1,4 @@
-tabelizeLinear <- function(data,
+tableLinear <- function(data,
                            measurementVar,
                            selectedMeasurement,
                            covariate,

@@ -137,8 +137,8 @@ shinyUI(pageWithSidebar(
       # TAB - Regression model : one evaluation time ####
       tabPanel(title="Regression model : one evaluation time",
                # Menus
-               textOutput("debug10"),
-               textOutput("debug9"),
+               #textOutput("debug10"),
+               #textOutput("debug9"),
                uiOutput("selectEvaluationTime"),
                uiOutput("selectCovariate"),
                uiOutput("checkUseFirthCorrection"),
@@ -181,7 +181,7 @@ shinyUI(pageWithSidebar(
       # TAB - Selected data ####
       tabPanel(title="Uploaded data", 
                # textOutput("messageSelectVars"),
-               dataTableOutput("data")),
+               dataTableOutput("data")) #,
       
       
 #       # TAB - Timeline ####
@@ -208,20 +208,20 @@ shinyUI(pageWithSidebar(
 #                uiOutput("tableforBoxplots")
 #                ),
 #       
-      # TAB - Distribution of the variables ####
-      tabPanel(title="OBSOLETE - Distribution of the variables: by measurement occasion",
-              textOutput("messageNotAppropriate4"),
-               # textOutput("messageSelectVars"),
-               uiOutput("proportionUI"),
-               #plotOutput("plotProportion", height="auto"), 
-               plotOutput("plotCI", height="auto"), 
-               plotOutput("plotBoxplot", height="auto"),
-               uiOutput("selectPosOnly"),
-               
-               tableOutput("tablePropMedian"),
-               uiOutput("textTablePropMedian")
-      )
-      
+#       # TAB - Distribution of the variables ####
+#       tabPanel(title="OBSOLETE - Distribution of the variables: by measurement occasion",
+#               textOutput("messageNotAppropriate4"),
+#                # textOutput("messageSelectVars"),
+#                uiOutput("proportionUI"),
+#                #plotOutput("plotProportion", height="auto"), 
+#                plotOutput("plotCI", height="auto"), 
+#                plotOutput("plotBoxplot", height="auto"),
+#                uiOutput("selectPosOnly"),
+#                
+#                tableOutput("tablePropMedian"),
+#                uiOutput("textTablePropMedian")
+#       )
+#       
 #       # TAB - Distribution of the variables: by grouping variable ####
 #       tabPanel(title="Distribution of the variables: by grouping variable"#,
 # #                textOutput("messageNotAppropriate5"),

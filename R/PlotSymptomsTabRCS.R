@@ -95,7 +95,7 @@ plotRCSmod <- function(My.mod,
 #' @description TODO
 #' 
 #' @param TODO
-tabelizeRCS <- function(data.all,
+tableRCS <- function(data.all,
                         data.yn,
                         measurement,
                         selectedSymptoms,

@@ -6,7 +6,7 @@
 #' @param data Data fram to be passed to the function.
 #' @param variableName The column name of the variable used for filtering.
 #' @param variableValues The value of the filtering variable used to filter.
-plotClusterDendrogram <- function (data,
+plotDendrogram <- function (data,
                                    variableName,
                                    variableValue,
                                    selectedSymptoms,
@@ -67,7 +67,7 @@ plotClusterHeatmap <- function (data,
 }
 
 ########
-plotClusterCorrelations <- function (data,
+plotCorrelations <- function (data,
                                      variableName,
                                      variableValue,
                                      selectedSymptoms,
