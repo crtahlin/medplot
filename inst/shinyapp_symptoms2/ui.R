@@ -149,10 +149,12 @@ shinyUI(pageWithSidebar(
                # plotOutput("plotLogistf", height="auto"),
                plotOutput("plotLogistf2", height="auto"),
                dataTableOutput("tableLogistf"),
+               dataTableOutput("tableLogistfIntercept"),
                
                # Logistic regression 
                plotOutput("plotLogist", height="auto"),
                dataTableOutput("tableLogist"),
+               dataTableOutput("tableLogistIntercept"),
                
                # Linear regression
                plotOutput("plotLinear", height="auto"),

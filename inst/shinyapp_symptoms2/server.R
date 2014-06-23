@@ -1139,6 +1139,15 @@ output$tableLogistf <- renderDataTable({
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
+# table - logistf Intercepts
+output$tableLogistfIntercept <- renderDataTable({
+  if(!is.null(resultsLogistf()) ){
+    if(regressionScenario()=="scenarioLogistf") {
+      resultsLogistf()[["printableInterceptTable"]]
+    }}
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
+
+
 # Scenario - logistic regression (without Firth correction) ####
 resultsLogist <- reactive({
   if(!is.null(regressionScenario()) ){
@@ -1162,6 +1171,13 @@ output$tableLogist <- renderDataTable({
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
+# table - logist intercept ####
+output$tableLogistIntercept <- renderDataTable({
+  if(!is.null(resultsLogist()) ){
+    if(regressionScenario()=="scenarioLogist") {
+      resultsLogist()[["printableInterceptTable"]]
+    }}
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # plot - logist ####
 output$plotLogist <- renderPlot({

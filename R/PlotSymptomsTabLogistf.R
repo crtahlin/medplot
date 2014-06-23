@@ -83,8 +83,9 @@ tableLogistf <- function (data,
   # binarize the data
   data[, selectedSymptoms] <- ifelse(data[, selectedSymptoms]>thresholdValue, 1, 0)
   
-  table <- data.frame("Variable"=selectedSymptoms) # table of printable results
+  table <- data.frame("Variable"=selectedSymptoms) # table of printable results - Fixed effect
   table2 <- data.frame("Variable"=selectedSymptoms) # table of raw results
+  table3 <- data.frame("Variable"=selectedSymptoms) # table of printable results - Intercept
   
   # check if covariate is binary and generate text which levels we are comparing
   if (determineTypeofVariable(data[,covariate])[["nLevels"]]=="binary") { # binary var
@@ -112,6 +113,19 @@ tableLogistf <- function (data,
     table2[table2["Variable"]==symptom, "CILower"] <- exp(model$ci.lower[2])
     table2[table2["Variable"]==symptom, "CIUpper"] <- exp(model$ci.upper[2])
     table[table["Variable"]==symptom, "P value"] <- format(model$prob[2], digits=2)
+    
+    # results for intercept 
+    table3[table3["Variable"]==symptom, "Odds (intercept)"] <- 
+      format(exp(model$coef[1]), digits=2)
+    table3[table3["Variable"]==symptom, "95% conf. interval"] <- 
+      paste(format(exp(model$ci.lower[1]), digits=2),
+            " to ",
+            format(exp(model$ci.upper[1]), digits=2))
+    table3[table3["Variable"]==symptom, "P value"] <- format(model$prob[1], digits=2)
+    
   }
-  return(list(printableResultsTable=table, rawResultsTable=table2, referenceValue=oddsFor))
+  return(list(printableResultsTable=table,
+              rawResultsTable=table2,
+              referenceValue=oddsFor,
+              printableInterceptTable=table3))
 }
