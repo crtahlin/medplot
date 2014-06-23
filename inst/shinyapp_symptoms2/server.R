@@ -1223,6 +1223,14 @@ output$tableLinear <- renderDataTable({
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
+# table - linear Intercepts ####
+output$tableLinearIntercept <- renderDataTable({
+  if(!is.null(resultsLinear())){
+    if (regressionScenario()=="scenarioLinearModel") {
+      resultsLinear()[["printableInterceptTable"]]
+    }}
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
+
 # plot - linear ####
 output$plotLinear <- renderPlot({
   if(!is.null(resultsLinear())){

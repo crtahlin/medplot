@@ -159,6 +159,7 @@ shinyUI(pageWithSidebar(
                # Linear regression
                plotOutput("plotLinear", height="auto"),
                dataTableOutput("tableLinear"),
+               dataTableOutput("tableLinearIntercept"),
                
                # RCS regression
                plotOutput("plotRCS", height="100%"),
