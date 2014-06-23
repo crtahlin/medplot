@@ -337,6 +337,8 @@ mixedModel <- function(data,
 #   }
  # browser()
 
+
+#### Construct printable results tables ####
 # printable results for coVariate1st ####
 if ("OR" %in% colnames(resultscoVariate1st) ) { # OR scenario ####
 if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
@@ -348,6 +350,10 @@ if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
                                              "to",
                                              format(resultscoVariate1st$ORCIUpper, digits=2)),
                  "P Value"=format(resultscoVariate1st$ORPValue, digits=2), check.names=FALSE)    
+    
+    # resort the results of printableResultsCoVariate1st
+    printableResultsCoVariate1st <- resortbyVariables(printableResultsCoVariate1st, selectedSymptoms)
+   
 } else { # non multilevel factor
   printableResultsCoVariate1st <-
     data.frame("Variable"=resultscoVariate1st$Variable,
@@ -366,7 +372,11 @@ if ("beta" %in% colnames(resultscoVariate1st) ) { # beta scenario ####
                  "95% conf. interval"= paste(format(resultscoVariate1st$betaCILower, digits=2),
                                              "to",
                                              format(resultscoVariate1st$betaCIUpper, digits=2)),
-                 "P Value"=format(resultscoVariate1st$betaPValue, digits=2), check.names=FALSE)    
+                 "P Value"=format(resultscoVariate1st$betaPValue, digits=2), check.names=FALSE)  
+    
+    # resort the results of printableResultsCoVariate1st
+    printableResultsCoVariate1st <- resortbyVariables(printableResultsCoVariate1st, selectedSymptoms)
+    
   } else { # non multilevel factor
     printableResultsCoVariate1st <-
       data.frame("Variable"=resultscoVariate1st$Variable,
@@ -390,9 +400,13 @@ if ("OR" %in% colnames(resultsMeasurementVar) ) { # OR scenario ####
                                                  "to",
                                                  format(resultsMeasurementVar$ORCIUpper, digits=2)),
                      "P Value"=format(resultsMeasurementVar$ORPValue, digits=2), check.names=FALSE)
+        
+        # resort the results of printableResultsMeasurementVar, to keep Variables together
+        printableResultsMeasurementVar <-
+          resortbyVariables(printableResultsMeasurementVar, selectedSymptoms)
 }
 
-if ("beta" %in% colnames(resultscoVariate1st) ) { # beta scenario ####
+if ("beta" %in% colnames(resultsMeasurementVar) ) { # beta scenario ####
          printableResultsMeasurementVar <- 
            data.frame("Variable"=resultsMeasurementVar$Variable,
                       "Levels"= resultsMeasurementVar$Measurement,
@@ -401,6 +415,10 @@ if ("beta" %in% colnames(resultscoVariate1st) ) { # beta scenario ####
                                                   "to",
                                                   format(resultsMeasurementVar$betaCIUpper, digits=2)),
                       "P Value"=format(resultsMeasurementVar$betaPValue, digits=2), check.names=FALSE)
+         
+         # resort the results of printableResultsMeasurementVar, to keep Variables together
+         printableResultsMeasurementVar <-
+           resortbyVariables(printableResultsMeasurementVar, selectedSymptoms)
 }
 
 
@@ -424,7 +442,6 @@ if ("beta" %in% colnames(resultsDaysSinceInclusion) ) { # beta scenario ####
                                            format(resultsDaysSinceInclusion$betaCIUpper, digits=2)),
                "P Value"=format(resultsDaysSinceInclusion$betaPValue, digits=2), check.names=FALSE)
 }
-
 
   return(list(coVariate1st=resultscoVariate1st,
               printablecoVariate1st=printableResultsCoVariate1st,
@@ -463,7 +480,6 @@ plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
                                             treatasBinary, 
                                             variableOrder) {
   graphTitle <- paste("Fixed effects of", coVariate1st)
-  
   # for binary response variable
   if (treatasBinary==TRUE) {
     xlabLabel <- "Odds ratios"
@@ -569,4 +585,12 @@ plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
   plot <- plot + myTheme() + labs(title=graphTitle,
                                    x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
   return(plot)  
+}
+
+# helper function to resort printable data frames to keep Variable levels together
+resortbyVariables <- function(dataframe, selectedSymptoms) {
+  variableOrder <- match(dataframe[,"Variable"], selectedSymptoms)
+  evaluationOrder <- dataframe[,"Levels"]
+  totalOrder <- order(variableOrder, evaluationOrder)
+  return(dataframe[totalOrder,])
 }
