@@ -81,7 +81,7 @@ mixedModel <- function(data,
                                                   Measurement=nonReferenceMeasurements))
 
   resultsDaysSinceInclusion <- data.frame(Variable=selectedSymptoms)
-  
+  resultsIntercept <- data.frame(Variable=selectedSymptoms)
 
   # The logic ####
   # cycle through response variables
@@ -121,6 +121,24 @@ mixedModel <- function(data,
         return(list(Estimate=Estimate, CILower=CILower, CIUpper=CIUpper, PValue=PValue))
       }
       ####
+      
+      # results for the intercept (should be the same code, regardles of model type?)
+      tempResult <- returnResultsGlmer(model, "(Intercept)")
+      # TODO: intercept has odds, not odds ratio - OK for now, change later (some code 
+      # depends on this. But the printable results already correct this.
+      resultsIntercept[resultsIntercept["Variable"]==symptom, "OR"] <- 
+        tempResult[["Estimate"]] 
+      
+      resultsIntercept[resultsIntercept["Variable"]==symptom, "ORCILower"] <- 
+        tempResult[["CILower"]] 
+      
+      resultsIntercept[resultsIntercept["Variable"]==symptom, "ORCIUpper"] <- 
+        tempResult[["CIUpper"]] 
+      
+      resultsIntercept[resultsIntercept["Variable"]==symptom, "ORPValue"] <- 
+        tempResult[["PValue"]] 
+      rm(tempResult)
+      
       
       # results for the grouping variable if it is multilevel factor ####
       if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) {
@@ -222,6 +240,23 @@ mixedModel <- function(data,
       }
       #####
  
+      # results for the intercept (should be the same code, regardles of model type?)
+      tempResult <- returnResultsLmer(model, "(Intercept)")
+      # TODO: intercept has intercept, not Beta - OK for now, change later (some code 
+      # depends on this. But the printable results already correct this.
+      resultsIntercept[resultsIntercept["Variable"]==symptom, "beta"] <-
+        tempResult[["Estimate"]]
+      
+      resultsIntercept[resultsIntercept["Variable"]==symptom, "betaCILower"] <-
+        tempResult[["CILower"]]
+      
+      resultsIntercept[resultsIntercept["Variable"]==symptom, "betaCIUpper"] <-
+        tempResult[["CIUpper"]]
+      
+      resultsIntercept[resultsIntercept["Variable"]==symptom, "betaPValue"] <-
+        tempResult[["PValue"]] 
+      rm(tempResult)
+      
       # results if coVariate1st multilevel factor
       if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) {
         for (level in referenceValue) {
@@ -339,6 +374,28 @@ mixedModel <- function(data,
 
 
 #### Construct printable results tables ####
+# printable results for the intercepts ####
+if ("OR" %in% colnames(resultsIntercept) ) { # OR scenario ####
+  printableResultsIntercept <- 
+    data.frame("Variable"=resultsIntercept$Variable,
+               "Odds (intercept)"=format(resultsIntercept$OR, digits=2),
+               "95% conf. interval"= paste(format(resultsIntercept$ORCILower, digits=2),
+                                           "to",
+                                           format(resultsIntercept$ORCIUpper, digits=2)),
+               "P Value"=format(resultsIntercept$ORPValue, digits=2), check.names=FALSE)
+}
+
+if ("beta" %in% colnames(resultsIntercept) ) { # beta scenario ####
+ printableResultsIntercept <- 
+   data.frame("Variable"=resultsIntercept$Variable,
+              "Intercept"=format(resultsIntercept$beta, digits=2),
+              "95% conf. interval"= paste(format(resultsIntercept$betaCILower, digits=2),
+                                          "to",
+                                          format(resultsIntercept$betaCIUpper, digits=2)),
+              "P Value"=format(resultsIntercept$betaPValue, digits=2), check.names=FALSE)                                                  
+}
+
+
 # printable results for coVariate1st ####
 if ("OR" %in% colnames(resultscoVariate1st) ) { # OR scenario ####
 if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
@@ -443,14 +500,16 @@ if ("beta" %in% colnames(resultsDaysSinceInclusion) ) { # beta scenario ####
                "P Value"=format(resultsDaysSinceInclusion$betaPValue, digits=2), check.names=FALSE)
 }
 
-  return(list(coVariate1st=resultscoVariate1st,
-              printablecoVariate1st=printableResultsCoVariate1st,
-              coVariate1stComparison=coVariate1stComparison,
-              measurementVar=resultsMeasurementVar,
-              printablemeasurementVar=printableResultsMeasurementVar,
-              measurementVarComparison=measurementVarComparison,
-              daysSinceInclusion=resultsDaysSinceInclusion,
-              printabledaysSinceInclusion=printableResultsDaysSinceInclusion))
+  return(list( intercept=resultsIntercept,
+               printableIntercept=printableResultsIntercept,
+               coVariate1st=resultscoVariate1st,
+               printablecoVariate1st=printableResultsCoVariate1st,
+               coVariate1stComparison=coVariate1stComparison,
+               measurementVar=resultsMeasurementVar,
+               printablemeasurementVar=printableResultsMeasurementVar,
+               measurementVarComparison=measurementVarComparison,
+               daysSinceInclusion=resultsDaysSinceInclusion,
+               printabledaysSinceInclusion=printableResultsDaysSinceInclusion))
 }
 
 calculateDaysSinceInclusion <- function (data,

@@ -1303,6 +1303,23 @@ mixedModelResults <- reactive({
              selectedModel=input$selectedMixedModelType)
 })
 
+# Table 0 ####
+output$mixedModelTable0Caption <- renderText(
+  if(!is.null(input$selectedMixedModelType)) {
+    
+    paste("Table: Intercepts for the models")
+    
+  })
+
+output$mixedModelTable0 <- renderDataTable({
+  if(!is.null(input$selectedMixedModelType)) {
+    
+    results <- mixedModelResults()[["printableIntercept"]] 
+
+    return(results)
+  }
+}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
+
 # Table 1 ####
 output$mixedModelTable1Caption <- renderText(
   if(!is.null(input$selectedMixedModelType)) {

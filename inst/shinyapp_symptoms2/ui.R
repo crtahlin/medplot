@@ -167,6 +167,8 @@ shinyUI(pageWithSidebar(
       tabPanel(title="Regression model : all evaluation times",
                uiOutput("selectCovariate1st"),
                uiOutput("selectMixedModelType"),
+               textOutput("mixedModelTable0Caption"),
+               dataTableOutput("mixedModelTable0"),
                textOutput("mixedModelTable1Caption"),
                dataTableOutput("mixedModelTable1"),
                plotOutput("mixedModelGraph1", height="auto"),               
