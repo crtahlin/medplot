@@ -203,7 +203,8 @@ shinyServer(function(input, output, session) {
   
   numRowsMixedModels1 <- function(){if(!is.null(dataFiltered()) &
                                          !is.null(input$selectedMixedModelType)){
-    max(ceiling(length(input$selectedSymptoms))*30,
+    browser()
+    max(ceiling(length(input$selectedSymptoms))*30*(length(unique(dataFiltered()[,input$selectedCovariate1st]))-1),
         300)  }else{return(0)} }
   
   numRowsMixedModels2 <- function(){if(!is.null(dataFiltered()) &
