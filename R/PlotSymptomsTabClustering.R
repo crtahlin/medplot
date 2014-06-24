@@ -51,7 +51,9 @@ plotClusterHeatmap <- function (data,
   #browser()
   annotation <- data.frame(data[, annotationVars])
   if (treatasBinary==FALSE) {
-  pheatmap(dataSubset, annotation=annotation#, 
+  pheatmap(dataSubset, annotation=annotation,
+           show_colnames=FALSE
+ 
            #main=FALSE) #"Outcomes and subjects heatmap"
            )
   } else {
@@ -60,7 +62,8 @@ plotClusterHeatmap <- function (data,
              legend_labels=c(0,1),
              color=c('blue','red'),
              drop_levels=TRUE,
-             annotation=annotation #, 
+             annotation=annotation,
+             show_colnames=FALSE
              #main=FALSE #"Outcomes and subjects heatmap"
              )
   }
