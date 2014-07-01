@@ -9,16 +9,18 @@
 #' @param symptoms Vector of variable names representing measured symptoms. 
 #' 
 #' for ggplot() (see melt()). Returns a ggplot object that has to be plotted via print().
-plotSymptomsTimeline <- function (data,
+plotTimeline <- function (data,
                                   date,
                                   personID,
                                   measurement,
                                   symptoms, 
-                                  displayFormat = "dates") {
+                                  displayFormat = "dates",
+                                  treatasBinary=FALSE) {
   
   
   # Scenario - timeFromInclusion
   # add info about days since inclusion in the study in a column if needed for ploting
+  # TODO: I will rewrite this as .calculateTimeSinceInclusion(); use this function here instead
   if (displayFormat == "timeFromInclusion") {
     # find the day of inclusion in the study for each person
     uniquePeople <- as.data.frame(unique(data[personID]))
@@ -29,9 +31,8 @@ plotSymptomsTimeline <- function (data,
       uniquePeople[which(uniquePeople[personID]==person), "minDate"] <- as.character(min(subset))
       data[which(data[personID]==person), "minDate"] <- as.character(min(subset))
     }
-    
     data$minDate <- as.Date(data$minDate, format="%Y-%m-%d")
-    data$daysSinceInclusion <- as.numeric(data$Date - data$minDate) # save as numeric for melt()to work
+    data$daysSinceInclusion <- as.numeric(data[,date] - data$minDate) # save as numeric for melt()to work
   }
     
   # keep only relevant data and melt() it into ggplot format
@@ -54,10 +55,6 @@ plotSymptomsTimeline <- function (data,
     colnames(data)[which(colnames(data)==date)] <- "horizontalAxisVariable"
   }
   
-  # rename column names to make sure ggplot recognizes them and that the code below works
-  colnames(data)[which(colnames(data)==personID)] <- "PersonID"
-  #colnames(data)[which(colnames(data)==measurement)] <- "Measurement"
- 
   # Scenario - measurement occasions
   if (displayFormat == "measurementOccasions") {
     
@@ -65,29 +62,43 @@ plotSymptomsTimeline <- function (data,
     data[ ,measurement] <- as.factor(data[ ,measurement])
     
     # calculate how many subject were measured on a occasion
-    peopleMeasured <- data.frame(horizontalAxisVariable=unique(data$Measurement), Number=NA)
-    for (i in (peopleMeasured[,"horizontalAxisVariable"])) {
+    peopleMeasured <- data.frame(horizontalAxisVariable=unique(data[,measurement]), Number=NA)
+    for (i in (peopleMeasured[,"horizontalAxisVariable"])) { # go through all measurement occasions
       dataForMeasurement <- data[data[measurement]==i,]
       peopleMeasured[peopleMeasured["horizontalAxisVariable"]==i,"Number"] <-
-        (length(unique(dataForMeasurement[,"PersonID"])))
+        (length(unique(dataForMeasurement[,personID])))
     }
     # Y coord for annotations above graph
     yCoord <- 0.65
-
+    
     # melt the data
     data <- melt(data=data, id.vars = c(personID, date, measurement))
     #horizontalAxisVariable <- "Measurement"
     colnames(data)[which(colnames(data)==measurement)] <- "horizontalAxisVariable"
- 
+    
   }
   
+  # rename column names to make sure ggplot recognizes them and that the code below works
+  colnames(data)[which(colnames(data)==personID)] <- "PersonID"
+  #colnames(data)[which(colnames(data)==measurement)] <- "Measurement"
+ 
   # Ploting function ####
-  plot <-  ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value, colour = variable)) +
-    geom_point(shape = 1) + theme_bw() + 
-    scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
-                    guide="legend",
-                    limits=c(1,10),
-                    max_size=10) 
+  if (treatasBinary==FALSE) {
+    plot <-  ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value, colour = variable)) +
+    geom_point(shape = 1) + myTheme() + 
+    geom_point(subset=.(value == 0), shape=2, size=1) + 
+      scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
+                      guide="legend",
+                      limits=c(1,10),
+                      max_size=10)}
+  
+  if (treatasBinary==TRUE) {
+    data[,"value"] <- ifelse(data[,"value"]==1, "PRESENT", "ABSENT")
+    plot <- ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value,
+                             colour = variable)) +
+      geom_point(shape=1) + myTheme() + scale_size_manual(values=c(1,5))
+      
+  }
   
   # if plotting dates on horizontal axis
   if (displayFormat == "dates") {

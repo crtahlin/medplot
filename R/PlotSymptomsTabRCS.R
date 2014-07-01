@@ -4,14 +4,18 @@
 #' 
 #' @param data Data for ploting.
 plotRCS <- function (data.all,
-                     data.yn,
+                     data.yn=NULL,
                      measurement,
                      selectedSymptoms,
                      measurementSelectedrcs,
-                     rcsIDVar) {
-  
+                     rcsIDVar,
+                     binaryVar=TRUE) {
+
   num.symptoms=length(selectedSymptoms)
-  my.data.symptoms.yn=data.yn[measurement==measurementSelectedrcs,]
+  # only if binary data is passed to function
+  if(binaryVar==TRUE & is.null(data.yn)) {return()}
+  if(binaryVar) {my.data.symptoms.yn=data.yn[measurement==measurementSelectedrcs,]} 
+  my.data.symptoms = data.all[measurement==measurementSelectedrcs, selectedSymptoms]
   
   #temp: use age
   my.var=data.all[measurement==measurementSelectedrcs,rcsIDVar] # should be which.rcsId ? or will it work like this?
@@ -19,12 +23,15 @@ plotRCS <- function (data.all,
   par(mfrow=c(ceiling(num.symptoms/3), 3))
   
   for(i in c(1:num.symptoms)){
+    if (binaryVar==TRUE) {my.data <- my.data.symptoms.yn[,i] } else {
+    my.data <- my.data.symptoms[,i]}
     
-    my.mod=glm(my.data.symptoms.yn[,i]~rcs(my.var), family="binomial", x=T, y=T)
+    my.mod=glm(my.data~rcs(my.var),
+    				 family=ifelse(binaryVar, "binomial", "gaussian"), x=T, y=T)
     plotRCSmod(my.mod,
                  my.mod$x[,2],
-                 my.ylab="Probability of reporting the symptom",
-                 my.xlab="Age",
+                 my.ylab=ifelse(binaryVar, "Probability of positive variable", "Estimated value"),
+                 my.xlab=rcsIDVar,
                  my.title=selectedSymptoms[i])
     my.p=ifelse(anova(my.mod, test="Chi")[2,5]<0.001,
                 "P<0.001", 
@@ -33,7 +40,7 @@ plotRCS <- function (data.all,
   }
 }
 
-#' @title Plot RSC MOD ??? TODO : help contents
+#' @title Plot RCS MOD ??? TODO : help contents
 #' 
 #' @param My.mod ???
 plotRCSmod <- function(My.mod,
@@ -81,4 +88,36 @@ plotRCSmod <- function(My.mod,
   # abline(h=seq(0,1,by=.1), v= vlines  , lty=3, col="light grey")
   if(!is.null(hlines) | !is.null(vlines)) abline(h=hlines, v= vlines  , lty=3, col="light grey") else grid()
   if(!is.null(my.knots)) axis(1, at=my.knots, line=2, cex.axis=.65)
+}
+
+#' @title Restricted cubic spline P values in tabular form
+#' 
+#' @description TODO
+#' 
+#' @param TODO
+tableRCS <- function(data.all,
+                        data.yn,
+                        measurement,
+                        selectedSymptoms,
+                        measurementSelectedrcs,
+                        rcsIDVar, 
+						binaryVar=TRUE) {
+  
+  if(binaryVar==TRUE) {
+  data <- data.yn[measurement==measurementSelectedrcs,]
+  } else {
+  data <- data.all[measurement==measurementSelectedrcs, selectedSymptoms]
+  }
+  variable <- data.all[measurement==measurementSelectedrcs,rcsIDVar]  
+  
+  table <- data.frame("Variable"=selectedSymptoms)
+  
+  for (symptom in selectedSymptoms) {
+    model <- glm(data[,symptom]~rcs(variable), family=ifelse(binaryVar, "binomial", "gaussian"), x=T, y=T)
+    table[table[,"Variable"]==symptom, "P value"] <- 
+      ifelse(anova(model, test="Chi")[2,5]<0.001,
+             "P<0.001", 
+             paste(format(round(anova(model, test="Chi")[2,5],4), digits=2)))
+  }
+  return(table)
 }

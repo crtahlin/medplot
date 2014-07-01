@@ -2,8 +2,8 @@
 \alias{plotRCS}
 \title{Plot RCS}
 \usage{
-plotRCS(data.all, data.yn, measurement, selectedSymptoms,
-  measurementSelectedrcs, rcsIDVar)
+plotRCS(data.all, data.yn = NULL, measurement, selectedSymptoms,
+  measurementSelectedrcs, rcsIDVar, binaryVar = TRUE)
 }
 \arguments{
   \item{data}{Data for ploting.}

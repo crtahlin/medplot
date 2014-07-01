@@ -3,7 +3,7 @@
 \title{Plot clustered heatmaps.}
 \usage{
 plotClusterHeatmap(data, variableName, variableValue, selectedSymptoms,
-  annotationVars = NA)
+  annotationVars = NA, treatasBinary = FALSE)
 }
 \arguments{
   \item{data}{Data fram to be passed to the function.}
