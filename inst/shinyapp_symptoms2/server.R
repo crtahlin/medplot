@@ -529,6 +529,18 @@ output$plotTimelineProfiles <- renderPlot({
       }}}
 }, height=numRowsTimelineProfile)
 
+output$plotTimelineProfilesDescr <- reactive({
+  if(!is.null(input$selectedGraphType)) {
+  description <- switch(input$selectedGraphType,
+         "oneGraph" = generateDescription("GraphExpl_ProfilePlots_AllSubjects"),
+         "randomSample" = generateDescription("GraphExpl_ProfilePlots_RandomSubjects"),
+         "multipleGraphs" = generateDescription("GraphExpl_ProfilePlots_MultipleGraphs")
+    )
+  return(description())
+  }})
+
+
+
 # Lasagna plots ####
 # Graph
 output$plotLasagna <- renderUI({
@@ -571,6 +583,14 @@ output$plotLasagna <- renderUI({
     }}
 })
 
+output$plotLasagnaDesc <- reactive({
+  if (!is.null(input$selectedGraphOverTime)) {
+    if (input$selectedGraphOverTime=="lasagnaPlot") {
+    description <- generateDescription("GraphExpl_LasagnaPlots")
+    
+    return(description())
+  }}})
+
 
 # Boxplots ####
 # Menu
@@ -609,6 +629,15 @@ output$plotTimelineBoxplots <- renderPlot({
       }}
   } else {return()}
 },height=numRowsTimelineBoxplots)
+
+output$plotTimelineBoxplotsDesc <- reactive({
+  if (!is.null(input$selectedGraphOverTime)) {
+    if (input$selectedGraphOverTime=="boxPlot") {
+      description <- generateDescription("GraphExpl_BoxPlots")
+      
+      return(description())
+    }}})
+
 
 # Timeline graph ####
 # Menu
@@ -653,6 +682,15 @@ output$plotTimeline <- renderPlot({
       }}  
 }, height=numRowsTimeline)
 
+output$plotTimelineDesc <- reactive({
+  if (!is.null(input$selectedGraphOverTime)) {
+    if (input$selectedGraphOverTime=="timelinePlot") {
+      description <- generateDescription("GraphExpl_Timeline")
+      
+      return(description())
+    }}})
+
+
 #Barplots with proportions ####
 #Menu
 output$selectMeasurementForPresencePlot <- renderUI({
@@ -674,6 +712,16 @@ output$plotProportion=renderPlot({
                        measurements=Measurement())
     }}
   }, height=numRowsProportion) 
+
+output$plotProportionDesc <- reactive({
+  if (!is.null(input$selectedGraphOverTime)) {
+    if (input$selectedGraphOverTime=="presencePlot") {
+      description <- generateDescription("GraphExpl_Barplots")
+      
+      return(description())
+    }}})
+
+
 
 # TAB - Summary ####
 

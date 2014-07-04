@@ -71,21 +71,26 @@ shinyUI(pageWithSidebar(
                uiOutput("selectRandomSampleSize"),
                uiOutput("selectMaxGroupSize"),
                plotOutput("plotTimelineProfiles", height="auto"),
+               uiOutput("plotTimelineProfilesDescr"),
                
                # Lasagna plot
                uiOutput("plotLasagna"), #, height="700px"),
+               uiOutput("plotLasagnaDesc"),
                
                # Boxplots
                uiOutput("selectFacetingType"),
                plotOutput("plotTimelineBoxplots", height="auto"),
+               uiOutput("plotTimelineBoxplotsDesc"),
                
                # Timeline graph
                uiOutput("selectDisplayFormat"),
                plotOutput("plotTimeline", height="auto"),
+               uiOutput("plotTimelineDesc"),
                
                # Presence of symptoms graph
                uiOutput("selectMeasurementForPresencePlot"),
-               plotOutput("plotProportion", height="auto") 
+               plotOutput("plotProportion", height="auto"),
+               uiOutput("plotProportionDesc")
                
       ),
      
