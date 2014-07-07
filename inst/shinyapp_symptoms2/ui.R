@@ -102,8 +102,9 @@ shinyUI(pageWithSidebar(
                dataTableOutput("tableforBoxplots"),
                dataTableOutput("tableforProportions"),
                plotOutput("plotPresence", height="auto"),
-               plotOutput("plotMedians", height="auto")
-               
+               plotOutput("plotMedians", height="auto"),
+               uiOutput("mediansDescr"),
+               uiOutput("proportionsDescr")
       ),
       
 #       # TAB - Graphical exploration : grouping variable ####
@@ -133,9 +134,12 @@ shinyUI(pageWithSidebar(
                # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram", height="auto"),
+               uiOutput("dendrogramDescr"),
                plotOutput("plotClusterCorrelations", height="auto"),
+               uiOutput("correlationDescr"),
                uiOutput("selectClusterAnnotations"),
-               plotOutput("plotClusterHeatmap", height="auto")
+               plotOutput("plotClusterHeatmap", height="auto"),
+               uiOutput("heatmapDescr")
                
                ),
     
@@ -155,20 +159,24 @@ shinyUI(pageWithSidebar(
                plotOutput("plotLogistf2", height="auto"),
                dataTableOutput("tableLogistf"),
                dataTableOutput("tableLogistfIntercept"),
+               uiOutput("logistfDescr"),
                
                # Logistic regression 
                plotOutput("plotLogist", height="auto"),
                dataTableOutput("tableLogist"),
                dataTableOutput("tableLogistIntercept"),
+               uiOutput("logistDescr"),
                
                # Linear regression
                plotOutput("plotLinear", height="auto"),
                dataTableOutput("tableLinear"),
                dataTableOutput("tableLinearIntercept"),
+               uiOutput("linearDescr"),
                
                # RCS regression
                plotOutput("plotRCS", height="100%"),
-               dataTableOutput("tableRCS")
+               dataTableOutput("tableRCS"),
+               uiOutput("RCSDescr")
         ),
       
       # TAB - Regression model : all evaluation times ####
@@ -185,7 +193,8 @@ shinyUI(pageWithSidebar(
                plotOutput("mixedModelGraph2", height="auto"),
                textOutput("mixedModelTable3Caption"),               
                dataTableOutput("mixedModelTable3"),
-               plotOutput("mixedModelGraph3", height="auto")
+               plotOutput("mixedModelGraph3", height="auto"),
+               uiOutput("regressionAllDescr")
       ),
       
       # TAB - Selected data ####
