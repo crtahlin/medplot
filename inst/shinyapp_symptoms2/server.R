@@ -337,7 +337,7 @@ shinyServer(function(input, output, session) {
   output$selectSymptoms <- renderUI({
     if (!is.null(dataVariableNames())) {
       selectInput(inputId="selectedSymptoms",
-                  label="Choose outcome variables to analyse:", 
+                  label="Choose outcome variables to analyse (the order used is also used on most graphs):", 
                   choices=dataVariableNames(),
                   multiple=TRUE,
                   if (input$dataFileType=="Demo"){selected=c("Fatigue","Malaise",
@@ -529,6 +529,18 @@ output$plotTimelineProfiles <- renderPlot({
       }}}
 }, height=numRowsTimelineProfile)
 
+output$plotTimelineProfilesDescr <- reactive({
+  if(!is.null(input$selectedGraphType)) {
+  description <- switch(input$selectedGraphType,
+         "oneGraph" = generateDescription("GraphExpl_ProfilePlots_AllSubjects"),
+         "randomSample" = generateDescription("GraphExpl_ProfilePlots_RandomSubjects"),
+         "multipleGraphs" = generateDescription("GraphExpl_ProfilePlots_MultipleGraphs")
+    )
+  return(description())
+  }})
+
+
+
 # Lasagna plots ####
 # Graph
 output$plotLasagna <- renderUI({
@@ -571,6 +583,14 @@ output$plotLasagna <- renderUI({
     }}
 })
 
+output$plotLasagnaDesc <- reactive({
+  if (!is.null(input$selectedGraphOverTime)) {
+    if (input$selectedGraphOverTime=="lasagnaPlot") {
+    description <- generateDescription("GraphExpl_LasagnaPlots")
+    
+    return(description())
+  }}})
+
 
 # Boxplots ####
 # Menu
@@ -609,6 +629,15 @@ output$plotTimelineBoxplots <- renderPlot({
       }}
   } else {return()}
 },height=numRowsTimelineBoxplots)
+
+output$plotTimelineBoxplotsDesc <- reactive({
+  if (!is.null(input$selectedGraphOverTime)) {
+    if (input$selectedGraphOverTime=="boxPlot") {
+      description <- generateDescription("GraphExpl_BoxPlots")
+      
+      return(description())
+    }}})
+
 
 # Timeline graph ####
 # Menu
@@ -653,6 +682,15 @@ output$plotTimeline <- renderPlot({
       }}  
 }, height=numRowsTimeline)
 
+output$plotTimelineDesc <- reactive({
+  if (!is.null(input$selectedGraphOverTime)) {
+    if (input$selectedGraphOverTime=="timelinePlot") {
+      description <- generateDescription("GraphExpl_Timeline")
+      
+      return(description())
+    }}})
+
+
 #Barplots with proportions ####
 #Menu
 output$selectMeasurementForPresencePlot <- renderUI({
@@ -674,6 +712,16 @@ output$plotProportion=renderPlot({
                        measurements=Measurement())
     }}
   }, height=numRowsProportion) 
+
+output$plotProportionDesc <- reactive({
+  if (!is.null(input$selectedGraphOverTime)) {
+    if (input$selectedGraphOverTime=="presencePlot") {
+      description <- generateDescription("GraphExpl_Barplots")
+      
+      return(description())
+    }}})
+
+
 
 # TAB - Summary ####
 
@@ -779,6 +827,15 @@ output$plotMedians <- renderPlot({
   print(plot)
 }, height=numRowsMedianPlot)
 
+# Medians description
+output$mediansDescr <- reactive({
+  if (!is.null(dataFiltered())) {
+    if (input$treatasBinary==FALSE) {
+      description <- generateDescription("Summary_Medians")
+      
+      return(description())
+    }}})
+
 # Proportions tables
 output$tableforProportions <- renderDataTable({
   if(!is.null(dataFilteredwithThreshold())) {
@@ -812,6 +869,15 @@ output$plotPresence <- renderPlot({
       print(plot)
     }}
 }, height=numRowsPresencePlot)
+
+# Proportions description
+output$proportionsDescr <- reactive({
+  if (!is.null(dataFiltered())) {
+    if (input$treatasBinary==TRUE) {
+      description <- generateDescription("Summary_Proportions")
+      
+      return(description())
+    }}})
 
 # TAB - Summary tables : grouping variable ####
 # Graph
@@ -883,14 +949,18 @@ output$tablePropGroups <- renderDataTable ({
   }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # text - explaining tablePropGroups
-output$textTablePropGroups <- renderUI({
+output$textTablePropGroups <- reactive({
   if(!is.null(dataFiltered())){
     if(input$treatasBinary==TRUE){
-      tagList(p("Table displays for each variable the proportion of subjects in a
-                certain group, P value for the difference of proportions and the 
-                95% confidence interval for the difference of proportions. 
-                Data with missing values for grouping variable 
-                are removed from analysis.", br(), br()))
+#       tagList(p("Table displays for each variable the proportion of subjects in a
+#                 certain group, P value for the difference of proportions and the 
+#                 95% confidence interval for the difference of proportions. 
+#                 Data with missing values for grouping variable 
+#                 are removed from analysis.", br(), br()))
+      
+      description <- generateDescription("SummaryGrouping_Proportions")
+      
+      return(description())
     }}
 })
 
@@ -918,14 +988,18 @@ output$tableMedianGroups <- renderDataTable ({
   }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # text - explainig tableMedianGroups
-output$textTableMedianGroups <- renderUI({
+output$textTableMedianGroups <- reactive({
   if(!is.null(dataFiltered())){
     if(input$treatasBinary==FALSE){
-      tagList(p("Table displays for each variable the median value for subjects in a
-                certain group, interquantile range for of the variable 
-                (25th to 75th percentile)and P value for the difference of samples (Mann-Whitney test). 
-                Data with missing values for grouping variable 
-                are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
+#       tagList(p("Table displays for each variable the median value for subjects in a
+#                 certain group, interquantile range for of the variable 
+#                 (25th to 75th percentile)and P value for the difference of samples (Mann-Whitney test). 
+#                 Data with missing values for grouping variable 
+#                 are removed from analysis. Threshold for positivity of variables is not taken into account.", br(), br() ))
+      description <- generateDescription("SummaryGrouping_Medians")
+      
+      return(description())
+      
     }}
   })
 
@@ -965,6 +1039,15 @@ output$plotClusterDendrogram=renderPlot({
 },height=numRowsClustering)
 
 
+# Dendrogram description
+output$dendrogramDescr <- reactive({
+  if (!is.null(dataFiltered())) {
+    if (!is.null(input$selectedMeasurementValue)) {
+      description <- generateDescription("Clustering_Dendrogram")
+      
+      return(description())
+    }}})
+
 # Heatmap - Selection of annotation variables
 output$selectClusterAnnotations <- renderUI({
   if(!is.null(dataFiltered())){
@@ -996,6 +1079,17 @@ output$plotClusterHeatmap=renderPlot({
     }#}
   },height=numRowsClustering2)
 
+
+# Heat map description
+output$heatmapDescr <- reactive({
+  if (!is.null(dataFiltered())) {
+    if (!is.null(input$selectedMeasurementValue)) {
+      description <- generateDescription("Clustering_Heatmap")
+      
+      return(description())
+    }}})
+
+
 # Correlation plot ####
 output$plotClusterCorrelations <- renderPlot({
   if(!is.null(dataExtended())){
@@ -1010,7 +1104,14 @@ output$plotClusterCorrelations <- renderPlot({
   }
   },height=numRowsClustering3)
 
-
+# Correlation plot description
+output$correlationDescr <- reactive({
+  if (!is.null(dataFiltered())) {
+    if (!is.null(input$selectedMeasurementValue)) {
+      description <- generateDescription("Clustering_Correlations")
+      
+      return(description())
+    }}})
 
 
 # output$messageNotAppropriate6 <- renderText({
@@ -1147,6 +1248,15 @@ output$tableLogistfIntercept <- renderDataTable({
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
+# description logistf
+output$logistfDescr <- reactive({
+  if (!is.null(resultsLogistf())) {
+    if (regressionScenario()=="scenarioLogistf") {
+      description <- generateDescription("RegressionOne_Firth")
+      
+      return(description())
+    }}})
+
 
 # Scenario - logistic regression (without Firth correction) ####
 resultsLogist <- reactive({
@@ -1201,6 +1311,16 @@ output$plotLogist <- renderPlot({
     }}
 }, height=numRowsLogist)
 
+# description logist
+output$logistDescr <- reactive({
+  if (!is.null(resultsLogist())) {
+    if (regressionScenario()=="scenarioLogist") {
+      description <- generateDescription("RegressionOne_OddsRatio")
+      
+      return(description())
+    }}})
+
+
 
 # Scenario - linear regression
 resultsLinear <- reactive({
@@ -1252,6 +1372,16 @@ output$plotLinear <- renderPlot({
     }}
   }, height=numRowsLinear) 
 
+# description linear
+output$linearDescr <- reactive({
+  if (!is.null(resultsLinear())) {
+    if (regressionScenario()=="scenarioLinearModel") {
+      description <- generateDescription("RegressionOne_Linear")
+      
+      return(description())
+    }}})
+
+
 # Scenario - modeling with Restricted Cubic Splines
 
 # plot - RCS plot ####
@@ -1285,6 +1415,15 @@ output$tableRCS <- renderDataTable({
       )
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
+
+# description RCS
+output$RCSDescr <- reactive({
+  if (!is.null(regressionScenario())) {
+    if (regressionScenario()=="scenarioRCSModel") {
+      description <- generateDescription("RegressionOne_RCS")
+      
+      return(description())
+    }}})
 
 # TAB - Regression model : all evaluations ####
 # Menu
@@ -1463,6 +1602,16 @@ output$mixedModelGraph3 <- renderPlot({
       )
     }}
 }, height=numRowsMixedModels3)
+
+# description Regression All
+output$regressionAllDescr <- reactive({
+  if (!is.null(input$selectedMixedModelType)) {
+      description <- generateDescription("RegressionAll")
+      
+      return(description())
+    }})
+
+
 
 # TAB - Uploaded data ####
 # Table - list the subseted data in an output slot ####

@@ -58,6 +58,10 @@ shinyUI(pageWithSidebar(
   mainPanel(
     progressInit(),
     tabsetPanel(
+      # TAB - welcome page with copyright info
+      tabPanel(title="Welcome",
+               includeHTML("www/welcome.html")),
+      
       # TAB - summary of data ####
       tabPanel(title="Data overview",
                verbatimTextOutput("dataSummary")), 
@@ -71,21 +75,26 @@ shinyUI(pageWithSidebar(
                uiOutput("selectRandomSampleSize"),
                uiOutput("selectMaxGroupSize"),
                plotOutput("plotTimelineProfiles", height="auto"),
+               uiOutput("plotTimelineProfilesDescr"),
                
                # Lasagna plot
                uiOutput("plotLasagna"), #, height="700px"),
+               uiOutput("plotLasagnaDesc"),
                
                # Boxplots
                uiOutput("selectFacetingType"),
                plotOutput("plotTimelineBoxplots", height="auto"),
+               uiOutput("plotTimelineBoxplotsDesc"),
                
                # Timeline graph
                uiOutput("selectDisplayFormat"),
                plotOutput("plotTimeline", height="auto"),
+               uiOutput("plotTimelineDesc"),
                
                # Presence of symptoms graph
                uiOutput("selectMeasurementForPresencePlot"),
-               plotOutput("plotProportion", height="auto") 
+               plotOutput("plotProportion", height="auto"),
+               uiOutput("plotProportionDesc")
                
       ),
      
@@ -97,8 +106,9 @@ shinyUI(pageWithSidebar(
                dataTableOutput("tableforBoxplots"),
                dataTableOutput("tableforProportions"),
                plotOutput("plotPresence", height="auto"),
-               plotOutput("plotMedians", height="auto")
-               
+               plotOutput("plotMedians", height="auto"),
+               uiOutput("mediansDescr"),
+               uiOutput("proportionsDescr")
       ),
       
 #       # TAB - Graphical exploration : grouping variable ####
@@ -128,9 +138,12 @@ shinyUI(pageWithSidebar(
                # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
                plotOutput("plotClusterDendrogram", height="auto"),
+               uiOutput("dendrogramDescr"),
                plotOutput("plotClusterCorrelations", height="auto"),
+               uiOutput("correlationDescr"),
                uiOutput("selectClusterAnnotations"),
-               plotOutput("plotClusterHeatmap", height="auto")
+               plotOutput("plotClusterHeatmap", height="auto"),
+               uiOutput("heatmapDescr")
                
                ),
     
@@ -150,20 +163,24 @@ shinyUI(pageWithSidebar(
                plotOutput("plotLogistf2", height="auto"),
                dataTableOutput("tableLogistf"),
                dataTableOutput("tableLogistfIntercept"),
+               uiOutput("logistfDescr"),
                
                # Logistic regression 
                plotOutput("plotLogist", height="auto"),
                dataTableOutput("tableLogist"),
                dataTableOutput("tableLogistIntercept"),
+               uiOutput("logistDescr"),
                
                # Linear regression
                plotOutput("plotLinear", height="auto"),
                dataTableOutput("tableLinear"),
                dataTableOutput("tableLinearIntercept"),
+               uiOutput("linearDescr"),
                
                # RCS regression
                plotOutput("plotRCS", height="100%"),
-               dataTableOutput("tableRCS")
+               dataTableOutput("tableRCS"),
+               uiOutput("RCSDescr")
         ),
       
       # TAB - Regression model : all evaluation times ####
@@ -180,7 +197,8 @@ shinyUI(pageWithSidebar(
                plotOutput("mixedModelGraph2", height="auto"),
                textOutput("mixedModelTable3Caption"),               
                dataTableOutput("mixedModelTable3"),
-               plotOutput("mixedModelGraph3", height="auto")
+               plotOutput("mixedModelGraph3", height="auto"),
+               uiOutput("regressionAllDescr")
       ),
       
       # TAB - Selected data ####
