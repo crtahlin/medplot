@@ -337,7 +337,7 @@ shinyServer(function(input, output, session) {
   output$selectSymptoms <- renderUI({
     if (!is.null(dataVariableNames())) {
       selectInput(inputId="selectedSymptoms",
-                  label="Choose outcome variables to analyse:", 
+                  label="Choose outcome variables to analyse (the order used is also used on most graphs):", 
                   choices=dataVariableNames(),
                   multiple=TRUE,
                   if (input$dataFileType=="Demo"){selected=c("Fatigue","Malaise",
