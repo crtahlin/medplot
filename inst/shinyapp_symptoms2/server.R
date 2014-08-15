@@ -505,7 +505,12 @@ output$selectMaxGroupSize <- renderUI({
 })
 
 # Graph
-output$plotTimelineProfiles <- renderPlot({
+# TODO : below code to make large PNG files, but render them "smaller" on screen
+# Decide if this is the way to go to enable high quality images for printing ...
+output$plotTimelineProfiles <- renderImage({
+  # TEMP
+  outfile <- tempfile(fileext = ".svg")
+  #renderPlot({
   if(!is.null(input$selectedGraphType)) {
     if ( (input$selectedGraphType=="oneGraph") ||
            (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
@@ -518,7 +523,15 @@ output$plotTimelineProfiles <- renderPlot({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
+        # TEMP
+        #svg(outfile)
+        #postscript(outfile)
+        # tiff(outfile)
+        # pdf(outfile)
         
+        # Width of 2100 should be enough for A4 at 300 dpi?
+        # Height is determined by a function depending on the data.
+        png(outfile, width = 2100, height = 2*numRowsTimelineProfile())
         print(plotTimelineProfiles(data=dataFiltered(),
                                    plotType=input$selectedGraphType,
                                    personIDVar=input$patientIDVar,
@@ -526,8 +539,15 @@ output$plotTimelineProfiles <- renderPlot({
                                    selectedSymptoms=input$selectedSymptoms,
                                    sizeofRandomSample=input$sampleSize,
                                    sizeofGroup=input$groupSize))
+        # TEMP
+        dev.off()
+                
       }}}
-}, height=numRowsTimelineProfile)
+  # return a list containing the filename
+  list(src=outfile, contentType="image/png", width = "1000")
+}, deleteFile=TRUE
+#height=numRowsTimelineProfile
+)
 
 output$plotTimelineProfilesDescr <- reactive({
   if(!is.null(input$selectedGraphType)) {

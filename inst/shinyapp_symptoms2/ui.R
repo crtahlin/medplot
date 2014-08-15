@@ -74,7 +74,8 @@ shinyUI(pageWithSidebar(
                uiOutput("selectGraphType"),
                uiOutput("selectRandomSampleSize"),
                uiOutput("selectMaxGroupSize"),
-               plotOutput("plotTimelineProfiles", height="auto"),
+               imageOutput("plotTimelineProfiles", height="auto"),
+               #plotOutput("plotTimelineProfiles", height="auto"),
                uiOutput("plotTimelineProfilesDescr"),
                
                # Lasagna plot
