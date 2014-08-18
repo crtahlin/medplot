@@ -75,6 +75,8 @@ shinyUI(pageWithSidebar(
                uiOutput("selectRandomSampleSize"),
                uiOutput("selectMaxGroupSize"),
                imageOutput("plotTimelineProfiles", height="auto"),
+               downloadButton("downLoadplotTimelineProfiles", label="Download EPS"),
+               downloadButton("downLoadplotTimelineProfiles2", label="Download SVG"),
                #plotOutput("plotTimelineProfiles", height="auto"),
                uiOutput("plotTimelineProfilesDescr"),
                
@@ -84,7 +86,8 @@ shinyUI(pageWithSidebar(
                
                # Boxplots
                uiOutput("selectFacetingType"),
-               plotOutput("plotTimelineBoxplots", height="auto"),
+               imageOutput("plotTimelineBoxplots", height="auto"),
+               #plotOutput("plotTimelineBoxplots", height="auto"),
                uiOutput("plotTimelineBoxplotsDesc"),
                
                # Timeline graph

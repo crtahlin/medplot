@@ -46,7 +46,7 @@ options(boot.ncpus=Sys.getenv('NUMBER_OF_PROCESSORS'))
 
 # Main function -----------------------------------------------------------
 
-shinyServer(function(input, output, session) {
+shinyServer(function(input, output, session, clientData) {
   
   # VARIABLES ####
   # the working directory
@@ -509,7 +509,7 @@ output$selectMaxGroupSize <- renderUI({
 # Decide if this is the way to go to enable high quality images for printing ...
 output$plotTimelineProfiles <- renderImage({
   # TEMP
-  outfile <- tempfile(fileext = ".svg")
+  outfile <- tempfile(fileext = ".png")
   #renderPlot({
   if(!is.null(input$selectedGraphType)) {
     if ( (input$selectedGraphType=="oneGraph") ||
@@ -548,6 +548,41 @@ output$plotTimelineProfiles <- renderImage({
 }, deleteFile=TRUE
 #height=numRowsTimelineProfile
 )
+
+# TEMP: Code to allow download of Profile plots as EPS
+output$downLoadplotTimelineProfiles <- downloadHandler(
+  filename = "example.eps",
+  content = function(file) {
+    postscript(file, paper="special", width = clientData$output_plotTimelineProfiles_width/72, height = numRowsTimelineProfile()/72)
+    print(plotTimelineProfiles(data=dataFiltered(),
+                               plotType=input$selectedGraphType,
+                               personIDVar=input$patientIDVar,
+                               measurementVar=input$measurementVar,
+                               selectedSymptoms=input$selectedSymptoms,
+                               sizeofRandomSample=input$sampleSize,
+                               sizeofGroup=input$groupSize))
+    dev.off()
+  },
+  contentType="application/postscript"
+  )
+
+# TEMP: Code to allow download of Profile plots as SVG
+output$downLoadplotTimelineProfiles2 <- downloadHandler(
+  filename = "example.svg",
+  content = function(file) {
+    svg(file, width = clientData$output_plotTimelineProfiles_width/72, height = numRowsTimelineProfile()/72)
+    print(plotTimelineProfiles(data=dataFiltered(),
+                               plotType=input$selectedGraphType,
+                               personIDVar=input$patientIDVar,
+                               measurementVar=input$measurementVar,
+                               selectedSymptoms=input$selectedSymptoms,
+                               sizeofRandomSample=input$sampleSize,
+                               sizeofGroup=input$groupSize))
+    dev.off()
+  },
+  contentType="image/svg+xml"
+)
+
 
 output$plotTimelineProfilesDescr <- reactive({
   if(!is.null(input$selectedGraphType)) {
@@ -627,7 +662,9 @@ output$selectFacetingType <- renderUI({
 
 
 # Graph
-output$plotTimelineBoxplots <- renderPlot({
+output$plotTimelineBoxplots <- renderImage({
+  # TEMP
+  #renderPlot({
   if(!is.null(dataFiltered())) {
     if(input$selectedGraphOverTime=="boxPlot") {
       
@@ -640,15 +677,28 @@ output$plotTimelineBoxplots <- renderPlot({
                      detail = 'This may take a while...', 
                      value=NULL)
         
+        # Read plot's width and height. These are reactive values, so this
+        # expression will re-run whenever these values change.
+        width  <- clientData$output_plotTimelineBoxplots_width / 72
+        height <- clientData$output_plotTimelineBoxplots_height / 72
+        
+        outfile <- tempfile(fileext = ".svg")
+        svg(outfile, width = width, height=numRowsTimelineBoxplots()/72)
         print(plotTimelineBoxplots(data=dataFiltered(),
                                    personIDVar=input$patientIDVar,
                                    measurementVar=input$measurementVar,
                                    selectedSymptoms=input$selectedSymptoms,
                                    faceting=input$selectedFacetingType)
-        )
+                      )
+        dev.off()
       }}
+    #TEMP
+  return(list(src=outfile,
+              contentType="image/svg+xml"))
   } else {return()}
-},height=numRowsTimelineBoxplots)
+}#,height=numRowsTimelineBoxplots
+)
+
 
 output$plotTimelineBoxplotsDesc <- reactive({
   if (!is.null(input$selectedGraphOverTime)) {
