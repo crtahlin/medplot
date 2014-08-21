@@ -87,8 +87,9 @@ shinyUI(pageWithSidebar(
                
                # Boxplots
                uiOutput("selectFacetingType"),
-               imageOutput("plotTimelineBoxplots", height="auto"),
-               #plotOutput("plotTimelineBoxplots", height="auto"),
+               plotOutput("plotTimelineBoxplots", height="auto"),
+               conditionalPanel(condition="input.selectedGraphOverTime=='boxPlot'",                                
+               downloadButton("downLoadplotTimelineBoxplot", label="Download")),
                uiOutput("plotTimelineBoxplotsDesc"),
                
                # Timeline graph

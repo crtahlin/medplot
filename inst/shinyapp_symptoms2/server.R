@@ -624,12 +624,20 @@ output$selectFacetingType <- renderUI({
 
 
 # Graph
-output$plotTimelineBoxplots <- renderImage({
-  # TEMP
-  #renderPlot({
+plotTimelineBoxplotsReactive <- reactive({
+  #print(
+    plotTimelineBoxplots(data=dataFiltered(),
+                             personIDVar=input$patientIDVar,
+                             measurementVar=input$measurementVar,
+                             selectedSymptoms=input$selectedSymptoms,
+                             faceting=input$selectedFacetingType)
+    #)
+  
+})
+
+output$plotTimelineBoxplots <- renderPlot({
   if(!is.null(dataFiltered())) {
     if(input$selectedGraphOverTime=="boxPlot") {
-      
       if(input$treatasBinary==FALSE){
         
         progress <- Progress$new(session, min=1, max=100)
@@ -639,28 +647,22 @@ output$plotTimelineBoxplots <- renderImage({
                      detail = 'This may take a while...', 
                      value=NULL)
         
-        # Read plot's width and height. These are reactive values, so this
-        # expression will re-run whenever these values change.
-        width  <- clientData$output_plotTimelineBoxplots_width / 72
-        height <- clientData$output_plotTimelineBoxplots_height / 72
-        
-        outfile <- tempfile(fileext = ".svg")
-        svg(outfile, width = width, height=numRowsTimelineBoxplots()/72)
-        print(plotTimelineBoxplots(data=dataFiltered(),
-                                   personIDVar=input$patientIDVar,
-                                   measurementVar=input$measurementVar,
-                                   selectedSymptoms=input$selectedSymptoms,
-                                   faceting=input$selectedFacetingType)
-                      )
-        dev.off()
-      }}
-    #TEMP
-  return(list(src=outfile,
-              contentType="image/svg+xml"))
+#         print(plotTimelineBoxplots(data=dataFiltered(),
+#                                    personIDVar=input$patientIDVar,
+#                                    measurementVar=input$measurementVar,
+#                                    selectedSymptoms=input$selectedSymptoms,
+#                                    faceting=input$selectedFacetingType))
+        plotTimelineBoxplotsReactive()
+        }
+    }
   } else {return()}
-}#,height=numRowsTimelineBoxplots
-)
+},height=numRowsTimelineBoxplots)
 
+output$downLoadplotTimelineBoxplot <- downloadPlot(
+  plotFunction = plotTimelineBoxplotsReactive,
+  width = clientData$output_plotTimelineBoxplots_width,
+  height = clientData$output_plotTimelineBoxplots_height,
+  print = TRUE)
 
 output$plotTimelineBoxplotsDesc <- reactive({
   if (!is.null(input$selectedGraphOverTime)) {
