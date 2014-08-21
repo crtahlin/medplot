@@ -5,7 +5,7 @@
 
 # Installation instructions for the medplot package
 
-After installing the [R programming language](http://cran.r-project.org/), use the console in R to iInstall the devtools package:
+After installing the [R programming language](http://cran.r-project.org/), use the console in R to install the devtools package:
 
 ```{r, eval=FALSE}
 install.packages("devtools")
@@ -66,7 +66,7 @@ sudo apt-get install libcurl4-openssl-dev
 To install devtools
 install.packages("devtools")
 
-To instal Cairo library
+To install Cairo library
 sudo apt-get install libcairo2-dev
 sudo apt-get install libxt-dev
 as described in http://stackoverflow.com/questions/16678934/r-cairo-installation-without-apt-get-sudo

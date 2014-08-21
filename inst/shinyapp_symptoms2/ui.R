@@ -74,9 +74,10 @@ shinyUI(pageWithSidebar(
                uiOutput("selectGraphType"),
                uiOutput("selectRandomSampleSize"),
                uiOutput("selectMaxGroupSize"),
-               imageOutput("plotTimelineProfiles", height="auto"),
-               downloadButton("downLoadplotTimelineProfiles", label="Download EPS"),
-               downloadButton("downLoadplotTimelineProfiles2", label="Download SVG"),
+               plotOutput("plotTimelineProfiles", height="auto"),
+               conditionalPanel(condition="input.selectedGraphOverTime=='profilePlot'",
+               downloadButton("downLoadplotTimelineProfiles", label="Download")),
+               #downloadButton("downLoadplotTimelineProfiles2", label="Download SVG"),
                #plotOutput("plotTimelineProfiles", height="auto"),
                uiOutput("plotTimelineProfilesDescr"),
                

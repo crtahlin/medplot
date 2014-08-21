@@ -505,12 +505,18 @@ output$selectMaxGroupSize <- renderUI({
 })
 
 # Graph
-# TODO : below code to make large PNG files, but render them "smaller" on screen
-# Decide if this is the way to go to enable high quality images for printing ...
-output$plotTimelineProfiles <- renderImage({
-  # TEMP
-  outfile <- tempfile(fileext = ".png")
-  #renderPlot({
+# reactive code for ploting
+plotTimelineProfilesReactive <- reactive({
+  plotTimelineProfiles(data=dataFiltered(),
+                             plotType=input$selectedGraphType,
+                             personIDVar=input$patientIDVar,
+                             measurementVar=input$measurementVar,
+                             selectedSymptoms=input$selectedSymptoms,
+                             sizeofRandomSample=input$sampleSize,
+                             sizeofGroup=input$groupSize) 
+    })
+# the plot rendered in browser
+output$plotTimelineProfiles <- renderPlot({
   if(!is.null(input$selectedGraphType)) {
     if ( (input$selectedGraphType=="oneGraph") ||
            (input$selectedGraphType=="randomSample" && !is.null(input$sampleSize)) ||
@@ -523,65 +529,21 @@ output$plotTimelineProfiles <- renderImage({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        # TEMP
-        #svg(outfile)
-        #postscript(outfile)
-        # tiff(outfile)
-        # pdf(outfile)
-        
-        # Width of 2100 should be enough for A4 at 300 dpi?
-        # Height is determined by a function depending on the data.
-        png(outfile, width = 2100, height = 2*numRowsTimelineProfile())
-        print(plotTimelineProfiles(data=dataFiltered(),
-                                   plotType=input$selectedGraphType,
-                                   personIDVar=input$patientIDVar,
-                                   measurementVar=input$measurementVar,
-                                   selectedSymptoms=input$selectedSymptoms,
-                                   sizeofRandomSample=input$sampleSize,
-                                   sizeofGroup=input$groupSize))
-        # TEMP
-        dev.off()
-                
+
+        plotTimelineProfilesReactive()
+
       }}}
-  # return a list containing the filename
-  list(src=outfile, contentType="image/png", width = "1000")
-}, deleteFile=TRUE
-#height=numRowsTimelineProfile
+  }, height=numRowsTimelineProfile
 )
 
-# TEMP: Code to allow download of Profile plots as EPS
-output$downLoadplotTimelineProfiles <- downloadHandler(
-  filename = "example.eps",
-  content = function(file) {
-    postscript(file, paper="special", width = clientData$output_plotTimelineProfiles_width/72, height = numRowsTimelineProfile()/72)
-    print(plotTimelineProfiles(data=dataFiltered(),
-                               plotType=input$selectedGraphType,
-                               personIDVar=input$patientIDVar,
-                               measurementVar=input$measurementVar,
-                               selectedSymptoms=input$selectedSymptoms,
-                               sizeofRandomSample=input$sampleSize,
-                               sizeofGroup=input$groupSize))
-    dev.off()
-  },
-  contentType="application/postscript"
+# the plot to be downloaded - high quality plot
+output$downLoadplotTimelineProfiles <-  downloadPlot(
+  plotFunction=plotTimelineProfilesReactive,
+  width=clientData$output_plotTimelineProfiles_width,
+  height=clientData$output_plotTimelineProfiles_height,
+  print=TRUE
   )
-
-# TEMP: Code to allow download of Profile plots as SVG
-output$downLoadplotTimelineProfiles2 <- downloadHandler(
-  filename = "example.svg",
-  content = function(file) {
-    svg(file, width = clientData$output_plotTimelineProfiles_width/72, height = numRowsTimelineProfile()/72)
-    print(plotTimelineProfiles(data=dataFiltered(),
-                               plotType=input$selectedGraphType,
-                               personIDVar=input$patientIDVar,
-                               measurementVar=input$measurementVar,
-                               selectedSymptoms=input$selectedSymptoms,
-                               sizeofRandomSample=input$sampleSize,
-                               sizeofGroup=input$groupSize))
-    dev.off()
-  },
-  contentType="image/svg+xml"
-)
+      
 
 
 output$plotTimelineProfilesDescr <- reactive({
