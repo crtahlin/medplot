@@ -845,10 +845,6 @@ output$plotPyramid <- renderPlot ({
                      detail = 'This may take a while...', 
                      value=NULL)
         
-#         plotPropPositive(data=dataFilteredwithThreshold(),
-#                              grouping=input$groupingVar,
-#                              measurements=input$measurementVar,
-#                              symptomsNames=input$selectedSymptoms)
        plotPyramidReactive()
       }}}, silent=TRUE)
 } ,height=numRowsProportions)
@@ -897,30 +893,35 @@ output$tableforBoxplots <- renderDataTable({
   if(!is.null(dataFiltered())) {
     if(input$treatasBinary==FALSE){
       return(dataforSummaryNonBinary()[["printableTable"]])
-      
-      #       out <- tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
-      #                               measurementVar=input$measurementVar,
-      #                               data=dataFiltered(),
-      #                               selectedSymptoms=input$selectedSymptoms)[["printableTable"]] 
-      #       
-      #       return(out)
-    } }
-}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
+    }}
+  }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Median plot
+plotMediansReactive <- reactive({
+  
+  plotValueswithCIs(data=dataforSummaryNonBinary()[["rawTable"]],
+                    variableName="Variables",
+                    valueName="Median",
+                    CILowerName="CILower",
+                    CIUpperName="CIUpper",
+                    xLabel="Medians",
+                    yLabel="Variable",
+                    graphTitle="Medians of variables \n(with 95% confidence intervals)",
+                    vLine=NULL,
+                    variableOrder=input$selectedSymptoms)
+  })
+
+
 output$plotMedians <- renderPlot({
-  plot <- plotValueswithCIs(data=dataforSummaryNonBinary()[["rawTable"]],
-                            variableName="Variables",
-                            valueName="Median",
-                            CILowerName="CILower",
-                            CIUpperName="CIUpper",
-                            xLabel="Medians",
-                            yLabel="Variable",
-                            graphTitle="Medians of variables \n(with 95% confidence intervals)",
-                            vLine=NULL,
-                            variableOrder=input$selectedSymptoms)
-  print(plot)
+  plotMediansReactive()
 }, height=numRowsMedianPlot)
+
+output$downLoadplotMedians <- downloadPlot(
+  plotFunction = plotMediansReactive,
+  width = clientData$output_plotMedians_width,
+  height = clientData$output_plotMedians_height,
+  print = TRUE
+  )
 
 # Medians description
 output$mediansDescr <- reactive({
@@ -945,6 +946,14 @@ output$tableforProportions <- renderDataTable({
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Proportions graph
+plotPresenceReactive <- reactive({
+  plot <- plotPresenceofSymptoms(data=dataFiltered(),
+                                 selectedSymptoms=input$selectedSymptoms,
+                                 measurementVar=input$measurementVar,
+                                 measurement=input$selectedEvaluationTime2,
+                                 thresholdValue=ifelse(!is.null(input$thresholdValue),input$thresholdValue ,0))
+  })
+
 output$plotPresence <- renderPlot({
   if(!is.null(input$selectedEvaluationTime2)) {
     if(input$treatasBinary==TRUE) {
@@ -956,14 +965,17 @@ output$plotPresence <- renderPlot({
                    detail = 'This may take a while...', 
                    value=NULL)
       
-      plot <- plotPresenceofSymptoms(data=dataFiltered(),
-                                     selectedSymptoms=input$selectedSymptoms,
-                                     measurementVar=input$measurementVar,
-                                     measurement=input$selectedEvaluationTime2,
-                                     thresholdValue=ifelse(!is.null(input$thresholdValue),input$thresholdValue ,0))
-      print(plot)
+      print(plotPresenceReactive())
     }}
 }, height=numRowsPresencePlot)
+
+output$downLoadplotPresence <- downloadPlot(
+  plotFunction = plotPresenceReactive,
+  width = clientData$output_plotPresence_width,
+  height = clientData$output_plotPresence_height,
+  print = TRUE
+  )
+
 
 # Proportions description
 output$proportionsDescr <- reactive({

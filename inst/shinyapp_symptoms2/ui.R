@@ -115,7 +115,11 @@ shinyUI(pageWithSidebar(
                dataTableOutput("tableforBoxplots"),
                dataTableOutput("tableforProportions"),
                plotOutput("plotPresence", height="auto"),
+               conditionalPanel(condition="input.treatasBinary==true",
+                                downloadButton("downLoadplotPresence", label="Download")),
                plotOutput("plotMedians", height="auto"),
+               conditionalPanel(condition="input.treatasBinary==false",
+                                downloadButton("downLoadplotMedians", label="Download")),
                uiOutput("mediansDescr"),
                uiOutput("proportionsDescr")
       ),
