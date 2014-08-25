@@ -21,10 +21,7 @@ plotDistribution <- function (data, selectedSymptoms, selectedProportion, measur
   title(paste0("Presence of outcome variables\n",
                "at evaluation occasion T = ",
                selectedProportion
-               ))
-  # TODO Remove
-  # TODO Remove
-  dev.list()
+               )) 
   }
 
 

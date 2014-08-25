@@ -757,6 +757,11 @@ output$plotProportion=renderPlot({
   }, height=numRowsProportion) 
 
 output$downLoadplotProportion <- downloadHandler (
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
   filename="plot.eps",
   
   content = function (file) {
@@ -770,16 +775,7 @@ output$downLoadplotProportion <- downloadHandler (
                      measurements=Measurement())
     
     dev.off()
-  }, contentType="application/postscript"
-  #downloadPlot(
-  #   plotFunction=plotProportionReactive,
-  #                                               width = clientData$output_plotProportion_width,
-  #                                               height = clientData$output_plotProportion_height,
-  #                                               print=TRUE
-  #   
-  
-  
-  )
+  }, contentType="application/postscript")
 
 output$plotProportionDesc <- reactive({
   if (!is.null(input$selectedGraphOverTime)) {
@@ -827,6 +823,16 @@ output$selectEvaluationTime2 <- renderUI({
 
 # Pyramid plot ####
 # Graph
+
+plotPyramidReactive <- reactive({
+  
+  plotPropPositive(data=dataFilteredwithThreshold(),
+                   grouping=input$groupingVar,
+                   measurements=input$measurementVar,
+                   symptomsNames=input$selectedSymptoms)
+  
+})
+
 output$plotPyramid <- renderPlot ({
   try({
     if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
@@ -839,13 +845,34 @@ output$plotPyramid <- renderPlot ({
                      detail = 'This may take a while...', 
                      value=NULL)
         
-        plotPropPositive(data=dataFilteredwithThreshold(),
-                             grouping=input$groupingVar,
-                             measurements=input$measurementVar,
-                             symptomsNames=input$selectedSymptoms)
-        
+#         plotPropPositive(data=dataFilteredwithThreshold(),
+#                              grouping=input$groupingVar,
+#                              measurements=input$measurementVar,
+#                              symptomsNames=input$selectedSymptoms)
+       plotPyramidReactive()
       }}}, silent=TRUE)
 } ,height=numRowsProportions)
+
+output$downLoadplotPyramid <- downloadHandler (
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotPyramid_width
+    height = clientData$output_plotPyramid_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    plotPropPositive(data=dataFilteredwithThreshold(),
+                     grouping=input$groupingVar,
+                     measurements=input$measurementVar,
+                     symptomsNames=input$selectedSymptoms)
+    
+    dev.off()
+  }, contentType="application/postscript")
 
 # calculate data for tables of medians & CI plots ####
 dataforSummaryNonBinary <- reactive({

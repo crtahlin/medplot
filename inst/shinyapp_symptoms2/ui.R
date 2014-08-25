@@ -108,8 +108,9 @@ shinyUI(pageWithSidebar(
      
       # TAB - Summary ####
       tabPanel(title="Summary",
-               #uiOutput("tableforBoxplots")
                plotOutput("plotPyramid", height="auto"),
+               conditionalPanel(condition="input.treatasBinary==true",
+                                downloadButton("downLoadplotPyramid", label="Download")),
                uiOutput("selectEvaluationTime2"),
                dataTableOutput("tableforBoxplots"),
                dataTableOutput("tableforProportions"),
@@ -119,12 +120,7 @@ shinyUI(pageWithSidebar(
                uiOutput("proportionsDescr")
       ),
       
-#       # TAB - Graphical exploration : grouping variable ####
-#       tabPanel(title="Graphical exploration : grouping variable",
-#                textOutput("messageNotAppropriate5"),                            
-#                plotOutput("plotPropCIs", height="auto")
-#                  ),
-      
+    
       # TAB - Summary tables : grouping variable ####
       tabPanel(title="Summary tables : grouping variable",
                #textOutput("messageNotAppropriate10"),
