@@ -76,9 +76,7 @@ shinyUI(pageWithSidebar(
                uiOutput("selectMaxGroupSize"),
                plotOutput("plotTimelineProfiles", height="auto"),
                conditionalPanel(condition="input.selectedGraphOverTime=='profilePlot'",
-               downloadButton("downLoadplotTimelineProfiles", label="Download")),
-               #downloadButton("downLoadplotTimelineProfiles2", label="Download SVG"),
-               #plotOutput("plotTimelineProfiles", height="auto"),
+                                downloadButton("downLoadplotTimelineProfiles", label="Download")),
                uiOutput("plotTimelineProfilesDescr"),
                
                # Lasagna plot
@@ -88,20 +86,22 @@ shinyUI(pageWithSidebar(
                # Boxplots
                uiOutput("selectFacetingType"),
                plotOutput("plotTimelineBoxplots", height="auto"),
-               conditionalPanel(condition="input.selectedGraphOverTime=='boxPlot'",                                
-               downloadButton("downLoadplotTimelineBoxplot", label="Download")),
+               conditionalPanel(condition="input.selectedGraphOverTime=='boxPlot'",
+                                downloadButton("downLoadplotTimelineBoxplot", label="Download")),
                uiOutput("plotTimelineBoxplotsDesc"),
                
                # Timeline graph
                uiOutput("selectDisplayFormat"),
                plotOutput("plotTimeline", height="auto"),
+               conditionalPanel(condition="input.selectedGraphOverTime=='timelinePlot'",
+                                downloadButton("downLoadplotTimeline", label="Download")),
                uiOutput("plotTimelineDesc"),
                
                # Presence of symptoms graph
                uiOutput("selectMeasurementForPresencePlot"),
                plotOutput("plotProportion", height="auto"),
                conditionalPanel(condition="input.selectedGraphOverTime=='presencePlot'",
-               downloadButton("downLoadplotProportion", label="Download")),
+                                downloadButton("downLoadplotProportion", label="Download")),
                uiOutput("plotProportionDesc")
                
       ),

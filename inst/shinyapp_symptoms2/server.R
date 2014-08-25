@@ -684,6 +684,22 @@ output$selectDisplayFormat <- renderUI({
 })
 
 # Graph
+plotTimelineReactive <- reactive({
+  
+  if (input$treatasBinary == TRUE) { 
+    data=dataFilteredwithThreshold()
+  } else { data=dataFiltered() }
+
+  plotTimeline(data=data,
+                     date=input$dateVar,
+                     personID=input$patientIDVar,
+                     measurement=input$measurementVar,
+                     symptoms=input$selectedSymptoms,
+                     displayFormat = input$displayFormat,
+                     treatasBinary=input$treatasBinary)
+  })
+  
+
 output$plotTimeline <- renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
     if(input$selectedGraphOverTime=="timelinePlot") {
@@ -694,22 +710,15 @@ output$plotTimeline <- renderPlot({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        if (input$treatasBinary == TRUE) { 
-          data=dataFilteredwithThreshold()
-        } else { data=dataFiltered() }
-        # observe({dataFiltered()})
-        # if no symbols are selected, do not plot
-        #if (dim(dataFiltered())[1]>0) {
-        print(plotTimeline(data=data,
-                                   date=input$dateVar,
-                                   personID=input$patientIDVar,
-                                   measurement=input$measurementVar,
-                                   symptoms=input$selectedSymptoms,
-                                   displayFormat = input$displayFormat,
-                                   treatasBinary=input$treatasBinary)
-        )
+
+      plotTimelineReactive()
       }}  
 }, height=numRowsTimeline)
+
+output$downLoadplotTimeline <- downloadPlot(plotFunction = plotTimelineReactive,
+                                            width = clientData$output_plotTimeline_width,
+                                            height = clientData$output_plotTimeline_height,
+                                            print = TRUE)
 
 output$plotTimelineDesc <- reactive({
   if (!is.null(input$selectedGraphOverTime)) {
@@ -742,10 +751,7 @@ plotProportionReactive <- reactive({
 output$plotProportion=renderPlot({
   if(!(is.null(dataFiltered.yn()) || is.null(input$selectedMeasurementForPresencePlot) )){
     if(input$treatasBinary==TRUE){
-#       plotDistribution(data=dataFiltered.yn(),
-#                        selectedSymptoms=input$selectedSymptoms,
-#                        selectedProportion=input$selectedMeasurementForPresencePlot,
-#                        measurements=Measurement())
+
       plotProportionReactive()
     }}
   }, height=numRowsProportion) 
