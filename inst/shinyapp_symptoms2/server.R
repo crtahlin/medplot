@@ -646,12 +646,7 @@ output$plotTimelineBoxplots <- renderPlot({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        
-#         print(plotTimelineBoxplots(data=dataFiltered(),
-#                                    personIDVar=input$patientIDVar,
-#                                    measurementVar=input$measurementVar,
-#                                    selectedSymptoms=input$selectedSymptoms,
-#                                    faceting=input$selectedFacetingType))
+
         plotTimelineBoxplotsReactive()
         }
     }
@@ -736,16 +731,49 @@ output$selectMeasurementForPresencePlot <- renderUI({
     }}
 })
 
+plotProportionReactive <- reactive({
+  plotDistribution(data=dataFiltered.yn(),
+                   selectedSymptoms=input$selectedSymptoms,
+                   selectedProportion=input$selectedMeasurementForPresencePlot,
+                   measurements=Measurement())
+})
+
 # Plot - Presence (plot - proportions) ###
 output$plotProportion=renderPlot({
   if(!(is.null(dataFiltered.yn()) || is.null(input$selectedMeasurementForPresencePlot) )){
     if(input$treatasBinary==TRUE){
-      plotDistribution(data=dataFiltered.yn(),
-                       selectedSymptoms=input$selectedSymptoms,
-                       selectedProportion=input$selectedMeasurementForPresencePlot,
-                       measurements=Measurement())
+#       plotDistribution(data=dataFiltered.yn(),
+#                        selectedSymptoms=input$selectedSymptoms,
+#                        selectedProportion=input$selectedMeasurementForPresencePlot,
+#                        measurements=Measurement())
+      plotProportionReactive()
     }}
   }, height=numRowsProportion) 
+
+output$downLoadplotProportion <- downloadHandler (
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotProportion_width
+    height = clientData$output_plotProportion_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    plotDistribution(data=dataFiltered.yn(),
+                     selectedSymptoms=input$selectedSymptoms,
+                     selectedProportion=input$selectedMeasurementForPresencePlot,
+                     measurements=Measurement())
+    
+    dev.off()
+  }, contentType="application/postscript"
+  #downloadPlot(
+  #   plotFunction=plotProportionReactive,
+  #                                               width = clientData$output_plotProportion_width,
+  #                                               height = clientData$output_plotProportion_height,
+  #                                               print=TRUE
+  #   
+  
+  
+  )
 
 output$plotProportionDesc <- reactive({
   if (!is.null(input$selectedGraphOverTime)) {

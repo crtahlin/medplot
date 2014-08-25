@@ -100,6 +100,8 @@ shinyUI(pageWithSidebar(
                # Presence of symptoms graph
                uiOutput("selectMeasurementForPresencePlot"),
                plotOutput("plotProportion", height="auto"),
+               conditionalPanel(condition="input.selectedGraphOverTime=='presencePlot'",
+               downloadButton("downLoadplotProportion", label="Download")),
                uiOutput("plotProportionDesc")
                
       ),

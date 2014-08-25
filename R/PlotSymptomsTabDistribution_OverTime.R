@@ -109,6 +109,8 @@ plotTimelineBoxplots <- function(data,
                                  measurementVar,
                                  selectedSymptoms,
                                  faceting) {
+  # TODO remove next line
+  dev.list()
   # prepare data
   dataMelted <- melt(data=data,
                      id.vars=c(personIDVar, measurementVar),
