@@ -990,6 +990,15 @@ output$proportionsDescr <- reactive({
 # Graph
 # Proportions by groups with confidence intervals ####
 # Graph
+plotPropPositiveCIReactive <- reactive({
+ 
+  plotPropPositiveCI(data=dataFilteredwithThreshold(),
+                     groupingVar=input$groupingVar,
+                     measurementVar=input$measurementVar,
+                     selectedSymptoms=input$selectedSymptoms)
+  
+})
+
 output$plotPropCIs <- renderPlot ({
   try({
     if(!is.null(dataFilteredwithThreshold())){
@@ -1001,15 +1010,18 @@ output$plotPropCIs <- renderPlot ({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        
-        print(
-          plotPropPositiveCI(data=dataFilteredwithThreshold(),
-                                 groupingVar=input$groupingVar,
-                                 measurementVar=input$measurementVar,
-                                 selectedSymptoms=input$selectedSymptoms)
-        )
+
+plotPropPositiveCIReactive()
       }}}, silent=TRUE)
 } ,height=numRowsProportionsCI)
+
+output$downLoadPropPositiveCI <- downloadPlot(
+  plotFunction = plotPropPositiveCIReactive,
+  width = clientData$output_plotPropCIs_width,
+  height = clientData$output_plotPropCIs_height,
+  print = TRUE
+  )
+
 
 # Menu
 output$UIpropTable = renderUI({

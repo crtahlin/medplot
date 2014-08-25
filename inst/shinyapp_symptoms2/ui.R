@@ -129,6 +129,8 @@ shinyUI(pageWithSidebar(
       tabPanel(title="Summary tables : grouping variable",
                #textOutput("messageNotAppropriate10"),
                plotOutput("plotPropCIs", height="auto"),
+               conditionalPanel(condition="input.treatasBinary==true",
+                                downloadButton("downLoadPropPositiveCI", label="Download")),
                
                uiOutput("UIpropTable"),
                uiOutput("UIdoPvalueAdjustments"),
