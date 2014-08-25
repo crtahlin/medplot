@@ -147,12 +147,18 @@ shinyUI(pageWithSidebar(
                #textOutput("messageNotAppropriate6"),
                # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
+               
                plotOutput("plotClusterDendrogram", height="auto"),
+               downloadButton("downLoadplotClusterDendrogram", label="Download"),
                uiOutput("dendrogramDescr"),
+               
                plotOutput("plotClusterCorrelations", height="auto"),
+               downloadButton("downLoadplotClusterCorrelations", label="Download"),
                uiOutput("correlationDescr"),
+               
                uiOutput("selectClusterAnnotations"),
                plotOutput("plotClusterHeatmap", height="auto"),
+               downloadButton("downLoadplotClusterHeatmap", label="Download"),
                uiOutput("heatmapDescr")
                
                ),

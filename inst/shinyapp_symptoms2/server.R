@@ -1158,6 +1158,30 @@ output$plotClusterDendrogram=renderPlot({
 },height=numRowsClustering)
 
 
+output$downLoadplotClusterDendrogram <- downloadHandler(
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotClusterDendrogram_width
+    height = clientData$output_plotClusterDendrogram_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}
+    plotDendrogram(data=data,
+                   variableName=input$measurementVar,
+                   variableValue=input$selectedMeasurementValue,
+                   selectedSymptoms=input$selectedSymptoms,
+                   treatasBinary=input$treatasBinary)
+    
+    dev.off()
+  }, contentType="application/postscript"
+  )
+
 # Dendrogram description
 output$dendrogramDescr <- reactive({
   if (!is.null(dataFiltered())) {
@@ -1199,6 +1223,32 @@ output$plotClusterHeatmap=renderPlot({
   },height=numRowsClustering2)
 
 
+output$downLoadplotClusterHeatmap <- downloadHandler(
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotClusterHeatmap_width
+    height = clientData$output_plotClusterHeatmap_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    if (input$treatasBinary==TRUE) {data=dataExtendedwithThreshold()} else {data=dataExtended()}  
+    plotClusterHeatmap(data=data,
+                       #TODO: make dependent on selection
+                       variableName=input$measurementVar,
+                       variableValue=input$selectedMeasurementValue,
+                       selectedSymptoms=input$selectedSymptoms,
+                       annotationVars=input$selectedClusterAnnotations,
+                       treatasBinary=input$treatasBinary)
+    
+    dev.off()
+  }, contentType="application/postscript"
+)
+
 # Heat map description
 output$heatmapDescr <- reactive({
   if (!is.null(dataFiltered())) {
@@ -1222,6 +1272,33 @@ output$plotClusterCorrelations <- renderPlot({
     
   }
   },height=numRowsClustering3)
+
+
+output$downLoadplotClusterCorrelations <- downloadHandler(
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotClusterCorrelations_width
+    height = clientData$output_plotClusterCorrelations_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}
+    
+    plotCorrelations(data=data,
+                     variableName=input$measurementVar,
+                     variableValue=input$selectedMeasurementValue,
+                     selectedSymptoms=input$selectedSymptoms,
+                     treatasBinary=input$treatasBinary)
+    
+    dev.off()
+  }, contentType="application/postscript"
+)
+
 
 # Correlation plot description
 output$correlationDescr <- reactive({
