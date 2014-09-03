@@ -164,8 +164,8 @@ shinyUI(pageWithSidebar(
       # TAB - Regression model : one evaluation time ####
       tabPanel(title="Regression model : one evaluation time",
                # Menus
-               textOutput("debug10"),
-               textOutput("debug9"),
+               #textOutput("debug10"),
+               #textOutput("debug9"),
                uiOutput("selectEvaluationTime"),
                uiOutput("selectCovariate"),
                uiOutput("checkUseFirthCorrection"),
@@ -199,11 +199,7 @@ shinyUI(pageWithSidebar(
                uiOutput("RCSRegDownload"),
                dataTableOutput("tableRCS"),
                uiOutput("RCSDescr")
-               
-#                textOutput("testtt"),
-#                conditionalPanel(condition = "output.testtt=='scenarioLinearModel'",
-#                downloadButton("downLoadRegressionOneTime", label="Download"))
-        ),
+               ),
       
       # TAB - Regression model : all evaluation times ####
       tabPanel(title="Regression model : all evaluation times",
