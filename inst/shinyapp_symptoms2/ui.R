@@ -209,13 +209,16 @@ shinyUI(pageWithSidebar(
                dataTableOutput("mixedModelTable0"),
                textOutput("mixedModelTable1Caption"),
                dataTableOutput("mixedModelTable1"),
-               plotOutput("mixedModelGraph1", height="auto"),               
+               plotOutput("mixedModelGraph1", height="auto"),
+               uiOutput("graph1Download"),
                textOutput("mixedModelTable2Caption"),
                dataTableOutput("mixedModelTable2"),
                plotOutput("mixedModelGraph2", height="auto"),
+               uiOutput("graph2Download"),
                textOutput("mixedModelTable3Caption"),               
                dataTableOutput("mixedModelTable3"),
                plotOutput("mixedModelGraph3", height="auto"),
+               uiOutput("graph3Download"),
                uiOutput("regressionAllDescr")
       ),
       

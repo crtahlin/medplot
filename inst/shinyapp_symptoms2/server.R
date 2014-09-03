@@ -1765,35 +1765,52 @@ output$mixedModelTable1Caption <- renderText(
   })
 
 output$mixedModelTable1 <- renderDataTable({
-#<- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     
     results <- mixedModelResults()[["printablecoVariate1st"]] 
-    #results <- mixedModelResults()[["coVariate1st"]] 
-    
-#     out <- print(xtable(results, caption=paste("Fixed effects of",
-#                                                input$selectedCovariate1st,
-#                                                "for", 
-#                                                mixedModelResults()[["coVariate1stComparison"]])),
-#                  type="html",
-#                  html.table.attributes='class="data table table-bordered table-condensed"',
-#                  caption.placement="top")
-#     return(div(HTML(out),class="shiny-html-output"))
+
     return(results)
   }
   }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 1 ####
+mixedModelGraph1Reactive <- reactive({
+  
+  #print(
+    plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
+                                       coVariate1st=input$selectedCovariate1st,
+                                       coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
+                                       treatasBinary=input$treatasBinary,
+                                       variableOrder=input$selectedSymptoms
+                                   )
+  
+})
+
+
 output$mixedModelGraph1 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
-    print(plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
-                                         coVariate1st=input$selectedCovariate1st,
-                                         coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
-                                         treatasBinary=input$treatasBinary,
-                                         variableOrder=input$selectedSymptoms) 
-    )
+#     print(plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
+#                                          coVariate1st=input$selectedCovariate1st,
+#                                          coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
+#                                          treatasBinary=input$treatasBinary,
+#                                          variableOrder=input$selectedSymptoms) 
+#     )
+    mixedModelGraph1Reactive()
+    
   }
 }, height=numRowsMixedModels1)
+
+# Download Graph 1 ####
+output$graph1Download <- renderUI({
+  
+  output$downLoadGraph1 <- downloadPlot(plotFunction = mixedModelGraph1Reactive,
+                                                    width = clientData$output_mixedModelGraph1_width,
+                                                    height = clientData$output_mixedModelGraph1_height,
+                                                    print = TRUE)
+  downloadButton("downLoadGraph1", label="Download")
+  
+})
+
 
 # Table 2 ####
 output$mixedModelTable2Caption <- renderText(
@@ -1812,32 +1829,48 @@ output$mixedModelTable2 <- renderDataTable({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
       results <- mixedModelResults()[["printablemeasurementVar"]] 
-      #results <- mixedModelResults()[["measurementVar"]] 
-      
-#       out <- print(xtable(results, caption=paste("Fixed effects of",
-#                                                  input$measurementVar,
-#                                                  "for T=",
-#                                                  mixedModelResults()[["measurementVarComparison"]],
-#                                                  "used as reference")),
-#                    type="html",
-#                    html.table.attributes='class="data table table-bordered table-condensed"',
-#                    caption.placement="top")
-#       return(div(HTML(out),class="shiny-html-output"))
+ 
       return(results)
     }}
   }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 2 ####
+mixedModelGraph2Reactive <- reactive({
+  #print(
+    plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
+                                         measurementVar=input$measurementVar,
+                                         treatasBinary=input$treatasBinary,
+                                         variableOrder=input$selectedSymptoms) 
+  #)
+  
+})
+
 output$mixedModelGraph2 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
-      print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
-                                             measurementVar=input$measurementVar,
-                                             treatasBinary=input$treatasBinary,
-                                             variableOrder=input$selectedSymptoms) 
-      )
+#       print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
+#                                              measurementVar=input$measurementVar,
+#                                              treatasBinary=input$treatasBinary,
+#                                              variableOrder=input$selectedSymptoms) 
+#       )
+      
+      mixedModelGraph2Reactive()
     }}
 }, height=numRowsMixedModels2)
+
+# Download Graph 2 ####
+output$graph2Download <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMmeasurement") {
+  output$downLoadGraph2 <- downloadPlot(plotFunction = mixedModelGraph2Reactive,
+                                        width = clientData$output_mixedModelGraph2_width,
+                                        height = clientData$output_mixedModelGraph2_height,
+                                        print = TRUE)
+  downloadButton("downLoadGraph2", label="Download")
+    }}
+  
+})
+
 
 # Table 3 ####
 output$mixedModelTable3Caption <- renderText(
@@ -1848,31 +1881,48 @@ output$mixedModelTable3Caption <- renderText(
   )
 
 output$mixedModelTable3 <- renderDataTable({
-  #renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
       results <- mixedModelResults()[["printabledaysSinceInclusion"]] 
-      #results <- mixedModelResults()[["daysSinceInclusion"]] 
-      
-#       out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
-#                    type="html",
-#                    html.table.attributes='class="data table table-bordered table-condensed"',
-#                    caption.placement="top")
-#       return(div(HTML(out),class="shiny-html-output"))
+   
       return(results)
     }}
   }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 3 ####
+mixedModelGraph3Reactive <- reactive({
+  #print(
+    plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+                                             treatasBinary=input$treatasBinary,
+                                             variableOrder=input$selectedSymptoms) 
+  #)
+  
+})
+
 output$mixedModelGraph3 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
-      print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
-                                                 treatasBinary=input$treatasBinary,
-                                                 variableOrder=input$selectedSymptoms) 
-      )
+#       print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+#                                                  treatasBinary=input$treatasBinary,
+#                                                  variableOrder=input$selectedSymptoms) 
+#       )
+      
+      mixedModelGraph3Reactive()
     }}
 }, height=numRowsMixedModels3)
+
+# Download Graph 3 ####
+output$graph3Download <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+  output$downLoadGraph3 <- downloadPlot(plotFunction = mixedModelGraph3Reactive,
+                                        width = clientData$output_mixedModelGraph3_width,
+                                        height = clientData$output_mixedModelGraph3_height,
+                                        print = TRUE)
+  downloadButton("downLoadGraph3", label="Download")
+    }}
+  
+})
 
 # description Regression All
 output$regressionAllDescr <- reactive({
