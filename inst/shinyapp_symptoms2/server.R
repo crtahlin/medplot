@@ -544,8 +544,6 @@ output$downLoadplotTimelineProfiles <-  downloadPlot(
   print=TRUE
   )
       
-
-
 output$plotTimelineProfilesDescr <- reactive({
   if(!is.null(input$selectedGraphType)) {
   description <- switch(input$selectedGraphType,
@@ -555,7 +553,6 @@ output$plotTimelineProfilesDescr <- reactive({
     )
   return(description())
   }})
-
 
 
 # Lasagna plots ####
@@ -573,15 +570,15 @@ output$plotLasagna <- renderUI({
       
       
       filenames <- vector()
+      filenamesEPS <- vector()
       
       # generate as many files as there are plots
       for (symptom in input$selectedSymptoms) {
         #filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"\\www\\temp"), fileext=".png")
         filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"/www/temp"), fileext=".png")
+        filenamesEPS[symptom] <- tempfile(pattern=symptom, fileext = ".eps")
         
-        # plot graph for each symptom
-        #for(symptom in input$selectedSymptoms) {
-        
+        # plot PNG graph for each symptom
         png(paste0(filenames[symptom]))
         plotLasagna(if (input$treatasBinary==FALSE) {dataFiltered()}else{dataFilteredwithThreshold()}, 
                     treatasBinary=input$treatasBinary, 
@@ -592,12 +589,49 @@ output$plotLasagna <- renderUI({
                     groupingVar=input$groupingVar,  
                     thresholdValue=input$thresholdValue) 
         dev.off()
+        
+        # prepare EPS graphs
+        width = 5 # in inches
+        height = 5 # in inches
+        postscript(filenamesEPS[symptom], paper="special", width=width, height = height)
+        plotLasagna(if (input$treatasBinary==FALSE) {dataFiltered()}else{dataFilteredwithThreshold()}, 
+                    treatasBinary=input$treatasBinary, 
+                    symptom=symptom,
+                    dateVar=input$dateVar, 
+                    personIDVar=input$patientIDVar, 
+                    measurementVar=input$measurementVar,
+                    groupingVar=input$groupingVar,  
+                    thresholdValue=input$thresholdValue)
+        dev.off()
+        
       }
+
+      # create a ZIP file of EPS plots
+      zipFile <<- tempfile(pattern="zip", tmpdir=paste0(workingDir,"/www/temp/"), fileext=".zip")
+      zip(zipfile=zipFile, files=filenamesEPS, flags="-Dj")
+      
       
       out <- pastePlotFilenames(filenames)
       
       return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
     }}
+})
+
+# prepare ZIP for downloading EPS files
+output$lasagnaDownload <- downloadHandler(
+  filename="Lasagna.zip",
+  content= function(file) {
+    file.copy(from=zipFile, to=file)
+  }, contentType="application/octet-stream")
+  
+
+
+# prepare download button
+output$downloadLasagna <- renderUI({
+  out <- downloadButton(outputId = "lasagnaDownload", label = "Download")
+  #         # delete EPS files
+  #         unlink(filenamesEPS)
+  return(out)
 })
 
 output$plotLasagnaDesc <- reactive({

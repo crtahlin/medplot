@@ -81,6 +81,7 @@ shinyUI(pageWithSidebar(
                
                # Lasagna plot
                uiOutput("plotLasagna"), #, height="700px"),
+               uiOutput("downloadLasagna"),
                uiOutput("plotLasagnaDesc"),
                
                # Boxplots
