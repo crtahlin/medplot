@@ -1310,14 +1310,6 @@ output$correlationDescr <- reactive({
     }}})
 
 
-# output$messageNotAppropriate6 <- renderText({
-#   if(!is.null(input$treatasBinary)){
-#     if (input$treatasBinary==TRUE) {
-#       "This type of analysis is not appropriate for binary responses."
-#     }}
-# })
-
-
 # TAB - Regression model : one evaluation ####
 # Menus ####
 output$debug10 <- renderText({paste(regressionScenario())})
@@ -1407,32 +1399,54 @@ resultsLogistf <- reactive({
 
 
 # plot - logistf ####
-output$plotLogistf2 <- renderPlot({
+plotLogistfReactive <- reactive({
+  if(regressionScenario()!="scenarioLogistf") {return()}
+  plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
+                    variableName="Variable",
+                    valueName="OR",
+                    CILowerName="CILower",
+                    CIUpperName="CIUpper",
+                    xLabel="Odds ratios",
+                    yLabel="Variables",
+                    graphTitle=paste("Odds ratios and confidence intervals for",
+                                     resultsLogistf()[["referenceValue"]], 
+                                     "\n at evaluation T=",
+                                     input$selectedEvaluationTime,
+                                     "(using Firth correction)"),
+                    vLine=1,
+                    variableOrder=input$selectedSymptoms) 
+  }) 
+
+
+
+output$plotLogistf <- renderPlot({
   if(!is.null(resultsLogistf()) ){
     if(regressionScenario()=="scenarioLogistf") {
-      out <- plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
-                               variableName="Variable",
-                               valueName="OR",
-                               CILowerName="CILower",
-                               CIUpperName="CIUpper",
-                               xLabel="Odds ratios",
-                               yLabel="Variables",
-                               graphTitle=paste("Odds ratios and confidence intervals for",
-                                                resultsLogistf()[["referenceValue"]], 
-                                                "\n at evaluation T=",
-                                                input$selectedEvaluationTime,
-                                                "(using Firth correction)"),
-                               vLine=1,
-                               variableOrder=input$selectedSymptoms) 
-      print(out)
+#       out <- plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
+#                                variableName="Variable",
+#                                valueName="OR",
+#                                CILowerName="CILower",
+#                                CIUpperName="CIUpper",
+#                                xLabel="Odds ratios",
+#                                yLabel="Variables",
+#                                graphTitle=paste("Odds ratios and confidence intervals for",
+#                                                 resultsLogistf()[["referenceValue"]], 
+#                                                 "\n at evaluation T=",
+#                                                 input$selectedEvaluationTime,
+#                                                 "(using Firth correction)"),
+#                                vLine=1,
+#                                variableOrder=input$selectedSymptoms) 
+#      print(out)
+      print(plotLogistfReactive())
     }}
 }, height=numRowsLogistf)
 
 # table - logistf ####
 output$tableLogistf <- renderDataTable({
+  
   if(!is.null(resultsLogistf()) ){
     if(regressionScenario()=="scenarioLogistf") {
-      resultsLogistf()[["printableResultsTable"]]
+      return(resultsLogistf()[["printableResultsTable"]])
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
@@ -1440,7 +1454,7 @@ output$tableLogistf <- renderDataTable({
 output$tableLogistfIntercept <- renderDataTable({
   if(!is.null(resultsLogistf()) ){
     if(regressionScenario()=="scenarioLogistf") {
-      resultsLogistf()[["printableInterceptTable"]]
+      return(resultsLogistf()[["printableInterceptTable"]])
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
@@ -1486,24 +1500,42 @@ output$tableLogistIntercept <- renderDataTable({
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # plot - logist ####
+plotLogistReactive <- reactive({
+  plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
+                           variableName="Variable",
+                           valueName="OR",
+                           CILowerName="CILower",
+                           CIUpperName="CIUpper",
+                           xLabel="Odds ratios",
+                           yLabel="Variables",
+                           graphTitle=paste("Odds ratios and confidence intervals for",
+                                            resultsLogist()[["referenceValue"]], 
+                                            "\n at evaluation T=",
+                                            input$selectedEvaluationTime),
+                           vLine=1,
+                           variableOrder=input$selectedSymptoms) 
+  
+})
+
 output$plotLogist <- renderPlot({
-  if(!(is.null(resultsLogist()))){
+  if(!is.null(resultsLogist())){
     if(regressionScenario()=="scenarioLogist") {
-      out <- plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
-                               variableName="Variable",
-                               valueName="OR",
-                               CILowerName="CILower",
-                               CIUpperName="CIUpper",
-                               xLabel="Odds ratios",
-                               yLabel="Variables",
-                               graphTitle=paste("Odds ratios and confidence intervals for",
-                                                resultsLogist()[["referenceValue"]], 
-                                                "\n at evaluation T=",
-                                                input$selectedEvaluationTime),
-                               vLine=1,
-                               variableOrder=input$selectedSymptoms)    
+#       out <- plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
+#                                variableName="Variable",
+#                                valueName="OR",
+#                                CILowerName="CILower",
+#                                CIUpperName="CIUpper",
+#                                xLabel="Odds ratios",
+#                                yLabel="Variables",
+#                                graphTitle=paste("Odds ratios and confidence intervals for",
+#                                                 resultsLogist()[["referenceValue"]], 
+#                                                 "\n at evaluation T=",
+#                                                 input$selectedEvaluationTime),
+#                                vLine=1,
+#                                variableOrder=input$selectedSymptoms)    
       
-      print(out)
+    #  print(out)
+      plotLogistReactive()
     }}
 }, height=numRowsLogist)
 
@@ -1548,23 +1580,42 @@ output$tableLinearIntercept <- renderDataTable({
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # plot - linear ####
+plotLinearReactive <- reactive({
+  plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
+                           variableName="Variable",
+                           valueName="beta",
+                           CILowerName="CILower",
+                           CIUpperName="CIUpper",
+                           xLabel="Beta (slope) coefficient",
+                           yLabel="Variables",
+                           graphTitle=paste("Beta coefficients and confidence intervals for effects of",
+                                            input$selectedCovariate, 
+                                            "\n on selected variables at evaluation T=",
+                                            input$selectedEvaluationTime),
+                           vLine=0,
+                           variableOrder=input$selectedSymptoms)  
+  
+})
+
 output$plotLinear <- renderPlot({
   if(!is.null(resultsLinear())){
     if (regressionScenario()=="scenarioLinearModel") {
-      out <- plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
-                               variableName="Variable",
-                               valueName="beta",
-                               CILowerName="CILower",
-                               CIUpperName="CIUpper",
-                               xLabel="Beta (slope) coefficient",
-                               yLabel="Variables",
-                               graphTitle=paste("Beta coefficients and confidence intervals for effects of",
-                                                input$selectedCovariate, 
-                                                "\n on selected variables at evaluation T=",
-                                                input$selectedEvaluationTime),
-                               vLine=0,
-                               variableOrder=input$selectedSymptoms)  
-      print(out)
+#       out <- plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
+#                                variableName="Variable",
+#                                valueName="beta",
+#                                CILowerName="CILower",
+#                                CIUpperName="CIUpper",
+#                                xLabel="Beta (slope) coefficient",
+#                                yLabel="Variables",
+#                                graphTitle=paste("Beta coefficients and confidence intervals for effects of",
+#                                                 input$selectedCovariate, 
+#                                                 "\n on selected variables at evaluation T=",
+#                                                 input$selectedEvaluationTime),
+#                                vLine=0,
+#                                variableOrder=input$selectedSymptoms)  
+      #print(out)
+      
+      plotLinearReactive()
     }}
   }, height=numRowsLinear) 
 
@@ -1581,18 +1632,30 @@ output$linearDescr <- reactive({
 # Scenario - modeling with Restricted Cubic Splines
 
 # plot - RCS plot ####
+plotRCSReactive <- reactive({
+  
+  plotRCS(data.all=dataExtended(),
+          data.yn=dataFiltered.yn(),
+          measurement=Measurement(),
+          selectedSymptoms=input$selectedSymptoms,
+          measurementSelectedrcs=input$selectedEvaluationTime,
+          rcsIDVar=input$selectedCovariate,
+          binaryVar=input$treatasBinary) 
+})
+
 output$plotRCS=renderPlot({
   
   if(!is.null(regressionScenario())){
     if (regressionScenario()=="scenarioRCSModel") {
       
-      plotRCS(data.all=dataExtended(),
-              data.yn=dataFiltered.yn(),
-              measurement=Measurement(),
-              selectedSymptoms=input$selectedSymptoms,
-              measurementSelectedrcs=input$selectedEvaluationTime,
-              rcsIDVar=input$selectedCovariate,
-              binaryVar=input$treatasBinary)   
+#       plotRCS(data.all=dataExtended(),
+#               data.yn=dataFiltered.yn(),
+#               measurement=Measurement(),
+#               selectedSymptoms=input$selectedSymptoms,
+#               measurementSelectedrcs=input$selectedEvaluationTime,
+#               rcsIDVar=input$selectedCovariate,
+#               binaryVar=input$treatasBinary)   
+      plotRCSReactive()
     }}
 }, height=numRowsRCSModel)
 
@@ -1620,6 +1683,126 @@ output$RCSDescr <- reactive({
       
       return(description())
     }}})
+
+# TODO: testing conditional buttons
+output$testtt <- reactive({ 
+  #print(2+2)
+  browser()
+ regressionScenario()
+}
+)
+
+# download "buttons" for each of the regression graphs ####
+output$linearRegDownload <- renderUI({
+  if (regressionScenario()=="scenarioLinearModel") {
+    output$downLoadRegressionOneTime1 <- downloadPlot(plotFunction = plotLinearReactive,
+                              width = clientData$output_plotLinear_width,
+                              height = clientData$output_plotLinear_height,
+                              print = TRUE)
+    downloadButton("downLoadRegressionOneTime1", label="Download")
+  }
+  })
+
+output$logistRegDownload <- renderUI({
+  if (regressionScenario()=="scenarioLogist") {
+    output$downLoadRegressionOneTime2 <- downloadPlot(plotFunction = plotLogistReactive,
+                                                     width = clientData$output_plotLogist_width,
+                                                     height = clientData$output_plotLogist_height,
+                                                     print = TRUE)
+    downloadButton("downLoadRegressionOneTime2", label="Download")
+  }
+})
+
+output$logistfRegDownload <- renderUI({
+  if (regressionScenario()=="scenarioLogistf") {
+    output$downLoadRegressionOneTime3 <- downloadPlot(plotFunction = plotLogistfReactive,
+                                                     width = clientData$output_plotLogistf_width,
+                                                     height = clientData$output_plotLogistf_height,
+                                                     print = TRUE)
+    downloadButton("downLoadRegressionOneTime3", label="Download")
+  }
+})
+
+output$RCSRegDownload <- renderUI({
+  if (regressionScenario()=="scenarioRCSModel") {
+    output$downLoadRegressionOneTime4 <- downloadHandler(
+      # since this is base graphics (not ggplot) the EPS file generation
+      # has to be handled differently - the downloadPlot() function does not work
+      # due to "Cairo" graphics device being used instead of "postscipt"
+      # maybe has to do with being called from a reactive function and/or plot being 
+      # in a different environement?
+      filename="plot.eps",
+      
+      content = function (file) {
+        width = clientData$output_plotRCS_width
+        height = clientData$output_plotRCS_height
+        postscript(file, paper="special", width = width/72, height = height/72)
+        
+        # if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}
+        
+        plotRCS(data.all=dataExtended(),
+                data.yn=dataFiltered.yn(),
+                measurement=Measurement(),
+                selectedSymptoms=input$selectedSymptoms,
+                measurementSelectedrcs=input$selectedEvaluationTime,
+                rcsIDVar=input$selectedCovariate,
+                binaryVar=input$treatasBinary)
+        
+        dev.off()
+      }, contentType="application/postscript"
+    )
+         
+    downloadButton("downLoadRegressionOneTime4", label="Download")
+  }
+})
+
+
+#TODO : ne deluje očitno tako kot je - napiši varianto z
+# downloadHandler, ki bo imela pod "content" te if variante
+# OR
+# do a renderUI to generate the graphs/tables/buttons as needed.
+# output$downLoadRegressionOneTime <- reactive({
+#   if (!is.null(regressionScenario())) {
+#     
+#     if (regressionScenario()=="scenarioLogist") {
+#     out <-       downloadPlot(plotFunction = plotLogistReactive,
+#                  width = clientData$output_plotLogist_width,
+#                  height = clientData$output_plotLogist_height,
+#                  print = TRUE)
+#     
+#     
+#   }
+#   
+#   if (regressionScenario()=="scenarioLogistf") {
+# out <-    downloadPlot(plotFunction = plotLogistfReactive,
+#                    width = clientData$output_plotLogistf_width,
+#                    height = clientData$output_plotLogistf_height,
+#                    print = TRUE)
+#     
+#     
+#   }
+#   
+#   if (regressionScenario()=="scenarioLinearModel") {
+#     
+# out <-      downloadPlot(plotFunction = plotLinearReactive,
+#                    width = clientData$output_plotLinear_width,
+#                    height = clientData$output_plotLinear_height,
+#                    print = TRUE)
+#     
+#   }
+#   
+#   if (regressionScenario()=="scenarioRCSModel") {
+#     
+#     out <-       downloadPlot(plotFunction = plotRCSReactive,
+#                  width = clientData$output_plotRCS_width,
+#                  height = clientData$output_plotRCS_height,
+#                  print = TRUE) 
+#       
+#     
+#   }
+#   out
+#   }
+# })
 
 # TAB - Regression model : all evaluations ####
 # Menu

@@ -144,8 +144,6 @@ shinyUI(pageWithSidebar(
               
       # TAB - Clustering ####
       tabPanel(title="Clustering",
-               #textOutput("messageNotAppropriate6"),
-               # textOutput("messageSelectVars"),
                uiOutput("clusteringUI"),
                
                plotOutput("plotClusterDendrogram", height="auto"),
@@ -166,8 +164,8 @@ shinyUI(pageWithSidebar(
       # TAB - Regression model : one evaluation time ####
       tabPanel(title="Regression model : one evaluation time",
                # Menus
-               #textOutput("debug10"),
-               #textOutput("debug9"),
+               textOutput("debug10"),
+               textOutput("debug9"),
                uiOutput("selectEvaluationTime"),
                uiOutput("selectCovariate"),
                uiOutput("checkUseFirthCorrection"),
@@ -176,27 +174,35 @@ shinyUI(pageWithSidebar(
                # Graphs
                # Logistic regression with Firth correction
                # plotOutput("plotLogistf", height="auto"),
-               plotOutput("plotLogistf2", height="auto"),
+               plotOutput("plotLogistf", height="auto"),
+               uiOutput("logistfRegDownload"),
                dataTableOutput("tableLogistf"),
                dataTableOutput("tableLogistfIntercept"),
                uiOutput("logistfDescr"),
                
                # Logistic regression 
                plotOutput("plotLogist", height="auto"),
+               uiOutput("logistRegDownload"),
                dataTableOutput("tableLogist"),
                dataTableOutput("tableLogistIntercept"),
                uiOutput("logistDescr"),
                
                # Linear regression
                plotOutput("plotLinear", height="auto"),
+               uiOutput("linearRegDownload"),
                dataTableOutput("tableLinear"),
                dataTableOutput("tableLinearIntercept"),
                uiOutput("linearDescr"),
                
                # RCS regression
                plotOutput("plotRCS", height="100%"),
+               uiOutput("RCSRegDownload"),
                dataTableOutput("tableRCS"),
                uiOutput("RCSDescr")
+               
+#                textOutput("testtt"),
+#                conditionalPanel(condition = "output.testtt=='scenarioLinearModel'",
+#                downloadButton("downLoadRegressionOneTime", label="Download"))
         ),
       
       # TAB - Regression model : all evaluation times ####
