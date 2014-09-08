@@ -226,103 +226,11 @@ shinyUI(pageWithSidebar(
       # TAB - Selected data ####
       tabPanel(title="Uploaded data", 
                # textOutput("messageSelectVars"),
-               dataTableOutput("data")) #,
+               dataTableOutput("data")), #,
       
-      
-#       # TAB - Timeline ####
-#       tabPanel(title="Timeline",
-#                textOutput("messageNotAppropriate"),  
-#                # textOutput("messageSelectVars"),
-#                  uiOutput("selectDisplayFormat"),
-#                  plotOutput("plotTimeline", height="auto")
-#                ),
-   
-#       # TAB - Distr. of the vars: over time ####
-#       tabPanel(title="Distribution of the variables: over time - profile plots" ,
-#                textOutput("messageNotAppropriate2"),
-#                uiOutput("selectGraphType"),
-#                uiOutput("selectRandomSampleSize"),
-#                uiOutput("selectMaxGroupSize"),
-#                plotOutput("plotTimelineProfiles", height="auto")               
-#       ),
-#       
-#       # TAB - Distr. of the vars: over time w boxplots ####
-#       tabPanel(title="Distribution of the variables: over time - boxplots",
-#                textOutput("messageNotAppropriate3"),
-#                #plotOutput("plotTimelineBoxplots", height="auto"),
-#                uiOutput("tableforBoxplots")
-#                ),
-#       
-#       # TAB - Distribution of the variables ####
-#       tabPanel(title="OBSOLETE - Distribution of the variables: by measurement occasion",
-#               textOutput("messageNotAppropriate4"),
-#                # textOutput("messageSelectVars"),
-#                uiOutput("proportionUI"),
-#                #plotOutput("plotProportion", height="auto"), 
-#                plotOutput("plotCI", height="auto"), 
-#                plotOutput("plotBoxplot", height="auto"),
-#                uiOutput("selectPosOnly"),
-#                
-#                tableOutput("tablePropMedian"),
-#                uiOutput("textTablePropMedian")
-#       )
-#       
-#       # TAB - Distribution of the variables: by grouping variable ####
-#       tabPanel(title="Distribution of the variables: by grouping variable"#,
-# #                textOutput("messageNotAppropriate5"),
-#                # textOutput("messageSelectVars"),
-# #                plotOutput("plotPyramid", height="auto"),              
-# #                plotOutput("plotPropCIs", height="auto"),
-#                           
-# #                uiOutput("UIpropTable"),
-# #               
-# #                tableOutput("tablePropGroups"),
-# #                uiOutput("textTablePropGroups"),
-# #                
-# #                tableOutput("tableMedianGroups"),
-# #                uiOutput("textTableMedianGroups")
-#                
-#                ),
-#       
-      
-     
-      
-      
-      
-#       # TAB - RCS ####
-#       tabPanel(title="RCS: by measurement occasion",
-#                #textOutput("messageNotAppropriate7"),
-#                #textOutput("messageSelectVars"),
-#                uiOutput("rcsUI"),
-#                uiOutput("rcsUI2")#,
-# #                plotOutput("plotRCS", height="100%"),
-# #                tableOutput("tableRCS")
-#       ),
-#       
-#       # TAB - Logistf ####
-#       tabPanel(title="Logistf: by measurement occasion",
-#                textOutput("messageNotAppropriate8"),
-#                # textOutput("messageSelectVars"),
-#                uiOutput("logistfUI2"),
-#                uiOutput("logistfUI")#,
-# #                plotOutput("plotLogistf", height="auto"),
-# #                tableOutput("tableLogistf")
-#                )#,
-      
-#       # TAB - Mixed model ####
-#       tabPanel(title="Mixed model",
-#                uiOutput("selectMixedModelType"),
-#                tableOutput("mixedModelTable1"),
-#                plotOutput("mixedModelGraph1", height="auto"),               
-#                tableOutput("mixedModelTable2"),
-#                plotOutput("mixedModelGraph2", height="auto"),
-#                tableOutput("mixedModelTable3"),
-#                plotOutput("mixedModelGraph3", height="auto")
-#                )
-#       
-      
-      # TAB - Debug ####
-      # tabPanel("Debug", verbatimTextOutput("debug"))
+       # TAB - Debug ####
+       tabPanel("Selected variables",
+                verbatimTextOutput("selectedVariables"))
     )
   )
 )
