@@ -134,10 +134,14 @@ The second graph shows the estimated proportion of subjects with positive outcom
 if (outputName=="SummaryGrouping_Proportions") {
   description <- renderText({
     paste(
-"Table displays for each variable the proportion of subjects in a certain group, P value for the difference of proportions and the 95% confidence interval for the difference of proportions. The groups are compared with the chi-squared test with continuity correction. Data with missing values for grouping variable are removed from analysis.<br><br>
+"
+The graph shows the estimated proportion of subjects with positive values of outcome variables together with their 95% confidence intervals. All evaluation occasions are represented for each outcome variable. Both groups are represented on the graph - one to the left and the other to right of the zero value on the horizontal axis.
 
-Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method or multivariate permutation based adjustment. Q values are evaluated using the Benjamini-Hochberg or Benjamini-Hochberg-Yekutieli procedure.<br><br>
+The table displays the estimated proportion of subjects in a certain group, P value for the difference of proportions and the 95% confidence interval for the difference of proportions. The groups are compared using the chi-squared test with continuity correction. Data with missing values for grouping variable are removed from analysis.<br><br>
 
+Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method (conservative and lacks statistical power with correlated if the outcomes are correlated) or multivariate permutation based adjustment (takes into account the correlation between outcomes and is generaly more statisticaly powerful than Holm-Bonferroni).  Q values are evaluated using the Benjamini-Hochberg (assumes inedependent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
+
+References:<br>
 Westfall PH YS (1993) Resampling-Based Multiple Testing. Wiley New York.<br>
 Benjamini Y, Hochberg Y (1995) Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal Statistical Society Series B (Methodological) : 289-300.<br>
 Benjamini Y, Yekutieli D (2001) The control of the false discovery rate in multiple testing under dependency. Annals of statistics : 1165-1188."
@@ -147,10 +151,11 @@ Benjamini Y, Yekutieli D (2001) The control of the false discovery rate in multi
 if (outputName=="SummaryGrouping_Medians") {
   description <- renderText({
     paste(
-"Table displays for each variable the median value for subjects in a certain group, interquartile range for of the variable (25th to 75th percentile)and P value for the difference of samples. The groups are compared with the Mann-Whitney test. Data with missing values for grouping variable are removed from analysis. Threshold for positivity of variables is not taken into account.<br><br>
+"The table displays the median value for subjects in a certain group, interquartile range for the variable (25th to 75th percentile) and P value for the difference of samples. The groups are compared with the Mann-Whitney test. Data with missing values for grouping variable are removed from analysis. Threshold for positivity of variables is not taken into account.<br><br>
 
-Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method or multivariate permutation based adjustment. Q values are evaluated using the Benjamini-Hochberg or Benjamini-Hochberg-Yekutieli procedure.<br><br>
+Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method (conservative and lacks statistical power with correlated if the outcomes are correlated) or multivariate permutation based adjustment (takes into account the correlation between outcomes and is generaly more statisticaly powerful than Holm-Bonferroni).  Q values are evaluated using the Benjamini-Hochberg (assumes inedependent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
 
+References:<br>
 Westfall PH YS (1993) Resampling-Based Multiple Testing. Wiley New York.<br>
 Benjamini Y, Hochberg Y (1995) Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal Statistical Society Series B (Methodological) : 289-300.<br>
 Benjamini Y, Yekutieli D (2001) The control of the false discovery rate in multiple testing under dependency. Annals of statistics : 1165-1188."
@@ -160,49 +165,63 @@ Benjamini Y, Yekutieli D (2001) The control of the false discovery rate in multi
 if (outputName=="Clustering_Dendrogram") {
   description <- renderText({
     paste(
-"The dendrogram displays the similarity of subjects by hierarchically clustering the outcomes for the chosen evaluation occasion."
+"The dendrogram displays the similarity of subjects by hierarchically clustering the outcomes for the chosen evaluation occasion. For numerical variables, their corelations are used in computing their differences. For binary variables, Euclidean distance is used. "
     )})}
 
 # Clustering_Heatmap ####
 if (outputName=="Clustering_Heatmap") {
   description <- renderText({
     paste(
-"The heat map displays the complete data obtained at the chosen evaluation occasion. A column represents values for a particular subject, while the rows represent outcome variables. Values are color coded. "
+"The heat map displays the complete data obtained at the chosen evaluation occasion. A column represents values for a particular subject, while the rows represent outcome variables. Subjects and outcome variables are arranged according to their similarities using hierachical clustering with complete linkage method and Euclidean distance. Values of outcomes are color coded.<br><br>
+
+Additional variables can be selected to annotate the graph - their values are displayed in the top row.<br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.
+"
     )})}
 
 # Clustering_Correlations ####
 if (outputName=="Clustering_Correlations") {
   description <- renderText({
     paste(
-"The heat map displays correlations between outcome variables at the chosen evaluation occasion. Values of pairwise Spearman correlations between two outcome variables are also displayed numerically in each cell. "
+"The heat map displays correlations between outcome variables at the chosen evaluation occasion. Values of pairwise Spearman correlations between two outcome variables are also displayed numerically in each cell and color coded. Only complete observations are used. The outcome variables are arranged according to their similarities using hierachical clustering with complete linkage method and Euclidean distance.<br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
 
 # RegressionOne_OddsRatio ####
 if (outputName=="RegressionOne_OddsRatio") {
   description <- renderText({
     paste(
-"The results in the tables display odds ratios and odds intercepts for outcome variables estimated using logistic regression. The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. The tables also display 95% confidence intervals for these parameters along with the P values. <br><br>
+"The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression. The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. The tables also display 95% confidence intervals for these parameters along with their P values. <br><br>
 
-The graph displays the odds ratios together with the 95% confidence intervals."
+The graph displays the odds ratios together with the 95% confidence intervals.<br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
 
 # RegressionOne_Linear ####
 if (outputName=="RegressionOne_Linear") {
   description <- renderText({
     paste(
-"The results in the tables display beta regression coefficients and intercepts for outcome variables. The coefficients represent the change in the outcome for a one unit change of the covariate. The tables also display 95% confidence intervals for these parameters along with the P values. <br><br>
+"The results in the tables display estimated beta regression coefficients and intercepts for outcome variables. The coefficients represent the change in the outcome for a one unit change of the covariate. The tables also display 95% confidence intervals for these parameters along with their P values. <br><br>
 
-The graph displays the estimated coefficient values together with their 95% confidence intervals."
+The graph displays the estimated coefficient values together with their 95% confidence intervals. <br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
 
 # RegressionOne_Firth ####
 if (outputName=="RegressionOne_Firth") {
   description <- renderText({
     paste(
-"The results in the tables display odds ratios and odds intercepts for outcome variables estimated using logistic regression with the Firth correction. The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. The tables also display 95% confidence intervals for these parameters along with the P values. <br><br>
+"The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression with the Firth correction. Zhe Firth correction is useful for small data sets or when the phenomenon of separation occurs (the positive and negative outcomes are perfectly separated by a covariate and the estimate of a parameter consequently diverges to infinity without this correction). The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. The tables also display 95% confidence intervals for these parameters along with their P values. <br><br>
 
 The graph displays the odds ratios together with the 95% confidence intervals.<br><br>
 
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
+
+References:<br>
 Heinze G, Schemper M (2002) A solution to the problem of separation in logistic regression. Statistics in medicine 21: 2409-2419."
     )})}
 
@@ -212,6 +231,9 @@ if (outputName=="RegressionOne_RCS") {
     paste(
 "The graphs represent modeling the association of the outcome variables with the chosen covariate using restricted cubic splines. Non linear associations might be apparent from the graphs. <br><br>
 
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button. <br><br>
+
+References: <br>
 Harrel FE, Lee KL, Pollock BG (1988) Regression models in clinical studies: determining relationships between predictors and response. Journal of the National Cancer Institute 80: 1198-1202."
     )})}
 
@@ -220,8 +242,14 @@ Harrel FE, Lee KL, Pollock BG (1988) Regression models in clinical studies: dete
 if (outputName=="RegressionAll") {
   description <- renderText({
     paste(
+
 "Modelling is done for each outcome variable separately, but over all evaluation occasions while allowing the intercept to vary for each subject (using a mixed model). Tables display the estimated intercepts for the models and the estimated regression coefficients (either odds ratios for binary or beta coefficients for numerical and categorical variables). The graphs display the estimated coefficients along with their 95% confidence intervals.<br><br>
 
+Choosing 'Outcome~Covariate+Subject(random effect)' will build models for studying the association of one covariate with the outcome, without adjusting the analysis for the other covariates. Choosing either 'Outcome~Covariate+Evaluation occasion+Subject(random effect)' or 'Outcome~Covariate+Time since inclusion+Subject(random effect)' will also evaluate time in the model. Evaluation occasions are modeled as categorical covariates while time since inclusion is modeled as a numerical covariate.<br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.
+
+References:<br>
 Gelman A, Hill J (2006) Data analysis using regression and multilevel/hierarchical models. Cambridge University Press."
     )})}
 
