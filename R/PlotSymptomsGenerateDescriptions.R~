@@ -7,7 +7,7 @@ paste(
 "Data were displayed using profile plots (also known as spaghetti plots). 
 Profile plots are scatterplots displaying the evaluation occasions and the values of the variables where the values from the same subject are connected. The larger red dots display the median values. Each outcome was displayed in a separate graph.<br><br>
 
-Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try plotting Lasagna plots, as they might be more informative.<br><br>
+Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try ploting Lasagna plots, as they might be more informative.<br><br>
 
 More descriptive statistics are provided in the Summary tabs.<br><br>
 
@@ -24,7 +24,7 @@ if (outputName=="GraphExpl_ProfilePlots_RandomSubjects") {
       "Data were displayed using profile plots (also known as spaghetti plots). 
 Profile plots are scatterplots displaying the evaluation occasions and the values of the variables where the values from the same subject are connected. The larger red dots display the median values. Each outcome was displayed in a separate graph.<br><br>
 
-Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try plotting Lasagna plots, as they might be more informative.<br><br>
+Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try ploting Lasagna plots, as they might be more informative.<br><br>
 
 More descriptive statistics are provided in the Summary tabs.<br><br>
 
@@ -41,7 +41,7 @@ if (outputName=="GraphExpl_ProfilePlots_MultipleGraphs") {
 "Data were displayed using profile plots (also known as spaghetti plots). 
 Profile plots are scatterplots displaying the evaluation occasions and the values of the variables where the values from the same subject are connected. The larger red dots display the median values. Each outcome was displayed in a separate graph.<br><br>
 
-Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try plotting Lasagna plots, as they might be more informative.<br><br>
+Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try ploting Lasagna plots, as they might be more informative.<br><br>
 
 More descriptive statistics are provided in the Summary tabs.<br><br>
 
@@ -57,7 +57,7 @@ if (outputName=="GraphExpl_LasagnaPlots") {
     paste(
       
 "Data were displayed using heat maps (also known as lasagna plots). 
-In lasagna plots the evaluation times are reported horizontally and the measurements of each subject appear in the same row. Colors are used to display the value of the variables. In our implementation the subjects are arranged using a hierarchical clustering algorithm (with Euclidean distance and complete linkage agglomeration method). The rearrangement of the subjects is useful for data exploration because similar subjects are grouped together. Missing values are displayed with white color.<br><br>
+In lasagna plots the evaluation times are reported horizontaly and the measurements of each subject appear in the same row. Colors are used to display the value of the variables. In our implementation the subjects are arranged using a hierarchical clustering algorithm (with Euclidean distance and complete linkage agglomeration method). The rearrangement of the subjects is useful for data exploration because similar subjects are grouped together. Missing values are displayed with white color.<br><br>
 
 More descriptive statistics are provided in the Summary tabs. <br><br>
 
@@ -147,7 +147,7 @@ The graph shows the estimated proportion of subjects with positive values of out
 
 The table displays the estimated proportion of subjects in a certain group, P value for the difference of proportions and the 95% confidence interval for the difference of proportions. The groups are compared using the chi-squared test with continuity correction. Data with missing values for grouping variable are removed from analysis.<br><br>
 
-Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method (conservative and lacks statistical power with correlated if the outcomes are correlated) or multivariate permutation based adjustment (takes into account the correlation between outcomes and is generally more statistically powerful than Holm-Bonferroni).  Q values are evaluated using the Benjamini-Hochberg (assumes independent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
+Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method (conservative and lacks statistical power with correlated if the outcomes are correlated) or multivariate permutation based adjustment (takes into account the correlation between outcomes and is generaly more statisticaly powerful than Holm-Bonferroni).  Q values are evaluated using the Benjamini-Hochberg (assumes inedependent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
 
@@ -163,7 +163,7 @@ if (outputName=="SummaryGrouping_Medians") {
     paste(
 "The table displays the median value for subjects in a certain group, interquartile range for the variable (25th to 75th percentile) and P value for the difference of samples. The groups are compared with the Mann-Whitney test. Data with missing values for grouping variable are removed from analysis. Threshold for positivity of variables is not taken into account.<br><br>
 
-Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method (conservative and lacks statistical power with correlated if the outcomes are correlated) or multivariate permutation based adjustment (takes into account the correlation between outcomes and is generally more statistically powerful than Holm-Bonferroni).  Q values are evaluated using the Benjamini-Hochberg (assumes independent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
+Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method (conservative and lacks statistical power with correlated if the outcomes are correlated) or multivariate permutation based adjustment (takes into account the correlation between outcomes and is generaly more statisticaly powerful than Holm-Bonferroni).  Q values are evaluated using the Benjamini-Hochberg (assumes inedependent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
 
 References:<br>
 Westfall PH YS (1993) Resampling-Based Multiple Testing. Wiley New York.<br>
@@ -175,7 +175,7 @@ Benjamini Y, Yekutieli D (2001) The control of the false discovery rate in multi
 if (outputName=="Clustering_Dendrogram") {
   description <- renderText({
     paste(
-"The dendrogram displays the similarity of subjects by hierarchically clustering the outcomes for the chosen evaluation occasion. For numerical variables, their correlations are used in computing their differences. For binary variables, Euclidean distance is used. <br><br>
+"The dendrogram displays the similarity of subjects by hierarchically clustering the outcomes for the chosen evaluation occasion. For numerical variables, their corelations are used in computing their differences. For binary variables, Euclidean distance is used. <br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
@@ -184,7 +184,7 @@ You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or '
 if (outputName=="Clustering_Heatmap") {
   description <- renderText({
     paste(
-"The heat map displays the complete data obtained at the chosen evaluation occasion. A column represents values for a particular subject, while the rows represent outcome variables. Subjects and outcome variables are arranged according to their similarities using hierarchical clustering with complete linkage method and Euclidean distance. Values of outcomes are color coded.<br><br>
+"The heat map displays the complete data obtained at the chosen evaluation occasion. A column represents values for a particular subject, while the rows represent outcome variables. Subjects and outcome variables are arranged according to their similarities using hierachical clustering with complete linkage method and Euclidean distance. Values of outcomes are color coded.<br><br>
 
 Additional variables can be selected to annotate the graph - their values are displayed in the top row.<br><br>
 
@@ -196,7 +196,7 @@ You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or '
 if (outputName=="Clustering_Correlations") {
   description <- renderText({
     paste(
-"The heat map displays correlations between outcome variables at the chosen evaluation occasion. Values of pairwise Spearman correlations between two outcome variables are also displayed numerically in each cell and color coded. Only complete observations are used. The outcome variables are arranged according to their similarities using hierarchical clustering with complete linkage method and Euclidean distance.<br><br>
+"The heat map displays correlations between outcome variables at the chosen evaluation occasion. Values of pairwise Spearman correlations between two outcome variables are also displayed numerically in each cell and color coded. Only complete observations are used. The outcome variables are arranged according to their similarities using hierachical clustering with complete linkage method and Euclidean distance.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
@@ -227,7 +227,7 @@ You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or '
 if (outputName=="RegressionOne_Firth") {
   description <- renderText({
     paste(
-"The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression with the Firth correction. The Firth correction is useful for small data sets or when the phenomenon of separation occurs (the positive and negative outcomes are perfectly separated by a covariate and the estimate of a parameter consequently diverges to infinity without this correction). The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. The tables also display 95% confidence intervals for these parameters along with their P values. <br><br>
+"The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression with the Firth correction. Zhe Firth correction is useful for small data sets or when the phenomenon of separation occurs (the positive and negative outcomes are perfectly separated by a covariate and the estimate of a parameter consequently diverges to infinity without this correction). The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. The tables also display 95% confidence intervals for these parameters along with their P values. <br><br>
 
 The graph displays the odds ratios together with the 95% confidence intervals.<br><br>
 
@@ -255,7 +255,7 @@ if (outputName=="RegressionAll") {
   description <- renderText({
     paste(
 
-"Modeling is done for each outcome variable separately, but over all evaluation occasions while allowing the intercept to vary for each subject (using a mixed model). Tables display the estimated intercepts for the models and the estimated regression coefficients (either odds ratios for binary or beta coefficients for numerical and categorical variables). The graphs display the estimated coefficients along with their 95% confidence intervals.<br><br>
+"Modelling is done for each outcome variable separately, but over all evaluation occasions while allowing the intercept to vary for each subject (using a mixed model). Tables display the estimated intercepts for the models and the estimated regression coefficients (either odds ratios for binary or beta coefficients for numerical and categorical variables). The graphs display the estimated coefficients along with their 95% confidence intervals.<br><br>
 
 Choosing 'Outcome~Covariate+Subject(random effect)' will build models for studying the association of one covariate with the outcome, without adjusting the analysis for the other covariates. Choosing either 'Outcome~Covariate+Evaluation occasion+Subject(random effect)' or 'Outcome~Covariate+Time since inclusion+Subject(random effect)' will also evaluate time in the model. Evaluation occasions are modeled as categorical covariates while time since inclusion is modeled as a numerical covariate.<br><br>
 
