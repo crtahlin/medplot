@@ -13,6 +13,7 @@ More descriptive statistics are provided in the Summary tabs.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
 
+References: <br>
 Weiss RE (2005) Modeling Longitudinal Data: With 72 Figures. Springer.")
 })}
   
@@ -29,6 +30,7 @@ More descriptive statistics are provided in the Summary tabs.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
 
+References: <br>
 Weiss RE (2005) Modeling Longitudinal Data: With 72 Figures. Springer.")
   })}
 
@@ -45,6 +47,7 @@ More descriptive statistics are provided in the Summary tabs.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
 
+References: <br>
 Weiss RE (2005) Modeling Longitudinal Data: With 72 Figures. Springer.")
   })}
 
@@ -60,6 +63,7 @@ More descriptive statistics are provided in the Summary tabs. <br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
 
+References: <br>
 Swihart B, Ca o B, James BD, Strand M, Schwartz BS, et al. (2010) Lasagna plots: a saucy alternative to spaghetti plots. Epidemiology 21: 621-625."
     )})}
 
@@ -114,7 +118,9 @@ if (outputName=="Summary_Medians") {
       
 "The table displays estimated medians and interquartile ranges for the outcome variables. 95% confidence intervals are reported for the medians, based on the percentile bootstrap with 2000 iterations. The number of missing values for each outcome variable is reported.<br><br>
 
-The graph shows the estimated median values for the outcome variables along with their 95% confidence intervals."
+The graph shows the estimated median values for the outcome variables along with their 95% confidence intervals.<br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
 
 # Summary_Proportions ####
@@ -127,7 +133,9 @@ The first graph shows the estimated proportion of subjects with positive values 
 
 The table displays the frequencies and estimated proportions of subjects with positive values of outcome variables. 95% confidence intervals are reported for proportions, based on the exact binomial method. The number of missing values for each outcome variable is reported.<br><br>
 
-The second graph shows the estimated proportion of subjects with positive outcome values of outcome variables along with their 95% confidence intervals."
+The second graph shows the estimated proportion of subjects with positive outcome values of outcome variables along with their 95% confidence intervals.<br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
 
 # SummaryGrouping_Proportions ####
@@ -140,6 +148,8 @@ The graph shows the estimated proportion of subjects with positive values of out
 The table displays the estimated proportion of subjects in a certain group, P value for the difference of proportions and the 95% confidence interval for the difference of proportions. The groups are compared using the chi-squared test with continuity correction. Data with missing values for grouping variable are removed from analysis.<br><br>
 
 Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method (conservative and lacks statistical power with correlated if the outcomes are correlated) or multivariate permutation based adjustment (takes into account the correlation between outcomes and is generaly more statisticaly powerful than Holm-Bonferroni).  Q values are evaluated using the Benjamini-Hochberg (assumes inedependent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
 
 References:<br>
 Westfall PH YS (1993) Resampling-Based Multiple Testing. Wiley New York.<br>
@@ -165,7 +175,9 @@ Benjamini Y, Yekutieli D (2001) The control of the false discovery rate in multi
 if (outputName=="Clustering_Dendrogram") {
   description <- renderText({
     paste(
-"The dendrogram displays the similarity of subjects by hierarchically clustering the outcomes for the chosen evaluation occasion. For numerical variables, their corelations are used in computing their differences. For binary variables, Euclidean distance is used. "
+"The dendrogram displays the similarity of subjects by hierarchically clustering the outcomes for the chosen evaluation occasion. For numerical variables, their corelations are used in computing their differences. For binary variables, Euclidean distance is used. <br><br>
+
+You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
 
 # Clustering_Heatmap ####
