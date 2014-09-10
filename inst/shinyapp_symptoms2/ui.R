@@ -230,7 +230,8 @@ shinyUI(pageWithSidebar(
       
        # TAB - Debug ####
        tabPanel("Selected variables",
-                verbatimTextOutput("selectedVariables"))
+                verbatimTextOutput("selectedVariables"),
+                textOutput("debug"))
     )
   )
 )

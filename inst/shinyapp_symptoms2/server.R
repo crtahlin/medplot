@@ -546,12 +546,14 @@ output$downLoadplotTimelineProfiles <-  downloadPlot(
       
 output$plotTimelineProfilesDescr <- reactive({
   if(!is.null(input$selectedGraphType)) {
+    if(input$selectedGraphType=="profilePlot") {
   description <- switch(input$selectedGraphType,
          "oneGraph" = generateDescription("GraphExpl_ProfilePlots_AllSubjects"),
          "randomSample" = generateDescription("GraphExpl_ProfilePlots_RandomSubjects"),
          "multipleGraphs" = generateDescription("GraphExpl_ProfilePlots_MultipleGraphs")
     )
   return(description())
+    } else {return()}
   }})
 
 
@@ -2045,5 +2047,10 @@ output$selectedVariables <- renderPrint({
   selectedInputs <- reactiveValuesToList(input)
   print(selectedInputs)
   })
+
+output$debug <- reactive({
+  browser()
+  
+})
 
 })
