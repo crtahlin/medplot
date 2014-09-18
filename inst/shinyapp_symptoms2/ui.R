@@ -81,7 +81,8 @@ shinyUI(pageWithSidebar(
                
                # Lasagna plot
                uiOutput("plotLasagna"), #, height="700px"),
-               uiOutput("downloadLasagna"),
+               conditionalPanel(condition="input.selectedGraphOverTime=='lasagnaPlot'",
+                                uiOutput("downloadLasagna")),
                uiOutput("plotLasagnaDesc"),
                
                # Boxplots
