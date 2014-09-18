@@ -171,6 +171,10 @@ shinyUI(pageWithSidebar(
                uiOutput("selectCovariate"),
                uiOutput("checkUseFirthCorrection"),
                uiOutput("checkUseRCSModel"),
+               selectInput(inputId = "sortMethod", label = "Sort outcome variables via:",
+                           selected = "listOrder",
+                           choices = c("As listed"="listOrder",
+                                       "By estimate value"="valueOrder")),
                
                # Graphs
                # Logistic regression with Firth correction

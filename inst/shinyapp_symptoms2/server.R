@@ -1437,6 +1437,15 @@ resultsLogistf <- reactive({
 # plot - logistf ####
 plotLogistfReactive <- reactive({
   if(regressionScenario()!="scenarioLogistf") {return()}
+  
+  # experiemental code for sorting the graph
+  # might be better to include the if clause in the plotting function below?
+  if (input$sortMethod=="valueOrder") {
+    browser()
+    data=resultsLogistf()[["rawResultsTable"]]
+    variableOrder <- data[order(data$OR), "Variable"]    
+  } else {variableOrder = input$selectedSymptoms}
+  
   plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
                     variableName="Variable",
                     valueName="OR",
@@ -1450,7 +1459,7 @@ plotLogistfReactive <- reactive({
                                      input$selectedEvaluationTime,
                                      "(using Firth correction)"),
                     vLine=1,
-                    variableOrder=input$selectedSymptoms) 
+                    variableOrder=variableOrder) 
   }) 
 
 output$plotLogistf <- renderPlot({
