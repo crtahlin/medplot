@@ -51,7 +51,9 @@ shinyUI(pageWithSidebar(
       
       uiOutput("selectTreatasBinary"),
       
-      uiOutput("selectThresholdValue")
+      uiOutput("selectThresholdValue")#,
+      
+      # submitButton()
     )),
   
   # Define the main panel ####

@@ -5,6 +5,7 @@
 #' @param width Width of the plot in pixels.
 #' @param height Height of plot in pixels.
 #' @param print Whether to use print() function or not. Needed with ggplot objects and not with base plots?
+#' @export
 downloadPlot <- function(filename="plot.eps",
                          plotFunction,
                          width,

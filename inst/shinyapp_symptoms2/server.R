@@ -2049,7 +2049,7 @@ output$selectedVariables <- renderPrint({
   })
 
 output$debug <- reactive({
-  browser()
+#  browser()
   
 })
 
