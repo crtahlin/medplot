@@ -5,6 +5,7 @@
 #' 
 #' @param datafile Path to the file containing data.
 #' @param format Format of the file containing data ("Excel", "TSV", "Demo").
+#' @export
 importSymptomsData <- function (datafile, format) {
   
   if (format=="Excel") {

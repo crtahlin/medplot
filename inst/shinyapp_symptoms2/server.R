@@ -46,7 +46,7 @@ options(boot.ncpus=Sys.getenv('NUMBER_OF_PROCESSORS'))
 
 # Main function -----------------------------------------------------------
 
-shinyServer(function(input, output, session) {
+shinyServer(function(input, output, session, clientData) {
   
   # VARIABLES ####
   # the working directory
@@ -505,6 +505,17 @@ output$selectMaxGroupSize <- renderUI({
 })
 
 # Graph
+# reactive code for ploting
+plotTimelineProfilesReactive <- reactive({
+  plotTimelineProfiles(data=dataFiltered(),
+                             plotType=input$selectedGraphType,
+                             personIDVar=input$patientIDVar,
+                             measurementVar=input$measurementVar,
+                             selectedSymptoms=input$selectedSymptoms,
+                             sizeofRandomSample=input$sampleSize,
+                             sizeofGroup=input$groupSize) 
+    })
+# the plot rendered in browser
 output$plotTimelineProfiles <- renderPlot({
   if(!is.null(input$selectedGraphType)) {
     if ( (input$selectedGraphType=="oneGraph") ||
@@ -518,27 +529,32 @@ output$plotTimelineProfiles <- renderPlot({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        
-        print(plotTimelineProfiles(data=dataFiltered(),
-                                   plotType=input$selectedGraphType,
-                                   personIDVar=input$patientIDVar,
-                                   measurementVar=input$measurementVar,
-                                   selectedSymptoms=input$selectedSymptoms,
-                                   sizeofRandomSample=input$sampleSize,
-                                   sizeofGroup=input$groupSize))
-      }}}
-}, height=numRowsTimelineProfile)
 
+        plotTimelineProfilesReactive()
+
+      }}}
+  }, height=numRowsTimelineProfile
+)
+
+# the plot to be downloaded - high quality plot
+output$downLoadplotTimelineProfiles <-  downloadPlot(
+  plotFunction=plotTimelineProfilesReactive,
+  width=clientData$output_plotTimelineProfiles_width,
+  height=clientData$output_plotTimelineProfiles_height,
+  print=TRUE
+  )
+      
 output$plotTimelineProfilesDescr <- reactive({
   if(!is.null(input$selectedGraphType)) {
+    if(input$selectedGraphType=="profilePlot") {
   description <- switch(input$selectedGraphType,
          "oneGraph" = generateDescription("GraphExpl_ProfilePlots_AllSubjects"),
          "randomSample" = generateDescription("GraphExpl_ProfilePlots_RandomSubjects"),
          "multipleGraphs" = generateDescription("GraphExpl_ProfilePlots_MultipleGraphs")
     )
   return(description())
+    } else {return()}
   }})
-
 
 
 # Lasagna plots ####
@@ -556,15 +572,15 @@ output$plotLasagna <- renderUI({
       
       
       filenames <- vector()
+      filenamesEPS <- vector()
       
       # generate as many files as there are plots
       for (symptom in input$selectedSymptoms) {
         #filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"\\www\\temp"), fileext=".png")
         filenames[symptom] <- tempfile(pattern="symptom", tmpdir=paste0(workingDir,"/www/temp"), fileext=".png")
+        filenamesEPS[symptom] <- tempfile(pattern=symptom, fileext = ".eps")
         
-        # plot graph for each symptom
-        #for(symptom in input$selectedSymptoms) {
-        
+        # plot PNG graph for each symptom
         png(paste0(filenames[symptom]))
         plotLasagna(if (input$treatasBinary==FALSE) {dataFiltered()}else{dataFilteredwithThreshold()}, 
                     treatasBinary=input$treatasBinary, 
@@ -575,12 +591,49 @@ output$plotLasagna <- renderUI({
                     groupingVar=input$groupingVar,  
                     thresholdValue=input$thresholdValue) 
         dev.off()
+        
+        # prepare EPS graphs
+        width = 5 # in inches
+        height = 5 # in inches
+        postscript(filenamesEPS[symptom], paper="special", width=width, height = height)
+        plotLasagna(if (input$treatasBinary==FALSE) {dataFiltered()}else{dataFilteredwithThreshold()}, 
+                    treatasBinary=input$treatasBinary, 
+                    symptom=symptom,
+                    dateVar=input$dateVar, 
+                    personIDVar=input$patientIDVar, 
+                    measurementVar=input$measurementVar,
+                    groupingVar=input$groupingVar,  
+                    thresholdValue=input$thresholdValue)
+        dev.off()
+        
       }
+
+      # create a ZIP file of EPS plots
+      zipFile <<- tempfile(pattern="zip", tmpdir=paste0(workingDir,"/www/temp/"), fileext=".zip")
+      zip(zipfile=zipFile, files=filenamesEPS, flags="-Dj")
+      
       
       out <- pastePlotFilenames(filenames)
       
       return(div(HTML(out),class="shiny-plot-output shiny-bound-output"))
     }}
+})
+
+# prepare ZIP for downloading EPS files
+output$lasagnaDownload <- downloadHandler(
+  filename="Lasagna.zip",
+  content= function(file) {
+    file.copy(from=zipFile, to=file)
+  }, contentType="application/octet-stream")
+  
+
+
+# prepare download button
+output$downloadLasagna <- renderUI({
+  out <- downloadButton(outputId = "lasagnaDownload", label = "Download")
+  #         # delete EPS files
+  #         unlink(filenamesEPS)
+  return(out)
 })
 
 output$plotLasagnaDesc <- reactive({
@@ -607,10 +660,20 @@ output$selectFacetingType <- renderUI({
 
 
 # Graph
+plotTimelineBoxplotsReactive <- reactive({
+  #print(
+    plotTimelineBoxplots(data=dataFiltered(),
+                             personIDVar=input$patientIDVar,
+                             measurementVar=input$measurementVar,
+                             selectedSymptoms=input$selectedSymptoms,
+                             faceting=input$selectedFacetingType)
+    #)
+  
+})
+
 output$plotTimelineBoxplots <- renderPlot({
   if(!is.null(dataFiltered())) {
     if(input$selectedGraphOverTime=="boxPlot") {
-      
       if(input$treatasBinary==FALSE){
         
         progress <- Progress$new(session, min=1, max=100)
@@ -619,16 +682,18 @@ output$plotTimelineBoxplots <- renderPlot({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        
-        print(plotTimelineBoxplots(data=dataFiltered(),
-                                   personIDVar=input$patientIDVar,
-                                   measurementVar=input$measurementVar,
-                                   selectedSymptoms=input$selectedSymptoms,
-                                   faceting=input$selectedFacetingType)
-        )
-      }}
+
+        plotTimelineBoxplotsReactive()
+        }
+    }
   } else {return()}
 },height=numRowsTimelineBoxplots)
+
+output$downLoadplotTimelineBoxplot <- downloadPlot(
+  plotFunction = plotTimelineBoxplotsReactive,
+  width = clientData$output_plotTimelineBoxplots_width,
+  height = clientData$output_plotTimelineBoxplots_height,
+  print = TRUE)
 
 output$plotTimelineBoxplotsDesc <- reactive({
   if (!is.null(input$selectedGraphOverTime)) {
@@ -655,6 +720,22 @@ output$selectDisplayFormat <- renderUI({
 })
 
 # Graph
+plotTimelineReactive <- reactive({
+  
+  if (input$treatasBinary == TRUE) { 
+    data=dataFilteredwithThreshold()
+  } else { data=dataFiltered() }
+
+  plotTimeline(data=data,
+                     date=input$dateVar,
+                     personID=input$patientIDVar,
+                     measurement=input$measurementVar,
+                     symptoms=input$selectedSymptoms,
+                     displayFormat = input$displayFormat,
+                     treatasBinary=input$treatasBinary)
+  })
+  
+
 output$plotTimeline <- renderPlot({
   if(!(is.null(dataFiltered()) || is.null(input$displayFormat))){
     if(input$selectedGraphOverTime=="timelinePlot") {
@@ -665,22 +746,15 @@ output$plotTimeline <- renderPlot({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        if (input$treatasBinary == TRUE) { 
-          data=dataFilteredwithThreshold()
-        } else { data=dataFiltered() }
-        # observe({dataFiltered()})
-        # if no symbols are selected, do not plot
-        #if (dim(dataFiltered())[1]>0) {
-        print(plotTimeline(data=data,
-                                   date=input$dateVar,
-                                   personID=input$patientIDVar,
-                                   measurement=input$measurementVar,
-                                   symptoms=input$selectedSymptoms,
-                                   displayFormat = input$displayFormat,
-                                   treatasBinary=input$treatasBinary)
-        )
+
+      plotTimelineReactive()
       }}  
 }, height=numRowsTimeline)
+
+output$downLoadplotTimeline <- downloadPlot(plotFunction = plotTimelineReactive,
+                                            width = clientData$output_plotTimeline_width,
+                                            height = clientData$output_plotTimeline_height,
+                                            print = TRUE)
 
 output$plotTimelineDesc <- reactive({
   if (!is.null(input$selectedGraphOverTime)) {
@@ -702,16 +776,42 @@ output$selectMeasurementForPresencePlot <- renderUI({
     }}
 })
 
+plotProportionReactive <- reactive({
+  plotDistribution(data=dataFiltered.yn(),
+                   selectedSymptoms=input$selectedSymptoms,
+                   selectedProportion=input$selectedMeasurementForPresencePlot,
+                   measurements=Measurement())
+})
+
 # Plot - Presence (plot - proportions) ###
 output$plotProportion=renderPlot({
   if(!(is.null(dataFiltered.yn()) || is.null(input$selectedMeasurementForPresencePlot) )){
     if(input$treatasBinary==TRUE){
-      plotDistribution(data=dataFiltered.yn(),
-                       selectedSymptoms=input$selectedSymptoms,
-                       selectedProportion=input$selectedMeasurementForPresencePlot,
-                       measurements=Measurement())
+
+      plotProportionReactive()
     }}
   }, height=numRowsProportion) 
+
+output$downLoadplotProportion <- downloadHandler (
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotProportion_width
+    height = clientData$output_plotProportion_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    plotDistribution(data=dataFiltered.yn(),
+                     selectedSymptoms=input$selectedSymptoms,
+                     selectedProportion=input$selectedMeasurementForPresencePlot,
+                     measurements=Measurement())
+    
+    dev.off()
+  }, contentType="application/postscript")
 
 output$plotProportionDesc <- reactive({
   if (!is.null(input$selectedGraphOverTime)) {
@@ -759,6 +859,16 @@ output$selectEvaluationTime2 <- renderUI({
 
 # Pyramid plot ####
 # Graph
+
+plotPyramidReactive <- reactive({
+  
+  plotPropPositive(data=dataFilteredwithThreshold(),
+                   grouping=input$groupingVar,
+                   measurements=input$measurementVar,
+                   symptomsNames=input$selectedSymptoms)
+  
+})
+
 output$plotPyramid <- renderPlot ({
   try({
     if(!(is.null(dataFilteredwithThreshold()) || is.null(input$treatasBinary) )){
@@ -771,13 +881,30 @@ output$plotPyramid <- renderPlot ({
                      detail = 'This may take a while...', 
                      value=NULL)
         
-        plotPropPositive(data=dataFilteredwithThreshold(),
-                             grouping=input$groupingVar,
-                             measurements=input$measurementVar,
-                             symptomsNames=input$selectedSymptoms)
-        
+       plotPyramidReactive()
       }}}, silent=TRUE)
 } ,height=numRowsProportions)
+
+output$downLoadplotPyramid <- downloadHandler (
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotPyramid_width
+    height = clientData$output_plotPyramid_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    plotPropPositive(data=dataFilteredwithThreshold(),
+                     grouping=input$groupingVar,
+                     measurements=input$measurementVar,
+                     symptomsNames=input$selectedSymptoms)
+    
+    dev.off()
+  }, contentType="application/postscript")
 
 # calculate data for tables of medians & CI plots ####
 dataforSummaryNonBinary <- reactive({
@@ -802,30 +929,35 @@ output$tableforBoxplots <- renderDataTable({
   if(!is.null(dataFiltered())) {
     if(input$treatasBinary==FALSE){
       return(dataforSummaryNonBinary()[["printableTable"]])
-      
-      #       out <- tabelizeBoxplotsforMeasurement(measurement=input$selectedEvaluationTime2,
-      #                               measurementVar=input$measurementVar,
-      #                               data=dataFiltered(),
-      #                               selectedSymptoms=input$selectedSymptoms)[["printableTable"]] 
-      #       
-      #       return(out)
-    } }
-}, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
+    }}
+  }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Median plot
+plotMediansReactive <- reactive({
+  
+  plotValueswithCIs(data=dataforSummaryNonBinary()[["rawTable"]],
+                    variableName="Variables",
+                    valueName="Median",
+                    CILowerName="CILower",
+                    CIUpperName="CIUpper",
+                    xLabel="Medians",
+                    yLabel="Variable",
+                    graphTitle="Medians of variables \n(with 95% confidence intervals)",
+                    vLine=NULL,
+                    variableOrder=input$selectedSymptoms)
+  })
+
+
 output$plotMedians <- renderPlot({
-  plot <- plotValueswithCIs(data=dataforSummaryNonBinary()[["rawTable"]],
-                            variableName="Variables",
-                            valueName="Median",
-                            CILowerName="CILower",
-                            CIUpperName="CIUpper",
-                            xLabel="Medians",
-                            yLabel="Variable",
-                            graphTitle="Medians of variables \n(with 95% confidence intervals)",
-                            vLine=NULL,
-                            variableOrder=input$selectedSymptoms)
-  print(plot)
+  plotMediansReactive()
 }, height=numRowsMedianPlot)
+
+output$downLoadplotMedians <- downloadPlot(
+  plotFunction = plotMediansReactive,
+  width = clientData$output_plotMedians_width,
+  height = clientData$output_plotMedians_height,
+  print = TRUE
+  )
 
 # Medians description
 output$mediansDescr <- reactive({
@@ -850,6 +982,14 @@ output$tableforProportions <- renderDataTable({
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Proportions graph
+plotPresenceReactive <- reactive({
+  plot <- plotPresenceofSymptoms(data=dataFiltered(),
+                                 selectedSymptoms=input$selectedSymptoms,
+                                 measurementVar=input$measurementVar,
+                                 measurement=input$selectedEvaluationTime2,
+                                 thresholdValue=ifelse(!is.null(input$thresholdValue),input$thresholdValue ,0))
+  })
+
 output$plotPresence <- renderPlot({
   if(!is.null(input$selectedEvaluationTime2)) {
     if(input$treatasBinary==TRUE) {
@@ -861,14 +1001,17 @@ output$plotPresence <- renderPlot({
                    detail = 'This may take a while...', 
                    value=NULL)
       
-      plot <- plotPresenceofSymptoms(data=dataFiltered(),
-                                     selectedSymptoms=input$selectedSymptoms,
-                                     measurementVar=input$measurementVar,
-                                     measurement=input$selectedEvaluationTime2,
-                                     thresholdValue=ifelse(!is.null(input$thresholdValue),input$thresholdValue ,0))
-      print(plot)
+      print(plotPresenceReactive())
     }}
 }, height=numRowsPresencePlot)
+
+output$downLoadplotPresence <- downloadPlot(
+  plotFunction = plotPresenceReactive,
+  width = clientData$output_plotPresence_width,
+  height = clientData$output_plotPresence_height,
+  print = TRUE
+  )
+
 
 # Proportions description
 output$proportionsDescr <- reactive({
@@ -883,6 +1026,15 @@ output$proportionsDescr <- reactive({
 # Graph
 # Proportions by groups with confidence intervals ####
 # Graph
+plotPropPositiveCIReactive <- reactive({
+ 
+  plotPropPositiveCI(data=dataFilteredwithThreshold(),
+                     groupingVar=input$groupingVar,
+                     measurementVar=input$measurementVar,
+                     selectedSymptoms=input$selectedSymptoms)
+  
+})
+
 output$plotPropCIs <- renderPlot ({
   try({
     if(!is.null(dataFilteredwithThreshold())){
@@ -894,15 +1046,18 @@ output$plotPropCIs <- renderPlot ({
         progress$set(message = 'Calculation in progress',
                      detail = 'This may take a while...', 
                      value=NULL)
-        
-        print(
-          plotPropPositiveCI(data=dataFilteredwithThreshold(),
-                                 groupingVar=input$groupingVar,
-                                 measurementVar=input$measurementVar,
-                                 selectedSymptoms=input$selectedSymptoms)
-        )
+
+plotPropPositiveCIReactive()
       }}}, silent=TRUE)
 } ,height=numRowsProportionsCI)
+
+output$downLoadPropPositiveCI <- downloadPlot(
+  plotFunction = plotPropPositiveCIReactive,
+  width = clientData$output_plotPropCIs_width,
+  height = clientData$output_plotPropCIs_height,
+  print = TRUE
+  )
+
 
 # Menu
 output$UIpropTable = renderUI({
@@ -1039,6 +1194,30 @@ output$plotClusterDendrogram=renderPlot({
 },height=numRowsClustering)
 
 
+output$downLoadplotClusterDendrogram <- downloadHandler(
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotClusterDendrogram_width
+    height = clientData$output_plotClusterDendrogram_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}
+    plotDendrogram(data=data,
+                   variableName=input$measurementVar,
+                   variableValue=input$selectedMeasurementValue,
+                   selectedSymptoms=input$selectedSymptoms,
+                   treatasBinary=input$treatasBinary)
+    
+    dev.off()
+  }, contentType="application/postscript"
+  )
+
 # Dendrogram description
 output$dendrogramDescr <- reactive({
   if (!is.null(dataFiltered())) {
@@ -1080,6 +1259,32 @@ output$plotClusterHeatmap=renderPlot({
   },height=numRowsClustering2)
 
 
+output$downLoadplotClusterHeatmap <- downloadHandler(
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotClusterHeatmap_width
+    height = clientData$output_plotClusterHeatmap_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    if (input$treatasBinary==TRUE) {data=dataExtendedwithThreshold()} else {data=dataExtended()}  
+    plotClusterHeatmap(data=data,
+                       #TODO: make dependent on selection
+                       variableName=input$measurementVar,
+                       variableValue=input$selectedMeasurementValue,
+                       selectedSymptoms=input$selectedSymptoms,
+                       annotationVars=input$selectedClusterAnnotations,
+                       treatasBinary=input$treatasBinary)
+    
+    dev.off()
+  }, contentType="application/postscript"
+)
+
 # Heat map description
 output$heatmapDescr <- reactive({
   if (!is.null(dataFiltered())) {
@@ -1104,6 +1309,33 @@ output$plotClusterCorrelations <- renderPlot({
   }
   },height=numRowsClustering3)
 
+
+output$downLoadplotClusterCorrelations <- downloadHandler(
+  # since this is base graphics (not ggplot) the EPS file generation
+  # has to be handled differently - the downloadPlot() function does not work
+  # due to "Cairo" graphics device being used instead of "postscipt"
+  # maybe has to do with being called from a reactive function and/or plot being 
+  # in a different environement?
+  filename="plot.eps",
+  
+  content = function (file) {
+    width = clientData$output_plotClusterCorrelations_width
+    height = clientData$output_plotClusterCorrelations_height
+    postscript(file, paper="special", width = width/72, height = height/72)
+    
+    if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}
+    
+    plotCorrelations(data=data,
+                     variableName=input$measurementVar,
+                     variableValue=input$selectedMeasurementValue,
+                     selectedSymptoms=input$selectedSymptoms,
+                     treatasBinary=input$treatasBinary)
+    
+    dev.off()
+  }, contentType="application/postscript"
+)
+
+
 # Correlation plot description
 output$correlationDescr <- reactive({
   if (!is.null(dataFiltered())) {
@@ -1112,14 +1344,6 @@ output$correlationDescr <- reactive({
       
       return(description())
     }}})
-
-
-# output$messageNotAppropriate6 <- renderText({
-#   if(!is.null(input$treatasBinary)){
-#     if (input$treatasBinary==TRUE) {
-#       "This type of analysis is not appropriate for binary responses."
-#     }}
-# })
 
 
 # TAB - Regression model : one evaluation ####
@@ -1211,32 +1435,38 @@ resultsLogistf <- reactive({
 
 
 # plot - logistf ####
-output$plotLogistf2 <- renderPlot({
+plotLogistfReactive <- reactive({
+  if(regressionScenario()!="scenarioLogistf") {return()}
+  plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
+                    variableName="Variable",
+                    valueName="OR",
+                    CILowerName="CILower",
+                    CIUpperName="CIUpper",
+                    xLabel="Odds ratios",
+                    yLabel="Variables",
+                    graphTitle=paste("Odds ratios and confidence intervals for",
+                                     resultsLogistf()[["referenceValue"]], 
+                                     "\n at evaluation T=",
+                                     input$selectedEvaluationTime,
+                                     "(using Firth correction)"),
+                    vLine=1,
+                    variableOrder=input$selectedSymptoms) 
+  }) 
+
+output$plotLogistf <- renderPlot({
   if(!is.null(resultsLogistf()) ){
     if(regressionScenario()=="scenarioLogistf") {
-      out <- plotValueswithCIs(data=resultsLogistf()[["rawResultsTable"]],
-                               variableName="Variable",
-                               valueName="OR",
-                               CILowerName="CILower",
-                               CIUpperName="CIUpper",
-                               xLabel="Odds ratios",
-                               yLabel="Variables",
-                               graphTitle=paste("Odds ratios and confidence intervals for",
-                                                resultsLogistf()[["referenceValue"]], 
-                                                "\n at evaluation T=",
-                                                input$selectedEvaluationTime,
-                                                "(using Firth correction)"),
-                               vLine=1,
-                               variableOrder=input$selectedSymptoms) 
-      print(out)
+
+      print(plotLogistfReactive())
     }}
 }, height=numRowsLogistf)
 
 # table - logistf ####
 output$tableLogistf <- renderDataTable({
+  
   if(!is.null(resultsLogistf()) ){
     if(regressionScenario()=="scenarioLogistf") {
-      resultsLogistf()[["printableResultsTable"]]
+      return(resultsLogistf()[["printableResultsTable"]])
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
@@ -1244,7 +1474,7 @@ output$tableLogistf <- renderDataTable({
 output$tableLogistfIntercept <- renderDataTable({
   if(!is.null(resultsLogistf()) ){
     if(regressionScenario()=="scenarioLogistf") {
-      resultsLogistf()[["printableInterceptTable"]]
+      return(resultsLogistf()[["printableInterceptTable"]])
     }}
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
@@ -1290,24 +1520,28 @@ output$tableLogistIntercept <- renderDataTable({
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # plot - logist ####
+plotLogistReactive <- reactive({
+  plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
+                           variableName="Variable",
+                           valueName="OR",
+                           CILowerName="CILower",
+                           CIUpperName="CIUpper",
+                           xLabel="Odds ratios",
+                           yLabel="Variables",
+                           graphTitle=paste("Odds ratios and confidence intervals for",
+                                            resultsLogist()[["referenceValue"]], 
+                                            "\n at evaluation T=",
+                                            input$selectedEvaluationTime),
+                           vLine=1,
+                           variableOrder=input$selectedSymptoms) 
+  
+})
+
 output$plotLogist <- renderPlot({
-  if(!(is.null(resultsLogist()))){
+  if(!is.null(resultsLogist())){
     if(regressionScenario()=="scenarioLogist") {
-      out <- plotValueswithCIs(data=resultsLogist()[["rawResultsTable"]],
-                               variableName="Variable",
-                               valueName="OR",
-                               CILowerName="CILower",
-                               CIUpperName="CIUpper",
-                               xLabel="Odds ratios",
-                               yLabel="Variables",
-                               graphTitle=paste("Odds ratios and confidence intervals for",
-                                                resultsLogist()[["referenceValue"]], 
-                                                "\n at evaluation T=",
-                                                input$selectedEvaluationTime),
-                               vLine=1,
-                               variableOrder=input$selectedSymptoms)    
-      
-      print(out)
+
+      plotLogistReactive()
     }}
 }, height=numRowsLogist)
 
@@ -1319,8 +1553,6 @@ output$logistDescr <- reactive({
       
       return(description())
     }}})
-
-
 
 # Scenario - linear regression
 resultsLinear <- reactive({
@@ -1352,23 +1584,27 @@ output$tableLinearIntercept <- renderDataTable({
 }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # plot - linear ####
+plotLinearReactive <- reactive({
+  plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
+                           variableName="Variable",
+                           valueName="beta",
+                           CILowerName="CILower",
+                           CIUpperName="CIUpper",
+                           xLabel="Beta (slope) coefficient",
+                           yLabel="Variables",
+                           graphTitle=paste("Beta coefficients and confidence intervals for effects of",
+                                            input$selectedCovariate, 
+                                            "\n on selected variables at evaluation T=",
+                                            input$selectedEvaluationTime),
+                           vLine=0,
+                           variableOrder=input$selectedSymptoms)  
+  })
+
 output$plotLinear <- renderPlot({
   if(!is.null(resultsLinear())){
     if (regressionScenario()=="scenarioLinearModel") {
-      out <- plotValueswithCIs(data=resultsLinear()[["rawResultsTable"]],
-                               variableName="Variable",
-                               valueName="beta",
-                               CILowerName="CILower",
-                               CIUpperName="CIUpper",
-                               xLabel="Beta (slope) coefficient",
-                               yLabel="Variables",
-                               graphTitle=paste("Beta coefficients and confidence intervals for effects of",
-                                                input$selectedCovariate, 
-                                                "\n on selected variables at evaluation T=",
-                                                input$selectedEvaluationTime),
-                               vLine=0,
-                               variableOrder=input$selectedSymptoms)  
-      print(out)
+
+      plotLinearReactive()
     }}
   }, height=numRowsLinear) 
 
@@ -1385,18 +1621,23 @@ output$linearDescr <- reactive({
 # Scenario - modeling with Restricted Cubic Splines
 
 # plot - RCS plot ####
+plotRCSReactive <- reactive({
+  
+  plotRCS(data.all=dataExtended(),
+          data.yn=dataFiltered.yn(),
+          measurement=Measurement(),
+          selectedSymptoms=input$selectedSymptoms,
+          measurementSelectedrcs=input$selectedEvaluationTime,
+          rcsIDVar=input$selectedCovariate,
+          binaryVar=input$treatasBinary) 
+})
+
 output$plotRCS=renderPlot({
   
   if(!is.null(regressionScenario())){
     if (regressionScenario()=="scenarioRCSModel") {
       
-      plotRCS(data.all=dataExtended(),
-              data.yn=dataFiltered.yn(),
-              measurement=Measurement(),
-              selectedSymptoms=input$selectedSymptoms,
-              measurementSelectedrcs=input$selectedEvaluationTime,
-              rcsIDVar=input$selectedCovariate,
-              binaryVar=input$treatasBinary)   
+      plotRCSReactive()
     }}
 }, height=numRowsRCSModel)
 
@@ -1424,6 +1665,72 @@ output$RCSDescr <- reactive({
       
       return(description())
     }}})
+
+
+# download "buttons" for each of the regression graphs ####
+output$linearRegDownload <- renderUI({
+  if (regressionScenario()=="scenarioLinearModel") {
+    output$downLoadRegressionOneTime1 <- downloadPlot(plotFunction = plotLinearReactive,
+                              width = clientData$output_plotLinear_width,
+                              height = clientData$output_plotLinear_height,
+                              print = TRUE)
+    downloadButton("downLoadRegressionOneTime1", label="Download")
+  }
+  })
+
+output$logistRegDownload <- renderUI({
+  if (regressionScenario()=="scenarioLogist") {
+    output$downLoadRegressionOneTime2 <- downloadPlot(plotFunction = plotLogistReactive,
+                                                     width = clientData$output_plotLogist_width,
+                                                     height = clientData$output_plotLogist_height,
+                                                     print = TRUE)
+    downloadButton("downLoadRegressionOneTime2", label="Download")
+  }
+})
+
+output$logistfRegDownload <- renderUI({
+  if (regressionScenario()=="scenarioLogistf") {
+    output$downLoadRegressionOneTime3 <- downloadPlot(plotFunction = plotLogistfReactive,
+                                                     width = clientData$output_plotLogistf_width,
+                                                     height = clientData$output_plotLogistf_height,
+                                                     print = TRUE)
+    downloadButton("downLoadRegressionOneTime3", label="Download")
+  }
+})
+
+output$RCSRegDownload <- renderUI({
+  if (regressionScenario()=="scenarioRCSModel") {
+    output$downLoadRegressionOneTime4 <- downloadHandler(
+      # since this is base graphics (not ggplot) the EPS file generation
+      # has to be handled differently - the downloadPlot() function does not work
+      # due to "Cairo" graphics device being used instead of "postscipt"
+      # maybe has to do with being called from a reactive function and/or plot being 
+      # in a different environement?
+      filename="plot.eps",
+      
+      content = function (file) {
+        width = clientData$output_plotRCS_width
+        height = clientData$output_plotRCS_height
+        postscript(file, paper="special", width = width/72, height = height/72)
+        
+        # if (input$treatasBinary==TRUE) {data=dataFilteredwithThreshold()} else {data=dataFiltered()}
+        
+        plotRCS(data.all=dataExtended(),
+                data.yn=dataFiltered.yn(),
+                measurement=Measurement(),
+                selectedSymptoms=input$selectedSymptoms,
+                measurementSelectedrcs=input$selectedEvaluationTime,
+                rcsIDVar=input$selectedCovariate,
+                binaryVar=input$treatasBinary)
+        
+        dev.off()
+      }, contentType="application/postscript"
+    )
+         
+    downloadButton("downLoadRegressionOneTime4", label="Download")
+  }
+})
+
 
 # TAB - Regression model : all evaluations ####
 # Menu
@@ -1494,35 +1801,52 @@ output$mixedModelTable1Caption <- renderText(
   })
 
 output$mixedModelTable1 <- renderDataTable({
-#<- renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     
     results <- mixedModelResults()[["printablecoVariate1st"]] 
-    #results <- mixedModelResults()[["coVariate1st"]] 
-    
-#     out <- print(xtable(results, caption=paste("Fixed effects of",
-#                                                input$selectedCovariate1st,
-#                                                "for", 
-#                                                mixedModelResults()[["coVariate1stComparison"]])),
-#                  type="html",
-#                  html.table.attributes='class="data table table-bordered table-condensed"',
-#                  caption.placement="top")
-#     return(div(HTML(out),class="shiny-html-output"))
+
     return(results)
   }
   }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 1 ####
+mixedModelGraph1Reactive <- reactive({
+  
+  #print(
+    plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
+                                       coVariate1st=input$selectedCovariate1st,
+                                       coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
+                                       treatasBinary=input$treatasBinary,
+                                       variableOrder=input$selectedSymptoms
+                                   )
+  
+})
+
+
 output$mixedModelGraph1 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
-    print(plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
-                                         coVariate1st=input$selectedCovariate1st,
-                                         coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
-                                         treatasBinary=input$treatasBinary,
-                                         variableOrder=input$selectedSymptoms) 
-    )
+#     print(plotFixedEffectsofcoVariate1st(calculatedStatistics=mixedModelResults()[["coVariate1st"]],
+#                                          coVariate1st=input$selectedCovariate1st,
+#                                          coVariate1stReferenceValue=mixedModelResults()[["coVariate1stReferenceValue"]],
+#                                          treatasBinary=input$treatasBinary,
+#                                          variableOrder=input$selectedSymptoms) 
+#     )
+    mixedModelGraph1Reactive()
+    
   }
 }, height=numRowsMixedModels1)
+
+# Download Graph 1 ####
+output$graph1Download <- renderUI({
+  
+  output$downLoadGraph1 <- downloadPlot(plotFunction = mixedModelGraph1Reactive,
+                                                    width = clientData$output_mixedModelGraph1_width,
+                                                    height = clientData$output_mixedModelGraph1_height,
+                                                    print = TRUE)
+  downloadButton("downLoadGraph1", label="Download")
+  
+})
+
 
 # Table 2 ####
 output$mixedModelTable2Caption <- renderText(
@@ -1541,32 +1865,48 @@ output$mixedModelTable2 <- renderDataTable({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
       results <- mixedModelResults()[["printablemeasurementVar"]] 
-      #results <- mixedModelResults()[["measurementVar"]] 
-      
-#       out <- print(xtable(results, caption=paste("Fixed effects of",
-#                                                  input$measurementVar,
-#                                                  "for T=",
-#                                                  mixedModelResults()[["measurementVarComparison"]],
-#                                                  "used as reference")),
-#                    type="html",
-#                    html.table.attributes='class="data table table-bordered table-condensed"',
-#                    caption.placement="top")
-#       return(div(HTML(out),class="shiny-html-output"))
+ 
       return(results)
     }}
   }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 2 ####
+mixedModelGraph2Reactive <- reactive({
+  #print(
+    plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
+                                         measurementVar=input$measurementVar,
+                                         treatasBinary=input$treatasBinary,
+                                         variableOrder=input$selectedSymptoms) 
+  #)
+  
+})
+
 output$mixedModelGraph2 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMmeasurement") {
-      print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
-                                             measurementVar=input$measurementVar,
-                                             treatasBinary=input$treatasBinary,
-                                             variableOrder=input$selectedSymptoms) 
-      )
+#       print(plotFixedEffectsofMeasurementVar(calculatedStatistics=mixedModelResults()[["measurementVar"]],
+#                                              measurementVar=input$measurementVar,
+#                                              treatasBinary=input$treatasBinary,
+#                                              variableOrder=input$selectedSymptoms) 
+#       )
+      
+      mixedModelGraph2Reactive()
     }}
 }, height=numRowsMixedModels2)
+
+# Download Graph 2 ####
+output$graph2Download <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMmeasurement") {
+  output$downLoadGraph2 <- downloadPlot(plotFunction = mixedModelGraph2Reactive,
+                                        width = clientData$output_mixedModelGraph2_width,
+                                        height = clientData$output_mixedModelGraph2_height,
+                                        print = TRUE)
+  downloadButton("downLoadGraph2", label="Download")
+    }}
+  
+})
+
 
 # Table 3 ####
 output$mixedModelTable3Caption <- renderText(
@@ -1577,31 +1917,48 @@ output$mixedModelTable3Caption <- renderText(
   )
 
 output$mixedModelTable3 <- renderDataTable({
-  #renderUI({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
       results <- mixedModelResults()[["printabledaysSinceInclusion"]] 
-      #results <- mixedModelResults()[["daysSinceInclusion"]] 
-      
-#       out <- print(xtable(results, caption=paste("Fixed effects of time since inclusion in the study")),
-#                    type="html",
-#                    html.table.attributes='class="data table table-bordered table-condensed"',
-#                    caption.placement="top")
-#       return(div(HTML(out),class="shiny-html-output"))
+   
       return(results)
     }}
   }, options=list(bFilter=FALSE, bPaginate=FALSE, bInfo=FALSE))
 
 # Graph 3 ####
+mixedModelGraph3Reactive <- reactive({
+  #print(
+    plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+                                             treatasBinary=input$treatasBinary,
+                                             variableOrder=input$selectedSymptoms) 
+  #)
+  
+})
+
 output$mixedModelGraph3 <- renderPlot({
   if(!is.null(input$selectedMixedModelType)) {
     if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
-      print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
-                                                 treatasBinary=input$treatasBinary,
-                                                 variableOrder=input$selectedSymptoms) 
-      )
+#       print(plotFixedEffectsofDaysSinceInclusion(calculatedStatistics=mixedModelResults()[["daysSinceInclusion"]],
+#                                                  treatasBinary=input$treatasBinary,
+#                                                  variableOrder=input$selectedSymptoms) 
+#       )
+      
+      mixedModelGraph3Reactive()
     }}
 }, height=numRowsMixedModels3)
+
+# Download Graph 3 ####
+output$graph3Download <- renderUI({
+  if(!is.null(input$selectedMixedModelType)) {
+    if (input$selectedMixedModelType=="MMtimeSinceInclusion") {
+  output$downLoadGraph3 <- downloadPlot(plotFunction = mixedModelGraph3Reactive,
+                                        width = clientData$output_mixedModelGraph3_width,
+                                        height = clientData$output_mixedModelGraph3_height,
+                                        print = TRUE)
+  downloadButton("downLoadGraph3", label="Download")
+    }}
+  
+})
 
 # description Regression All
 output$regressionAllDescr <- reactive({
@@ -1663,53 +2020,6 @@ output$selectPosOnly <- renderUI({
   }
 })
 
-# OBSOLETE ####
-# # plot - boxplots ###
-# output$plotBoxplot=renderPlot({
-#   if(!(is.null(dataFiltered()) || is.null(input$posOnly)  )){
-#     if(input$treatasBinary==TRUE){
-#       
-#       plotDistributionBoxplot(data=dataFiltered(),
-#                               data.yn=dataFiltered.yn(),
-#                               selectedSymptoms=input$selectedSymptoms,
-#                               selectedProportion=input$measurementSelectedProportion,
-#                               measurements=Measurement(),
-#                               posOnly=input$posOnly,
-#                               threshold=input$thresholdValue)
-#     }
-#   }
-# }, height=numRowsDistributions)
-# 
-# # plot - CI ###
-# output$plotCI <- renderPlot({
-#   if(!(is.null(dataFiltered.yn()) ||
-#          is.null(input$measurementSelectedProportion) ||
-#          is.null(Measurement()) ||
-#          is.null(input$selectedSymptoms) )){
-#     if(input$treatasBinary==TRUE){
-#       
-#       plotCI(data.yn=dataFiltered.yn(),
-#              measurements=Measurement(),
-#              selectedSymptoms=input$selectedSymptoms,
-#              selectedProportion=input$measurementSelectedProportion)
-#     }
-#   }
-# }, height=numRowsDistributions)
-# 
-# # table - for all patients - proportions and medians
-# output$tablePropMedian <- renderTable({ 
-#   if(!( is.null(dataFiltered()) || is.null(input$measurementSelectedProportion) )){
-#     if(input$treatasBinary==TRUE){
-#       
-#       tableAllWithSymptoms(data=dataFiltered(),
-#                            measurementVar=input$measurementVar,
-#                            forMeasurement=input$measurementSelectedProportion,
-#                            symptomsNames=input$selectedSymptoms,
-#                            thresholdValue=input$thresholdValue)
-#     }
-#   }
-# })
-
 # text - explainig tableMedianGroups
 output$textTablePropMedian <- renderUI({
   if(!is.null(dataFiltered())){
@@ -1731,75 +2041,16 @@ output$messageNotAppropriate4 <- renderText({
     }}
 })
 
-# # TAB - RCS ####
-# # ui - user interface to select a numerical variable to associate with the presence of symptom ###
-# output$rcsUI= renderUI({
-#   if(!is.null(dataFiltered())){
-#     
-#     selectInput(inputId="rcsIDVar",
-#                 label="Numerical variable:", 
-#                 choices=dataVariableNames(),
-#                 multiple=FALSE,
-#                 if (input$dataFileType=="Demo"){selected=c("Age")}) 
-#     
-#   }
-# })
-# 
-# # ui - user interface to select which measurments to cluster ###
-# output$rcsUI2 = renderUI({
-#   if(!is.null(measurementLevels())){
-#     
-#     #select the measurement
-#     selectInput(inputId="measurementSelectedrcs",
-#                 label="Select evaluation occasion:", 
-#                 choices=measurementLevels(), selected=measurementLevels()[1])
-#     
-#   }
-# })
-# 
-# output$messageNotAppropriate7 <- renderText({
-#   if(!is.null(input$treatasBinary)){
-#     if (input$treatasBinary==FALSE) {
-#       "This type of analysis is not appropriate for numerical responses."
-#     }}
-# })
-# 
+# TAB - Selected variables ####
 
-################ association of variables with the outcome using logistic regression with Firth correction
+output$selectedVariables <- renderPrint({
+  selectedInputs <- reactiveValuesToList(input)
+  print(selectedInputs)
+  })
 
-# # TAB - Logistf ####
-# # ui - user interface to select which measurments to cluster ###
-# output$logistfUI = renderUI({
-#   if(!is.null(measurementLevels())){
-#     if (input$treatasBinary==TRUE) {
-#       #select the measurement
-#       selectInput(inputId="measurementSelectedlogistf",
-#                   label="Select evaluation occasion:", 
-#                   choices=measurementLevels(), selected=measurementLevels()[1])
-#     }
-#   }
-# })
-# 
-# 
-# # ui - user interface to select a numerical variable to associate with the presence of symptom ###
-# output$logistfUI2= renderUI({
-#   if(!is.null(dataFiltered())){
-#     if (input$treatasBinary==TRUE) {
-#       selectInput(inputId="logistfIDVar",
-#                   label="Select a variable to associate with presence of symptoms:", 
-#                   choices=dataVariableNames(),
-#                   if (input$dataFileType=="Demo"){selected=c("Sex")})
-#     }
-#   }
-# })
-# 
-# output$messageNotAppropriate8 <- renderText({
-#   if(!is.null(input$treatasBinary)){
-#     if (input$treatasBinary==FALSE) {
-#       "This type of analysis is not appropriate for numerical responses."
-#     }}
-# })
-# 
-# 
-# 
+output$debug <- reactive({
+#  browser()
+  
+})
+
 })

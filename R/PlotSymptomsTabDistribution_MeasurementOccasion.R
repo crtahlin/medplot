@@ -5,7 +5,9 @@ plotDistribution <- function (data, selectedSymptoms, selectedProportion, measur
   
   #adjust the margins for the labels of the boxplot
   linch <-  max(strwidth(selectedSymptoms, "inch")+0.4, na.rm = TRUE)
+  
   par(mai=c(1.02,linch,0.82,0.42))
+  
   #par(mfrow=c(1,2))
   #calculate the proportion with symptoms and reorder (from the most common to the least common)
 
@@ -19,8 +21,8 @@ plotDistribution <- function (data, selectedSymptoms, selectedProportion, measur
   title(paste0("Presence of outcome variables\n",
                "at evaluation occasion T = ",
                selectedProportion
-               ))
-}
+               )) 
+  }
 
 
 #' @title Plots boxplots of symptoms. 
