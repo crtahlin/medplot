@@ -60,7 +60,7 @@ shinyUI(pageWithSidebar(
   mainPanel(
     progressInit(),
     tabsetPanel(
-      # TAB - welcome page with copyright info
+      # TAB - welcome page with copyright info ####
       tabPanel(title="Welcome",
                includeHTML("www/welcome.html")),
       
