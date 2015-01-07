@@ -347,14 +347,16 @@ output$downLoadplotTimelineProfiles <-  downloadPlot(
   print=TRUE
   )
       
+# profile plot descriptions
 output$plotTimelineProfilesDescr <- reactive({
   if(!is.null(input$selectedGraphType)) {
-    if(input$selectedGraphType=="profilePlot") {
+    if(input$selectedGraphOverTime=="profilePlot") {
   description <- switch(input$selectedGraphType,
          "oneGraph" = generateDescription("GraphExpl_ProfilePlots_AllSubjects"),
          "randomSample" = generateDescription("GraphExpl_ProfilePlots_RandomSubjects"),
          "multipleGraphs" = generateDescription("GraphExpl_ProfilePlots_MultipleGraphs")
     )
+ 
   return(description())
     } else {return()}
   }})

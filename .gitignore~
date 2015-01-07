@@ -1,0 +1,41 @@
+.Rproj.user
+.Rhistory
+.RData
+.Rbuildignore
+.dropbox
+.gitignore
+example.svg
+example_tooltips.svg
+medplot.Rproj
+Rprof.out
+desktop.ini
+R/RemovePackages.R
+Read-and-delete-me
+inst/PlotTests - Copy - Copy.xlsm
+inst/PlotTests - Copy.xlsm
+inst/extdata/~$PlotSymptoms_shiny.xlsx
+inst/extdata/~$PlotTests_shiny.xlsx
+inst/shinyapp_symptoms2.zip
+debug.Rdata
+inst/shinyapp_symptoms2/DataDebug.Rdata
+inst/shinyapp_symptoms2/Server_crt26.3.R
+inst/shinyapp_symptoms2/Ui_crt26.3.R
+inst/shinyapp_symptoms2/data.Rdata
+inst/shinyapp_symptoms2/debugData123.Rdata
+inst/shinyapp_symptoms2/debuging
+inst/shinyapp_symptoms2/debuging.Rdata
+inst/shinyapp_symptoms2/debuging.Rsave
+inst/shinyapp_symptoms2/ggplot_test.Rdata
+inst/shinyapp_symptoms2/server_Lara27.3.R
+inst/shinyapp_symptoms2/server_lara28.3.R
+inst/shinyapp_symptoms2/ui_Lara27.3.R
+inst/shinyapp_symptoms2/ui_lara28.3.R
+inst/shinyapp_symptoms2/Rplot.jpeg
+inst/shinyapp_symptoms2/dataFiltered.Rdata
+Working.R
+inst/extdata/DataEM - Copy.txt
+inst/extdata/DataEMShort.txt
+inst/extdata/DataEM_BinaryVariables.txt
+inst/extdata/DataEM_RenamedVariables.txt
+inst/doc/FunctionsOnTabs.xlsx
+inst/doc/PlotSymptomsReactiveVariables.xlsx

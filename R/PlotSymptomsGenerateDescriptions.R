@@ -86,7 +86,7 @@ if (outputName=="GraphExpl_Timeline") {
   description <- renderText({
     paste(
 
-"Data were visualized using a timeline plot. Timeline plots display the measurement occasion (date, evaluation occasion or day from inclusion) on the horizontal axis while the measurements of each subject appear at the same height; the values of the outcomes are displayed using dots of different sizes (bubbles).  The colors denote the outcomes. All the selected outcomes and subjects are displayed in the same graph. <br><br>
+"Data were visualized using a timeline plot. Timeline plots display the measurement occasion (date, evaluation occasion or day from inclusion) on the horizontal axis while the measurements of each subject appear at the same height; the values of the outcomes are displayed using dots of different sizes (bubbles). Values of zero are represented using small triangles. The colors denote the outcomes. All the selected outcomes and subjects are displayed in the same graph. <br><br>
 
 Timeline plots are useful especially for small data sets, where the individual patterns are easy to follow or for displaying a small number of outcomes (you can use the menu to de-select the outcomes you are not interested in).<br><br>
 
