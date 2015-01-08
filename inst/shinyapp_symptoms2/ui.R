@@ -9,10 +9,12 @@ shinyUI(fluidPage(
   #theme="/bootstrap/journal_bootstrap.css",
   
   # Application title ####
-  headerPanel("medplot"),
+  titlePanel("medplot"),
   sidebarLayout(
+    
     # Define the sidebar panel ####
     sidebarPanel(
+      width=3,
       textOutput("medplotVersion"),
       uiOutput("messageSelectVars"),
       wellPanel(
@@ -55,7 +57,7 @@ shinyUI(fluidPage(
         uiOutput("selectThresholdValue")#,
         
         # submitButton()
-      ), width=3),
+      )),
     
     # Define the main panel ####
     mainPanel(
