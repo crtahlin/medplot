@@ -2,10 +2,10 @@
 
 # load library for generation interactive web pages
 library(shiny)
-if(!require(shinyIncubator)) { # NOTE!!!: this is not available on CRAN, might not be best to include it?
-  devtools::install_github("shiny-incubator", "rstudio")
-  library(shinyIncubator)
-}
+# if(!require(shinyIncubator)) { # NOTE!!!: this is not available on CRAN, might not be best to include it?
+#   devtools::install_github("shiny-incubator", "rstudio")
+#   library(shinyIncubator)
+# }
 # load library for generating graph scales
 library(scales)
 # load library for melting data

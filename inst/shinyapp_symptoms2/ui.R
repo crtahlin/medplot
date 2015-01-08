@@ -59,7 +59,7 @@ shinyUI(fluidPage(
     
     # Define the main panel ####
     mainPanel(
-      progressInit(),
+      #progressInit(),
       tabsetPanel(
         # TAB - welcome page with copyright info ####
         tabPanel(title="Welcome",
