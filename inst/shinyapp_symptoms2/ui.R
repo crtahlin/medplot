@@ -1,22 +1,21 @@
 # This is the GUI part of the shiny script to plot
 # graph for displaying presence of symptoms. 
 
-library(shiny)
-library(shinyIncubator)
-
 # Define UI for displaying presence of symptoms
 shinyUI(fluidPage(
-  #theme="/bootstrap/journal_bootstrap.css",
+  #theme="/bootstrap/spacelab_bootstrap.css",
   
   # Application title ####
   titlePanel("medplot"),
+  
+  # Layout of the GUI ####
   sidebarLayout(
-    
     # Define the sidebar panel ####
     sidebarPanel(
       width=3,
       textOutput("medplotVersion"),
       uiOutput("messageSelectVars"),
+      # greyed out panel
       wellPanel(
         conditionalPanel(
           condition="input.dataFileType =='Demo'",
@@ -32,6 +31,7 @@ shinyUI(fluidPage(
                       "Demo data"="Demo"
                     )),
         
+        # show file upload control if user selects she will upload a file
         conditionalPanel(
           condition="input.dataFileType =='Excel' || input.dataFileType =='TSV'",
           fileInput(inputId="dataFile",
@@ -42,6 +42,7 @@ shinyUI(fluidPage(
                              "text/plain"))
         ),
         
+        # selection of various variables needed in the analysis
         uiOutput("selectPatientIDVar"),
         
         uiOutput("selectDateVar"),
@@ -50,18 +51,16 @@ shinyUI(fluidPage(
         
         uiOutput("selectGroupingVar"),
         
-        uiOutput("selectSymptoms"),
+        uiOutput("selectSymptoms"), # these are our outcome variables
         
         uiOutput("selectTreatasBinary"),
         
-        uiOutput("selectThresholdValue")#,
-        
-        # submitButton()
-      )),
+        uiOutput("selectThresholdValue")
+      )
+    ),
     
     # Define the main panel ####
     mainPanel(
-      #progressInit(),
       tabsetPanel(
         # TAB - welcome page with copyright info ####
         tabPanel(title="Welcome",
@@ -85,7 +84,7 @@ shinyUI(fluidPage(
                  uiOutput("plotTimelineProfilesDescr"),
                  
                  # Lasagna plot
-                 uiOutput("plotLasagna"), #, height="700px"),
+                 uiOutput("plotLasagna"),
                  conditionalPanel(condition="input.selectedGraphOverTime=='lasagnaPlot'",
                                   uiOutput("downloadLasagna")),
                  uiOutput("plotLasagnaDesc"),
@@ -110,7 +109,6 @@ shinyUI(fluidPage(
                  conditionalPanel(condition="input.selectedGraphOverTime=='presencePlot'",
                                   downloadButton("downLoadplotProportion", label="Download")),
                  uiOutput("plotProportionDesc")
-                 
         ),
         
         # TAB - Summary ####
@@ -131,10 +129,9 @@ shinyUI(fluidPage(
                  uiOutput("proportionsDescr")
         ),
         
-        
         # TAB - Summary tables : grouping variable ####
         tabPanel(title="Summary tables : grouping variable",
-                 #textOutput("messageNotAppropriate10"),
+                 
                  plotOutput("plotPropCIs", height="auto"),
                  conditionalPanel(condition="input.treatasBinary==true",
                                   downloadButton("downLoadPropPositiveCI", label="Download")),
@@ -170,9 +167,7 @@ shinyUI(fluidPage(
         
         # TAB - Regression model : one evaluation time ####
         tabPanel(title="Regression model : one evaluation time",
-                 # Menus
-                 #textOutput("debug10"),
-                 #textOutput("debug9"),
+                 
                  uiOutput("selectEvaluationTime"),
                  uiOutput("selectCovariate"),
                  uiOutput("checkUseFirthCorrection"),
@@ -180,7 +175,6 @@ shinyUI(fluidPage(
                  
                  # Graphs
                  # Logistic regression with Firth correction
-                 # plotOutput("plotLogistf", height="auto"),
                  plotOutput("plotLogistf", height="auto"),
                  uiOutput("logistfRegDownload"),
                  dataTableOutput("tableLogistf"),
@@ -231,14 +225,13 @@ shinyUI(fluidPage(
         
         # TAB - Selected data ####
         tabPanel(title="Uploaded data", 
-                 # textOutput("messageSelectVars"),
-                 dataTableOutput("data")), #,
+                 dataTableOutput("data")),
         
         # TAB - Debug ####
         tabPanel("Selected variables",
                  verbatimTextOutput("selectedVariables"),
                  textOutput("debug"))
-      )
+        )
     )
   )
 )
