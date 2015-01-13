@@ -72,7 +72,7 @@ if (outputName=="GraphExpl_BoxPlots") {
   description <- renderText({
     paste(
 
-"Data were visualized using box and whisker plots (also known as boxplots). The boxplots represent the first quartile (i.e., lower edge of the box), median (i.e., bar inside the box), third quartile (i.e., upper edge of the box), and minimum and maximum (i.e., horizontal lines). If any points are at a greater distance from the quartiles than 1.5 times the interquartile range (IQR), these are plotted individually as dots. Horizontal bars represent a distance of 1.5 times IQR from the upper or lower quartile.<br><br>
+"Data were visualized using box and whisker plots (also known as boxplots). The boxplots represent the first quartile (i.e., lower edge of the box), median (i.e., bar inside the box) and third quartile (i.e., upper edge of the box). Horizontal bars represent a distance of 1.5 times IQR from the upper or lower quartile. If any points are at a greater distance from the quartiles than 1.5 times the interquartile range (IQR), these are plotted individually as dots. <br><br>
 
 Boxplots do not display individual changes or the presence of missing values. Profile plots and heat maps (lasagna plots) might be used if the aim is to visualize individual changes over time.<br><br>
 
@@ -86,7 +86,7 @@ if (outputName=="GraphExpl_Timeline") {
   description <- renderText({
     paste(
 
-"Data were visualized using a timeline plot. Timeline plots display the measurement occasion (date, evaluation occasion or day from inclusion) on the horizontal axis while the measurements of each subject appear at the same height; the values of the outcomes are displayed using dots of different sizes (bubbles).  The colors denote the outcomes. All the selected outcomes and subjects are displayed in the same graph. <br><br>
+"Data were visualized using a timeline plot. Timeline plots display the measurement occasion (date, evaluation occasion or day from inclusion) on the horizontal axis while the measurements of each subject appear at the same height; the values of the outcomes are displayed using dots of different sizes (bubbles). Values of zero are represented using small triangles. The colors denote the outcomes. All the selected outcomes and subjects are displayed in the same graph. <br><br>
 
 Timeline plots are useful especially for small data sets, where the individual patterns are easy to follow or for displaying a small number of outcomes (you can use the menu to de-select the outcomes you are not interested in).<br><br>
 
@@ -129,9 +129,9 @@ if (outputName=="Summary_Proportions") {
     paste(
       
 "
-The first graph shows the estimated proportion of subjects with positive values of outcome variables. All evaluation occasion are represented on the graph - with horizontal bars of different color stacked on top of each other. Both groups are represented on the graph - one to the left and the other to right of the zero value on the horizontal axis.
+The first graph shows the estimated proportion of subjects with positive values of outcome variables. All evaluation occasion are represented on the graph - with horizontal bars of different color stacked on top of each other. Both groups are represented on the graph - one to the left and the other to right of the zero value on the horizontal axis.<br><br>
 
-The table displays the frequencies and estimated proportions of subjects with positive values of outcome variables. 95% confidence intervals are reported for proportions, based on the exact binomial method. The number of missing values for each outcome variable is reported.<br><br>
+The table displays the frequencies (Positive) and estimated proportions (Proportion) of subjects with positive values of outcome variables. 95% confidence intervals are reported for proportions (95% CI for proportion), based on the exact binomial method. The number of missing values (#NAs) for each outcome variable is reported.<br><br>
 
 The second graph shows the estimated proportion of subjects with positive outcome values of outcome variables along with their 95% confidence intervals.<br><br>
 
@@ -143,11 +143,12 @@ if (outputName=="SummaryGrouping_Proportions") {
   description <- renderText({
     paste(
 "
-The graph shows the estimated proportion of subjects with positive values of outcome variables together with their 95% confidence intervals. All evaluation occasions are represented for each outcome variable. Both groups are represented on the graph - one to the left and the other to right of the zero value on the horizontal axis.
+The graph shows the estimated proportion of subjects with positive values of outcome variables together with their 95% confidence intervals. All evaluation occasions are represented for each outcome variable. Both groups are represented on the graph - one to the left and the other to right of the zero value on the horizontal axis.<br><br>
 
 The table displays the estimated proportion of subjects in a certain group, P value for the difference of proportions and the 95% confidence interval for the difference of proportions. The groups are compared using the chi-squared test with continuity correction. Data with missing values for grouping variable are removed from analysis.<br><br>
 
-Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed if the user chooses so. Adjusted P values are based on the Holm-Bonferroni method (conservative and lacks statistical power with correlated if the outcomes are correlated) or multivariate permutation based adjustment (takes into account the correlation between outcomes and is generally more statistically powerful than Holm-Bonferroni).  Q values are evaluated using the Benjamini-Hochberg (assumes independent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
+Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed only if the option “Calculate P value adjustments?” was selected.
+Adjusted P values are based on the Holm-Bonferroni method (which is conservative and lacks statistical power if the outcomes are correlated) or on a multivariate permutation based adjustment (which takes into account the correlation between outcomes and is generally more statistically powerful than Holm-Bonferroni). Q values are evaluated using the Benjamini-Hochberg (which assumes independent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (which makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
 
@@ -203,36 +204,46 @@ if (outputName=="Clustering_Correlations") {
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
 
-# RegressionOne_OddsRatio ####
-if (outputName=="RegressionOne_OddsRatio") {
-  description <- renderText({
-    paste(
-"The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression. The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. The tables also display 95% confidence intervals for these parameters along with their P values. <br><br>
-
-The graph displays the odds ratios together with the 95% confidence intervals.<br><br>
-
-You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
-    )})}
 
 # RegressionOne_Linear ####
 if (outputName=="RegressionOne_Linear") {
   description <- renderText({
     paste(
-"Linear regression was used to estimate the association between the outcome variables and the selected covariate for the measurements obtained at the selected evaluation occasion.  A separate linear regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate.
-The results in the tables display the estimated regression coefficients (beta - slope) and the intercepts for each of the models; the variable names appearing in the tables indicate which outcome variable was used. The coefficients represent the change in the outcome for a one unit change of the covariate; the intercept provides an estimate of the average value of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless). The tables also display 95% confidence intervals for these parameters along with their P values (the null hypotheses are that the coefficients are equal to 0 in the population).<br><br>
+"Linear regression was used to estimate the association between the outcome variables and the selected covariate for the measurements obtained at the selected evaluation occasion. A separate linear regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate.<br><br>
 
-The graph displays the estimated regression coefficients obtained for each of the estimated model, together with their 95% confidence intervals. <br><br>
+The graph displays the estimated regression coefficients (beta - slope) obtained for each of the estimated models, together with their 95% confidence intervals. <br><br>
+
+The results in the tables display the estimated regression coefficients (beta - slope) and the intercepts for each of the models; the variable names appearing in the tables indicate which outcome variable was used. The coefficients represent the change in the outcome for one unit change of the covariate; the intercept provides an estimate of the average value of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless). The tables also display 95% confidence intervals for these parameters along with their P values (the null hypotheses are that the coefficients are equal to 0 in the population).<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
+    )})}
+
+# RegressionOne_OddsRatio ####
+if (outputName=="RegressionOne_OddsRatio") {
+  description <- renderText({
+    paste(
+      "Logistic regression was used to estimate the association between the outcome variable and the selected covariate for the measurements obtained at the selected evaluation occasion. A separate logistic regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate.<br><br>
+      
+      The graph displays the odds ratios together with the 95% confidence intervals.<br><br>
+      
+      The results in the tables display estimated odds ratios and odds intercepts for each of the models; the variable names appearing in the tables indicate which outcome variable was used. The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. They represent the increase in odds of the outcome for one unit chenge of the covariate. The odds intercept provides an estimate of the average odds of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless).
+      The tables also display 95% confidence intervals for these parameters along with their P values (the null hypothesis are that the odds ratio is equal to 1 in the population). <br><br>
+      
+      You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
 
 # RegressionOne_Firth ####
 if (outputName=="RegressionOne_Firth") {
   description <- renderText({
     paste(
-"The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression with the Firth correction. The Firth correction is useful for small data sets or when the phenomenon of separation occurs (the positive and negative outcomes are perfectly separated by a covariate and the estimate of a parameter consequently diverges to infinity without this correction). The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. The tables also display 95% confidence intervals for these parameters along with their P values. <br><br>
+"Logistic regression with the Firth correction was used to estimate the association between the outcome variable and the selected covariate for the measurements obtained at the selected evaluation occasion. A separate logistic regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate.<br><br>
 
 The graph displays the odds ratios together with the 95% confidence intervals.<br><br>
+
+The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression with the Firth correction for each of the models. The Firth correction is useful for small data sets or when the phenomenon of separation occurs (the positive and negative outcomes are perfectly separated by a covariate and the estimate of a parameter consequently diverges to infinity without this correction). 
+
+The variable names appearing in the tables indicate which outcome variable was used. The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. They represent the increase in odds of the outcome for one unit chenge of the covariate. The odds intercept provides an estimate of the average odds of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless).
+      The tables also display 95% confidence intervals for these parameters along with their P values (the null hypothesis are that the odds ratio is equal to 1 in the population). <br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
 
@@ -244,7 +255,7 @@ Heinze G, Schemper M (2002) A solution to the problem of separation in logistic 
 if (outputName=="RegressionOne_RCS") {
   description <- renderText({
     paste(
-"The graphs represent modeling the association of the outcome variables with the chosen covariate using restricted cubic splines. Non linear associations might be apparent from the graphs. <br><br>
+"The graphs represent modeling the association of the outcome variables with the chosen covariate using restricted cubic splines. Non linear associations might be apparent from the graphs. The table contains P values for the model (the null hypthosesis being that the model terms are zero). <br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button. <br><br>
 
@@ -258,9 +269,14 @@ if (outputName=="RegressionAll") {
   description <- renderText({
     paste(
 
-"Modeling is done for each outcome variable separately, but over all evaluation occasions while allowing the intercept to vary for each subject (using a mixed model). Tables display the estimated intercepts for the models and the estimated regression coefficients (either odds ratios for binary or beta coefficients for numerical and categorical variables). The graphs display the estimated coefficients along with their 95% confidence intervals.<br><br>
+"Linear regression was used to assess the association between each of the outcome variables and the selected covariate, using all the measurements taken over time (a separate model was fitted for each of the outcomes).
+To take into account the multiple measurements repeated in each patient, the analyses were adjusted for the subject variable as a random effect (a mixed effect linear model was used). Optionaly, the analyses can be adjusted for Evaluation occasion or Time from inclusion in the study.<br><br>
 
 Choosing 'Outcome~Covariate+Subject(random effect)' will build models for studying the association of one covariate with the outcome, without adjusting the analysis for the other covariates. Choosing either 'Outcome~Covariate+Evaluation occasion+Subject(random effect)' or 'Outcome~Covariate+Time since inclusion+Subject(random effect)' will also evaluate time in the model. Evaluation occasions are modeled as categorical covariates while time since inclusion is modeled as a numerical covariate.<br><br>
+
+Tables display the estimated intercepts for the models and the estimated regression coefficients - either odds ratios (OR) for binary or beta coefficients (beta - slope) for numerical and categorical variables. The 95% confidence intervals for the coefficients are listed (95% conf. interval), as well as the P values (the null hypothesis being, that the coefficients do not differ from 0). <br><br>
+
+The graphs display the estimated coefficients along with their 95% confidence intervals .<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.
 
