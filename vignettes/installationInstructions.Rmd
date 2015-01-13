@@ -1,5 +1,5 @@
 <!--
-%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{medplot installation instructions}
 -->
 
