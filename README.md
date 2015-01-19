@@ -1,14 +1,14 @@
 # medplot R package
 
-Functions for drawing graphs in R visualizing medical information.
+Functions for visualizing and analyzing medical data in R - primarily longitudinal epidemiologic data.
 
 You can find the Excel template file (to use with the medplot shiny app) in the folder:
 
-/inst/extdata/PlotSymptoms_shiny.xlsx
+[/inst/extdata/PlotSymptoms_shiny.xlsx](/inst/extdata/PlotSymptoms_shiny.xlsx)
 
 And the Tab Separated Values template file in the folder:
 
-/inst/extdata/PlotSymptoms_TemplateTSV.txt
+[/inst/extdata/PlotSymptoms_TemplateTSV.txt]()
 
 # Installation instructions for the medplot package
 
