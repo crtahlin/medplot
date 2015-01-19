@@ -1,5 +1,5 @@
 <!--
-%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{medplot installation instructions}
 -->
 
@@ -19,8 +19,7 @@ Load devtools and install packages from GitHub:
 
 ```{r, eval=FALSE}
 library(devtools)
-install_github(username="rstudio", repo="shiny-incubator")
-install_github(username="crtahlin", repo="medplot")
+install_github("crtahlin/medplot")
 ```
 
 # Running medplot localy
