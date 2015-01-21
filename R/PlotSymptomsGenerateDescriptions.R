@@ -4,8 +4,8 @@ generateDescription <- function(outputName) {
 if (outputName=="GraphExpl_ProfilePlots_AllSubjects") {
   description <- renderText({
 paste(
-"Data were displayed using profile plots (also known as spaghetti plots). 
-Profile plots are scatterplots displaying the evaluation occasions and the values of the variables where the values from the same subject are connected. The larger red dots display the median values. Each outcome was displayed in a separate graph.<br><br>
+"Data are displayed using profile plots (also known as spaghetti plots). 
+Profile plots are scatterplots displaying the evaluation occasions and the values of the variables where the values from the same subject are connected. The larger red dots display the median values. Each outcome is displayed in a separate graph.<br><br>
 
 Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try plotting Lasagna plots, as they might be more informative.<br><br>
 
@@ -22,7 +22,7 @@ if (outputName=="GraphExpl_ProfilePlots_RandomSubjects") {
   description <- renderText({
     paste(
       "Data were displayed using profile plots (also known as spaghetti plots). 
-Profile plots are scatterplots displaying the evaluation occasions and the values of the variables where the values from the same subject are connected. The larger red dots display the median values. Each outcome was displayed in a separate graph.<br><br>
+Profile plots are scatterplots displaying the evaluation occasions and the values of the variables where the values from the same subject are connected. The larger red dots display the median values. Each outcome is displayed in a separate graph.<br><br>
 
 Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try plotting Lasagna plots, as they might be more informative.<br><br>
 
@@ -39,7 +39,7 @@ if (outputName=="GraphExpl_ProfilePlots_MultipleGraphs") {
   description <- renderText({
     paste(
 "Data were displayed using profile plots (also known as spaghetti plots). 
-Profile plots are scatterplots displaying the evaluation occasions and the values of the variables where the values from the same subject are connected. The larger red dots display the median values. Each outcome was displayed in a separate graph.<br><br>
+Profile plots are scatterplots displaying the evaluation occasions on the x-axis and the values of the outcome variables on the y-axis. The values from the same subject are connected. The larger red dots indicate the median values. Each outcome is displayed in a separate graph.<br><br>
 
 Profile plots are useful for the identification of trends and to display individual changes.  When many subjects are plotted together or the possible number of values of the variable is limited, the profiles might overlap obscuring the trends. You might improve your graphs by displaying only a subset of the subjects (select: 'Random selection of the subjects on one graph' as the type of graph to plot) or by plotting multiple graphs for each outcome (select: 'Multiple graphs per outcome variable').  You could also try plotting Lasagna plots, as they might be more informative.<br><br>
 
@@ -72,7 +72,7 @@ if (outputName=="GraphExpl_BoxPlots") {
   description <- renderText({
     paste(
 
-"Data were visualized using box and whisker plots (also known as boxplots). The boxplots represent the first quartile (i.e., lower edge of the box), median (i.e., bar inside the box) and third quartile (i.e., upper edge of the box). Horizontal bars represent a distance of 1.5 times IQR from the upper or lower quartile. If any points are at a greater distance from the quartiles than 1.5 times the interquartile range (IQR), these are plotted individually as dots. <br><br>
+"Data were visualized using box and whisker plots (also known as boxplots). The boxplots represent the first quartile (i.e., lower edge of the box), median (i.e., bar inside the box) and third quartile (i.e., upper edge of the box). Vertical lines extend to the most extreme values or to a distance of 1.5 times the interquartile range (IQR) from the upper or lower quartile. The points (if any) plotted individually as dots are those that are at a greater distance from the quartiles than 1.5 times the IQR.  <br><br>
 
 Boxplots do not display individual changes or the presence of missing values. Profile plots and heat maps (lasagna plots) might be used if the aim is to visualize individual changes over time.<br><br>
 
@@ -103,6 +103,8 @@ if (outputName=="GraphExpl_Barplots") {
 
 "Data were visualized using barplots that display the proportion of patients with positive outcomes at a given evaluation occasion. <br><br>
 
+Please note that in medplot we define positive outcomes of binary variables those coded with the largest value (1s if the 0/1 coding was used, Yes if the Yes/No coding is used (alphabetical order), etc).  
+
 You might want to display the proportions with their 95% confidence intervals, which are more informative. These graphs are available in the Summary tab. <br><br>
 
 More descriptive statistics are provided in the Summary tabs.<br><br>
@@ -129,11 +131,11 @@ if (outputName=="Summary_Proportions") {
     paste(
       
 "
-The first graph shows the estimated proportion of subjects with positive values of outcome variables. All evaluation occasion are represented on the graph - with horizontal bars of different color stacked on top of each other. Both groups are represented on the graph - one to the left and the other to right of the zero value on the horizontal axis.<br><br>
+Please note that in medplot we define positive outcomes of binary variables those coded with the largest value (1s if the 0/1 coding was used, Yes if the Yes/No coding is used (alphabetical order), etc).  <br><br>
 
 The table displays the frequencies (Positive) and estimated proportions (Proportion) of subjects with positive values of outcome variables. 95% confidence intervals are reported for proportions (95% CI for proportion), based on the exact binomial method. The number of missing values (#NAs) for each outcome variable is reported.<br><br>
 
-The second graph shows the estimated proportion of subjects with positive outcome values of outcome variables along with their 95% confidence intervals.<br><br>
+The graph shows the overall estimated proportion of subjects with positive value of the outcome variables for the selected evaluation occasion, along with their 95% confidence intervals.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
@@ -143,11 +145,15 @@ if (outputName=="SummaryGrouping_Proportions") {
   description <- renderText({
     paste(
 "
+In medplot outputs the largest value of a binary outcome variable is defined as Positive (i.e., the positive value is 1 with a 0/1 coding, Yes with a Yes/No coding, etc).<br><br> 
+
+The subjects were divided in two groups, defined by the values observed for the selected grouping variable.<br><br> 
+
 The graph shows the estimated proportion of subjects with positive values of outcome variables together with their 95% confidence intervals. All evaluation occasions are represented for each outcome variable. Both groups are represented on the graph - one to the left and the other to right of the zero value on the horizontal axis.<br><br>
 
 The table displays the estimated proportion of subjects in a certain group, P value for the difference of proportions and the 95% confidence interval for the difference of proportions. The groups are compared using the chi-squared test with continuity correction. Data with missing values for grouping variable are removed from analysis.<br><br>
 
-Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed only if the option “Calculate P value adjustments?” was selected.
+Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed only if the option 'Calculate P value adjustments?' was selected.
 Adjusted P values are based on the Holm-Bonferroni method (which is conservative and lacks statistical power if the outcomes are correlated) or on a multivariate permutation based adjustment (which takes into account the correlation between outcomes and is generally more statistically powerful than Holm-Bonferroni). Q values are evaluated using the Benjamini-Hochberg (which assumes independent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (which makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button.<br><br>
@@ -162,11 +168,14 @@ Benjamini Y, Yekutieli D (2001) The control of the false discovery rate in multi
 if (outputName=="SummaryGrouping_Medians") {
   description <- renderText({
     paste(
-"The subjects were divided in two groups, defined by the values observed for the selected grouping variable. The table displays the median and interquartile range (25th to 75th percentile) within each subgroup.
+"The subjects were divided in two groups, defined by the values observed for the selected grouping variable.<br><br> 
+
+The table displays the median and interquartile range (25th to 75th percentile) within each subgroup. 
 The subgroups were compared with the Mann-Whitney test (also known as the Wilcoxon rank sum test). The null hypothesis of the Mann-Whitney test is that the distributions of both groups are identical in the population. Data with missing values for grouping variable were removed from analysis.<br><br>
 
-Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed only if the option “Calculate P value adjustments?” was selected.
-Adjusted P values are based on the Holm-Bonferroni method (which is conservative and lacks statistical power if the outcomes are correlated) or on a multivariate permutation based adjustment (which takes into account the correlation between outcomes and is generally more statistically powerful than Holm-Bonferroni). Q values are evaluated using the Benjamini-Hochberg (which assumes independent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (which makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
+Adjusted P values and False discovery rates (Q values) taking into account multiple comparisons are calculated and displayed only if the option 'Calculate P value adjustments?' was selected.<br><br>
+Adjusted P values are based on the Holm-Bonferroni method (which is conservative and lacks statistical power if the outcomes are correlated) or on a multivariate permutation based adjustment (which takes into account the correlation between outcomes and is generally more statistically powerful than Holm-Bonferroni). <br><br>
+Q values are evaluated using the Benjamini-Hochberg (which assumes independent or positively dependent outcomes) or Benjamini-Hochberg-Yekutieli procedure (which makes no assumptions about outcome dependence but is more conservative). Q values represent the minimum false discovery rate at which the test may be called significant.<br><br>
 
 References:<br>
 Westfall PH YS (1993) Resampling-Based Multiple Testing. Wiley New York.<br>
@@ -178,7 +187,7 @@ Benjamini Y, Yekutieli D (2001) The control of the false discovery rate in multi
 if (outputName=="Clustering_Dendrogram") {
   description <- renderText({
     paste(
-"The dendrogram displays the similarity of subjects by hierarchically clustering the outcomes for the chosen evaluation occasion. For numerical variables, their correlations are used in computing their differences. For binary variables, Euclidean distance is used. <br><br>
+"The dendrogram displays the similarity of outcome variables by hierarchically clustering the them for the chosen evaluation occasion. The complete linkage method is used and the distance is based on correlation for numerical variables and on Euclidean distance for binary variables. <br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
@@ -199,7 +208,7 @@ You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or '
 if (outputName=="Clustering_Correlations") {
   description <- renderText({
     paste(
-"The heat map displays correlations between outcome variables at the chosen evaluation occasion. Values of pairwise Spearman correlations between two outcome variables are also displayed numerically in each cell and color coded. Only complete observations are used. The outcome variables are arranged according to their similarities using hierarchical clustering with complete linkage method and Euclidean distance.<br><br>
+"The heat map displays the correlations between outcome variables at the chosen evaluation occasion. Values of pairwise Spearman correlations between two outcome variables are also displayed numerically in each cell, and are color coded. Only complete observations are used. The outcome variables are arranged according to their similarities using hierarchical clustering with complete linkage method and Euclidean distance.<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
@@ -209,11 +218,13 @@ You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or '
 if (outputName=="RegressionOne_Linear") {
   description <- renderText({
     paste(
-"Linear regression was used to estimate the association between the outcome variables and the selected covariate for the measurements obtained at the selected evaluation occasion. A separate linear regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate.<br><br>
+"
+A separate linear regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate and an intercept. Only the measurements obtained at the selected evaluation occasion were used.
+The aim of the analyses was to estimate the association between the selected covariate and each of the numerical outcome variables at a given evaluation occasion. <br><br>
 
-The graph displays the estimated regression coefficients (beta - slope) obtained for each of the estimated models, together with their 95% confidence intervals. <br><br>
+The graph displays the estimated regression coefficients (beta - slope) for the covariate, obtained for each of the estimated models, together with their 95% confidence intervals. <br><br>
 
-The results in the tables display the estimated regression coefficients (beta - slope) and the intercepts for each of the models; the variable names appearing in the tables indicate which outcome variable was used. The coefficients represent the change in the outcome for one unit change of the covariate; the intercept provides an estimate of the average value of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless). The tables also display 95% confidence intervals for these parameters along with their P values (the null hypotheses are that the coefficients are equal to 0 in the population).<br><br>
+The results in the tables display the estimated regression coefficients (beta - slope) and the intercepts for each of the models; the variable names appearing in the tables indicate which outcome variable was used. The coefficients represent the estimated change in the outcome for one unit change of the covariate; the intercept provides an estimate of the average value of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless). The tables also display 95% confidence intervals for these parameters along with their P values (the null hypotheses are that the coefficients are equal to 0 in the population).<br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
     )})}
@@ -222,11 +233,17 @@ You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or '
 if (outputName=="RegressionOne_OddsRatio") {
   description <- renderText({
     paste(
-      "Logistic regression was used to estimate the association between the outcome variable and the selected covariate for the measurements obtained at the selected evaluation occasion. A separate logistic regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate.<br><br>
+      "A separate logistic regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate and an intercept. Only the measurements obtained at the selected evaluation occasion were used.
+	  
+The aim of the analyses was to estimate the association between the selected covariate and each of the binary outcome variables at a given evaluation occasion. <br><br>
+	  <br><br>
       
-      The graph displays the odds ratios together with the 95% confidence intervals.<br><br>
+      The graph displays the estimated odds ratios for the covariate, together with their 95% confidence intervals.<br><br>
       
-      The results in the tables display estimated odds ratios and odds intercepts for each of the models; the variable names appearing in the tables indicate which outcome variable was used. The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. They represent the increase in odds of the outcome for one unit chenge of the covariate. The odds intercept provides an estimate of the average odds of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless).
+      The results in the tables display the estimated odds ratios for the covariate and the intercept, for each of the fitted models; the variable names appearing in the tables indicate which outcome variable was 
+	  used. For categorical covariates the odds ratios are expressed for a level of covariate compared to the reference level of that covariate (the reference level is the level coded with the smallest value). 
+	  For numerical covariates they represent the increase in odds of the outcome for one unit change of the covariate. 
+	  The odds intercept provides an estimate of the average odds of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless).
       The tables also display 95% confidence intervals for these parameters along with their P values (the null hypothesis are that the odds ratio is equal to 1 in the population). <br><br>
       
       You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button."
@@ -236,11 +253,13 @@ if (outputName=="RegressionOne_OddsRatio") {
 if (outputName=="RegressionOne_Firth") {
   description <- renderText({
     paste(
-"Logistic regression with the Firth correction was used to estimate the association between the outcome variable and the selected covariate for the measurements obtained at the selected evaluation occasion. A separate logistic regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate.<br><br>
+"Logistic regression with the Firth correction was used to estimate the association between each of the outcome variables and the selected covariate, using the measurements obtained at the selected evaluation occasion. 
+A separate logistic regression model was estimated for each of the outcome variables, each of the regression models included the selected covariate and an intercept.<br><br>
 
-The graph displays the odds ratios together with the 95% confidence intervals.<br><br>
+The graph displays the odds ratios for the covariate, together with the 95% confidence intervals.<br><br>
 
-The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression with the Firth correction for each of the models. The Firth correction is useful for small data sets or when the phenomenon of separation occurs (the positive and negative outcomes are perfectly separated by a covariate and the estimate of a parameter consequently diverges to infinity without this correction). 
+The results in the tables display estimated odds ratios and odds intercepts for outcome variables estimated using logistic regression with the Firth correction, for each of the models. 
+The Firth correction is useful for small data sets or when the phenomenon of separation occurs (the positive and negative outcomes are perfectly separated by a covariate and the estimate of a parameter consequently diverges to infinity without this correction). 
 
 The variable names appearing in the tables indicate which outcome variable was used. The odds ratios are expressed for a level of covariate compared to the reference level of the covariate. They represent the increase in odds of the outcome for one unit chenge of the covariate. The odds intercept provides an estimate of the average odds of the outcome, when the value of the covariate is equal to 0 (often the interpretation of the intercept is meaningless).
       The tables also display 95% confidence intervals for these parameters along with their P values (the null hypothesis are that the odds ratio is equal to 1 in the population). <br><br>
@@ -255,7 +274,8 @@ Heinze G, Schemper M (2002) A solution to the problem of separation in logistic 
 if (outputName=="RegressionOne_RCS") {
   description <- renderText({
     paste(
-"The graphs represent modeling the association of the outcome variables with the chosen covariate using restricted cubic splines. Non linear associations might be apparent from the graphs. The table contains P values for the model (the null hypthosesis being that the model terms are zero). <br><br>
+"The graphs represent the estimated association of the chosen covariate with each of the outcome variables, obtained using restricted cubic splines to flexibly model the association. 
+Non linear associations might be apparent from the graphs. The table contains P values for the model (the null hypthosesis being that the model terms are zero). <br><br>
 
 You can copy the graph(s) by right clicking on them (selecting 'Copy Image' or 'Save Image as...') or download them as Postscript graphics by clicking the 'Download' button. <br><br>
 
