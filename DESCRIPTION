@@ -1,13 +1,16 @@
 Package: medplot
 Type: Package
-Title: Plotting functions to be used by healthcare workers.
-Version: 0.9.989
-Date: 2015-01-21
+Title: Web application developed to facilitate the exploration and analysis of
+    longitudinal data.
+Version: 0.9.990
+Date: 2015-01-22
 Author: coding by Crt Ahlin with design and coding contribution from Lara Lusa
 Maintainer: Crt Ahlin <crt.ahlin@gmail.com>
-Description: Collection of plotting and analysis tools to be used by healthcare
-    workers. Contains: shiny application to visualise/analyse a specific kind
-    of medical data (longitudinal test results data).
+Description: medplot is a web application developed to facilitate the
+    exploration and analysis of longitudinal data. The application was
+    developed for biomedical researchers that wish to summarize, visualize and
+    analyze longitudinal data where numerous variables are evaluated at
+    multiple occasions for a group of subjects.
 License: GPL-3
 Depends:
     Cairo,
