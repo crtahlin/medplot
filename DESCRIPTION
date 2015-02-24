@@ -13,7 +13,7 @@ Description: medplot is a web application developed to facilitate the
     multiple occasions for a group of subjects.
 License: GPL-3
 BugReports: https://github.com/crtahlin/medplot/issues
-Depends:
+Imports:
     Cairo,
     gplots,
     RColorBrewer,
