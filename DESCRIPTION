@@ -37,6 +37,5 @@ Imports:
     permute,
     boot
 Suggests:
-    SVGAnnotation,
     knitr
 VignetteBuilder: knitr
