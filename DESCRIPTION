@@ -15,18 +15,14 @@ License: GPL-3
 BugReports: https://github.com/crtahlin/medplot/issues
 Imports:
     Cairo,
-    gplots,
-    RColorBrewer,
     shiny,
     scales,
     reshape2,
     ggplot2,
-    seriation,
     XML,
     plyr,
     gdata,
     lubridate,
-    survival,
     rms,
     xtable,
     nlme,
