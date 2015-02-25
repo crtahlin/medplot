@@ -32,6 +32,3 @@ Imports:
     logistf,
     permute,
     boot
-Suggests:
-    knitr
-VignetteBuilder: knitr
