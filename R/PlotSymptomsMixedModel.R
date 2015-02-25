@@ -526,7 +526,7 @@ calculateDaysSinceInclusion <- function (data,
   }
   # data$minDate <- as.Date(data$minDate, format="%Y-%m-%d")
   data$daysSinceInclusion <- as.numeric(as.Date(data[,dateVar], format="%d.%m.%Y") - data$minDate) # save as numeric for melt()to work
-  # TODO: tu je nekaj čudnega  - zakaj je to sploh delovlao? oba datuma sta v različnem formatu
+  # TODO: tu je nekaj cudnega  - zakaj je to sploh delovlao? oba datuma sta v razlicnem formatu
   # morao bi biti: data$minDate <- as.Date(data$minDate, format="%d.%m.%Y")
   # in tudi : as.Date(data[,dateVar], format="%d.%m.%Y")
   # as.Date(data[,dateVar], format="%d.%m.%Y") - as.Date(data$minDate, format="%d.%m.%Y")
