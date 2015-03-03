@@ -13,6 +13,6 @@ determineTypeofVariable(variableValues)
 Returns the number of levels and type of variable.
 }
 \description{
-Determines what type of variable is used.
+Determines what type of variable is used. Used in regression modeling.
 }
 

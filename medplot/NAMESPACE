@@ -2,6 +2,7 @@
 
 export(determineTypeofVariable)
 export(downloadPlot)
+export(generateDescription)
 export(importSymptomsData)
 export(medplotOnline)
 import(Cairo)

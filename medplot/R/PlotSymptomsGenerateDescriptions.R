@@ -1,3 +1,10 @@
+#' @title Generate descriptions of outputs
+#' 
+#' @description Generates descriptions for output (tables, graphs).
+#' 
+#' @param outputName Takes the output name (label) as argument.
+#' 
+#' @export
 generateDescription <- function(outputName) {
 
 # GraphExpl_ProfilePlots_AllSubjects ####
