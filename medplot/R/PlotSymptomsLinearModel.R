@@ -6,8 +6,8 @@
 #' @param data The data.
 #' @param measurementVar Which variable represent the measurement occasion.
 #' @param selectedMeasurement Which measurement occasion was selected.
-#' @param Which covariates are to be used.
-#' @param Which outcome variables were selected.
+#' @param covariate Which covariates are to be used.
+#' @param selectedSymptoms Which outcome variables were selected.
 #' 
 #' @export
 tableLinear <- function(data,
