@@ -11,7 +11,7 @@ importSymptomsData <- function (datafile, format) {
   
   if (format=="Excel") {
     # read the data into R
-    data <- read.xls(datafile, sheet="DATA")
+    data <- gdata::read.xls(datafile, sheet="DATA")
     # transform date information into R compliant dates
     # TODO: should we remove this line, since transform is done later, when the user select the 
     # date column?
@@ -36,6 +36,6 @@ importSymptomsData <- function (datafile, format) {
 #' @export
 importSymptomsPatients <- function (datafile) {
   
-  data <- read.xls(datafile, sheet="PATIENTS")
+  data <- gdata::read.xls(datafile, sheet="PATIENTS")
   return(data)
 }

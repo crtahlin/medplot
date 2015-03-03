@@ -2,8 +2,8 @@
 #' 
 #' @description Function call loads the shiny app in located the default installation folder.
 #' 
-#' @import Cairo XML boot gdata ggplot2 logistf lubridate nlme lme4 permute
-#' @import pheatmap plyr reshape2 rms scales shiny xtable 
+#' @import Cairo XML boot ggplot2 logistf lubridate nlme lme4 permute
+#' @import plyr reshape2 rms scales shiny xtable 
 #' 
 #' @export
 medplotOnline <- function(){

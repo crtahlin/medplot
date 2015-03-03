@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlotSymptomsImportData.R
 \name{importSymptomsData}
 \alias{importSymptomsData}
-\title{Function that imports data for the plotSymptoms plot}
+\title{Function that imports data for the plotSymptoms shiny app}
 \usage{
 importSymptomsData(datafile, format)
 }
@@ -13,6 +13,6 @@ importSymptomsData(datafile, format)
 }
 \description{
 Function is called to import the data in appropriate format for the
-plotSymptoms plot.
+plotSymptoms shiny app.
 }
 
