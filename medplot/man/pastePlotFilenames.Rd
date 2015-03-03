@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlotSymptomsLasagnaPlot.R
 \name{pastePlotFilenames}
 \alias{pastePlotFilenames}
-\title{Paste a list of filenames (helper function for lasagna plots)}
+\title{Return a list of plot file locations (helper function for lasagna plots)}
 \usage{
 pastePlotFilenames(filenames)
 }
@@ -13,6 +13,6 @@ pastePlotFilenames(filenames)
 Returns a vector containing paths to generated files (plots).
 }
 \description{
-Paste a list of filenames (helper function for lasagna plots)
+Return a list of plot file locations (helper function for lasagna plots)
 }
 
