@@ -1,10 +1,11 @@
-#' @title Function that imports data for the plotSymptoms plot
+#' @title Function that imports data for the plotSymptoms shiny app
 #' 
 #' @description Function is called to import the data in appropriate format for the
-#' plotSymptoms plot.
+#' plotSymptoms shiny app.
 #' 
 #' @param datafile Path to the file containing data.
 #' @param format Format of the file containing data ("Excel", "TSV", "Demo").
+#' 
 #' @export
 importSymptomsData <- function (datafile, format) {
   
@@ -25,12 +26,14 @@ importSymptomsData <- function (datafile, format) {
   }
   if (format=="Demo") {# Same code as for Excel at the moment
   }
-
+  
 }
 
 #' @title Function that imports PATIENTS Excel tab for the plotSymptoms plot
 #' 
 #' @param datafile Path to the file containing data.
+#' 
+#' @export
 importSymptomsPatients <- function (datafile) {
   
   data <- read.xls(datafile, sheet="PATIENTS")
