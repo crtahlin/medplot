@@ -1,10 +1,12 @@
 #' @title Determine the type of variable
 #' 
-#' @description Determines what type of variable is used.
+#' @description Determines what type of variable is used. Used in regression modeling.
 #' 
 #' @param variableValues takes a vector of values
 #' 
 #' @return Returns the number of levels and type of variable.
+#' 
+#' @export
 determineTypeofVariable <- function(variableValues) { # takes a vector of values
   if(!is.vector(variableValues)) {return("Error: Function expects a vector as argument")}
   #variableValues <- as.vector(variableValues)
