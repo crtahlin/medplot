@@ -1,3 +1,19 @@
+#' @title Return a list of result for mixed modeling
+#' 
+#' @description Returns a list containing results of mixed modeling. 
+#' The list contains the printable (for GUI output) and raw results (for ploting).
+#' 
+#' @param data The data.
+#' @param selectedSymptoms Which outcome variables were selected.
+#' @param coVariate1st Which covariate was selected.
+#' @param subjectIDVar Which variable identifies the subject.
+#' @param measurementVar Which variable represent the measurement occasion.
+#' @param dateVar Which variable represents the date.
+#' @param thresholdValue What was the selected theshold value.
+#' @param treatasBinary Should the data be treated as binary.
+#' @param selectedModel Which modeling variant was selected.
+#' 
+#' @export
 mixedModel <- function(data,               
                        selectedSymptoms,   
                        coVariate1st,        
@@ -9,14 +25,14 @@ mixedModel <- function(data,
                        selectedModel){      
   # if response variable is binary, do a data transformation based on the thresholdvalue
   if (treatasBinary==TRUE) {data[, selectedSymptoms] <- 
-                              ifelse(data[,selectedSymptoms]>thresholdValue, 1, 0)                            
+    ifelse(data[,selectedSymptoms]>thresholdValue, 1, 0)                            
   }
   
   # transform the 1st covariate into appropriate form ####
   coVariate1stType <- determineTypeofVariable(data[,coVariate1st])
   if (coVariate1stType["type"]=="character") {
-  # make coVariate1st factor variable
-  data[, coVariate1st] <- as.factor(data[, coVariate1st])
+    # make coVariate1st factor variable
+    data[, coVariate1st] <- as.factor(data[, coVariate1st])
   }
   if (coVariate1stType["type"]=="numeric" | coVariate1stType["type"]=="integer") {
     # make coVariate1st numeric variable
@@ -49,12 +65,12 @@ mixedModel <- function(data,
   }
   
   if (is.factor(data[,coVariate1st])) {
-  # name of the binary grouping variable coeficient assigned by R
-  coVariate1stCoefName <- describeComparison(data, coVariate1st)[["comparisonString"]]
-  # reference value is? the second level - the one that gets compared to the first level
-  referenceValue <- describeComparison(data, coVariate1st)[["nonReferenceLevels"]]
-  # what are we comparing?
-  coVariate1stComparison <- describeComparison(data, coVariate1st)[["comparisonText"]]
+    # name of the binary grouping variable coeficient assigned by R
+    coVariate1stCoefName <- describeComparison(data, coVariate1st)[["comparisonString"]]
+    # reference value is? the second level - the one that gets compared to the first level
+    referenceValue <- describeComparison(data, coVariate1st)[["nonReferenceLevels"]]
+    # what are we comparing?
+    coVariate1stComparison <- describeComparison(data, coVariate1st)[["comparisonText"]]
   } else {
     coVariate1stCoefName <- coVariate1st
     coVariate1stComparison <- "continious variable"
@@ -66,23 +82,23 @@ mixedModel <- function(data,
   measurementVarComparison <- describeComparison(data, measurementVar)[["referenceLevel"]]
   # the other measurement levels
   nonReferenceMeasurements <- describeComparison(data, measurementVar)[["nonReferenceLevels"]]
-   
+  
   # prepare data frame for the results, depending on what kind of response variable we have
   if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) { 
     # if 1st covariate is multilevel factor
     resultscoVariate1st <- data.frame(expand.grid(Variable=selectedSymptoms,
                                                   CovariateLevel=referenceValue))
     
-    } else { # if the 1st covariate is binary factor or numerical
-      resultscoVariate1st <- data.frame(Variable=selectedSymptoms) 
-      
-    }
+  } else { # if the 1st covariate is binary factor or numerical
+    resultscoVariate1st <- data.frame(Variable=selectedSymptoms) 
+    
+  }
   resultsMeasurementVar <- data.frame(expand.grid(Variable=selectedSymptoms,
                                                   Measurement=nonReferenceMeasurements))
-
+  
   resultsDaysSinceInclusion <- data.frame(Variable=selectedSymptoms)
   resultsIntercept <- data.frame(Variable=selectedSymptoms)
-
+  
   # The logic ####
   # cycle through response variables
   for (symptom in selectedSymptoms) {
@@ -142,73 +158,73 @@ mixedModel <- function(data,
       
       # results for the grouping variable if it is multilevel factor ####
       if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) {
-      for (level in referenceValue) {
-        tempResult <- returnResultsGlmer(model, paste0(coVariate1st,level))
-        
-        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
-                              resultscoVariate1st["CovariateLevel"]==level,
+        for (level in referenceValue) {
+          tempResult <- returnResultsGlmer(model, paste0(coVariate1st,level))
+          
+          resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                resultscoVariate1st["CovariateLevel"]==level,
                               "OR"] <- tempResult[["Estimate"]]
-        
-        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom & 
-                              resultscoVariate1st["CovariateLevel"]==level,
+          
+          resultscoVariate1st[resultscoVariate1st["Variable"]==symptom & 
+                                resultscoVariate1st["CovariateLevel"]==level,
                               "ORCILower"] <- tempResult[["CILower"]] 
-        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
-                              resultscoVariate1st["CovariateLevel"]==level,
+          resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                resultscoVariate1st["CovariateLevel"]==level,
                               "ORCIUpper"] <- tempResult[["CIUpper"]] 
-        
-        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
-                              resultscoVariate1st["CovariateLevel"]==level,
+          
+          resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                resultscoVariate1st["CovariateLevel"]==level,
                               "ORPValue"] <-  tempResult[["PValue"]] 
-       
-        rm(tempResult)
-      
-      }
+          
+          rm(tempResult)
+          
+        }
         
       } else {
-      # results for the grouping variable if it is binary or numerical ####
-      tempResult <- returnResultsGlmer(model, coVariate1stCoefName)
+        # results for the grouping variable if it is binary or numerical ####
+        tempResult <- returnResultsGlmer(model, coVariate1stCoefName)
         
-      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "OR"] <- 
-        tempResult[["Estimate"]] 
-      
-      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORCILower"] <- 
-        tempResult[["CILower"]] 
-      
-      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORCIUpper"] <- 
-        tempResult[["CIUpper"]] 
-      
-      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORPValue"] <- 
-        tempResult[["PValue"]] 
-      rm(tempResult)
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "OR"] <- 
+          tempResult[["Estimate"]] 
+        
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORCILower"] <- 
+          tempResult[["CILower"]] 
+        
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORCIUpper"] <- 
+          tempResult[["CIUpper"]] 
+        
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "ORPValue"] <- 
+          tempResult[["PValue"]] 
+        rm(tempResult)
       }
       
       
       # results for the measurement variable
       if (selectedModel=="MMmeasurement") {
-                
+        
         for (measurement in nonReferenceMeasurements) {
           tempResult <- returnResultsGlmer(model, paste0(measurementVar,measurement))
           
           resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["Measurement"]==measurement,
-                              "OR"] <- tempResult[["Estimate"]] 
+                                  resultsMeasurementVar["Measurement"]==measurement,
+                                "OR"] <- tempResult[["Estimate"]] 
           resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom & 
                                   resultsMeasurementVar["Measurement"]==measurement,
                                 "ORCILower"] <- tempResult[["CILower"]] 
           resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["Measurement"]==measurement,
+                                  resultsMeasurementVar["Measurement"]==measurement,
                                 "ORCIUpper"] <- tempResult[["CIUpper"]] 
           resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["Measurement"]==measurement,
-                              "ORPValue"] <- 
-          tempResult[["PValue"]] 
-        rm(tempResult)
-      }}
+                                  resultsMeasurementVar["Measurement"]==measurement,
+                                "ORPValue"] <- 
+            tempResult[["PValue"]] 
+          rm(tempResult)
+        }}
       
       # results for the days since inclusion variable
       if (selectedModel=="MMtimeSinceInclusion") {
         tempResult <- returnResultsGlmer(model, time)
-                
+        
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "OR"] <- 
           tempResult[["Estimate"]] 
         
@@ -226,20 +242,20 @@ mixedModel <- function(data,
     
     if(treatasBinary==FALSE) { #####
       model <- lmerTest::lmer(formula, na.action=na.omit, data=data)
-    
+      
       
       ##### Returns results form lmer() ####
       returnResultsLmer <- function(model,
                                     variateName) {
-      Estimate <- summary(model)$coef[variateName, "Estimate"]
-      confIntervals <- confint(model)[variateName, c("2.5 %", "97.5 %")]
-      CILower <- confIntervals[1]
-      CIUpper <- confIntervals[2]
-      PValue <- lmerTest::summary(model)$coef[variateName, "Pr(>|t|)"]
-      return(list(Estimate=Estimate, CILower=CILower, CIUpper=CIUpper, PValue=PValue))
+        Estimate <- summary(model)$coef[variateName, "Estimate"]
+        confIntervals <- confint(model)[variateName, c("2.5 %", "97.5 %")]
+        CILower <- confIntervals[1]
+        CIUpper <- confIntervals[2]
+        PValue <- lmerTest::summary(model)$coef[variateName, "Pr(>|t|)"]
+        return(list(Estimate=Estimate, CILower=CILower, CIUpper=CIUpper, PValue=PValue))
       }
       #####
- 
+      
       # results for the intercept (should be the same code, regardles of model type?)
       tempResult <- returnResultsLmer(model, "(Intercept)")
       # TODO: intercept has intercept, not Beta - OK for now, change later (some code 
@@ -260,63 +276,63 @@ mixedModel <- function(data,
       # results if coVariate1st multilevel factor
       if ( is.factor(data[,coVariate1st]) & (length(levels(data[,coVariate1st]))>2) ) {
         for (level in referenceValue) {
-            tempResult <- returnResultsLmer(model, paste0(coVariate1st,level))
-            
-            resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
-                                  resultscoVariate1st["CovariateLevel"]==level,
-                                "beta"] <- tempResult[["Estimate"]] 
-            resultscoVariate1st[resultscoVariate1st["Variable"]==symptom & 
-                                  resultscoVariate1st["CovariateLevel"]==level,
-                                "betaCILower"] <- tempResult[["CILower"]] 
-            resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
-                                  resultscoVariate1st["CovariateLevel"]==level,
-                                "betaCIUpper"] <- tempResult[["CIUpper"]] 
-            resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
-                                  resultscoVariate1st["CovariateLevel"]==level,
-                                "betaPValue"] <- 
-              tempResult[["PValue"]] 
-            rm(tempResult)
+          tempResult <- returnResultsLmer(model, paste0(coVariate1st,level))
+          
+          resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                resultscoVariate1st["CovariateLevel"]==level,
+                              "beta"] <- tempResult[["Estimate"]] 
+          resultscoVariate1st[resultscoVariate1st["Variable"]==symptom & 
+                                resultscoVariate1st["CovariateLevel"]==level,
+                              "betaCILower"] <- tempResult[["CILower"]] 
+          resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                resultscoVariate1st["CovariateLevel"]==level,
+                              "betaCIUpper"] <- tempResult[["CIUpper"]] 
+          resultscoVariate1st[resultscoVariate1st["Variable"]==symptom &
+                                resultscoVariate1st["CovariateLevel"]==level,
+                              "betaPValue"] <- 
+            tempResult[["PValue"]] 
+          rm(tempResult)
         }
-        } else {
-      # results for the coVariate1st variable
-      tempResult <- returnResultsLmer(model, coVariate1stCoefName)
-      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "beta"] <-
-        tempResult[["Estimate"]]
+      } else {
+        # results for the coVariate1st variable
+        tempResult <- returnResultsLmer(model, coVariate1stCoefName)
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "beta"] <-
+          tempResult[["Estimate"]]
         
-      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaCILower"] <-
-        tempResult[["CILower"]]
-      
-      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaCIUpper"] <-
-        tempResult[["CIUpper"]]
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaCILower"] <-
+          tempResult[["CILower"]]
         
-      resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaPValue"] <-
-        tempResult[["PValue"]]
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaCIUpper"] <-
+          tempResult[["CIUpper"]]
         
-      rm(tempResult)
-        }
+        resultscoVariate1st[resultscoVariate1st["Variable"]==symptom, "betaPValue"] <-
+          tempResult[["PValue"]]
+        
+        rm(tempResult)
+      }
       
       if (selectedModel=="MMmeasurement") {
         # results for the measurement variable
         for (measurement in nonReferenceMeasurements) {
-        tempResult <- returnResultsLmer(model, paste0(measurementVar,measurement))
+          tempResult <- returnResultsLmer(model, paste0(measurementVar,measurement))
           
           resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["Measurement"]==measurement,
-                              "beta"] <- tempResult[["Estimate"]]
-        
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["Measurement"]==measurement,
-                              "betaCILower"] <- tempResult[["CILower"]]
-        
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["Measurement"]==measurement,
-                              "betaCIUpper"] <- tempResult[["CIUpper"]]
-        
-        resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
-                                resultsMeasurementVar["Measurement"]==measurement,
-                              "betaPValue"] <- tempResult[["PValue"]]
-        rm(tempResult)
-      }}
+                                  resultsMeasurementVar["Measurement"]==measurement,
+                                "beta"] <- tempResult[["Estimate"]]
+          
+          resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
+                                  resultsMeasurementVar["Measurement"]==measurement,
+                                "betaCILower"] <- tempResult[["CILower"]]
+          
+          resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
+                                  resultsMeasurementVar["Measurement"]==measurement,
+                                "betaCIUpper"] <- tempResult[["CIUpper"]]
+          
+          resultsMeasurementVar[resultsMeasurementVar["Variable"]==symptom &
+                                  resultsMeasurementVar["Measurement"]==measurement,
+                                "betaPValue"] <- tempResult[["PValue"]]
+          rm(tempResult)
+        }}
       
       if (selectedModel=="MMtimeSinceInclusion") {
         # results for the days since inclusion variable
@@ -330,176 +346,138 @@ mixedModel <- function(data,
           tempResult[["CIUpper"]]
         resultsDaysSinceInclusion[resultsDaysSinceInclusion["Variable"]==symptom, "betaPValue"] <-
           tempResult[["PValue"]]
-                  
+        
         rm(tempResult)
       }
     }
   }
   
-#   # generate printable results tables
-#   # for outcome non-binary
-#   if (treatasBinary==FALSE) {
-#   # for covariate1st
-#     # TODO: for scenario with multilevel categorical
-#     # TODO: all scenarios for binary variables
-#   printableResultsCoVariate1st <- cbind(format(resultscoVariate1st$Variable, digits=2),
-#                                         format(resultscoVariate1st$beta, digits=2),
-#                                         paste(format(resultscoVariate1st$betaCILower, digits=2),
-#                                               "to",
-#                                               format(resultscoVariate1st$betaCIUpper, digits=2)),
-#                                         format(resultscoVariate1st$betaPValue, digits=2))
-#   colnames(printableResultsCoVariate1st) <- c("Variable", "Beta", "95% conf. interval", "P Value" )
-#   # for evaluation occasion
-#   printableResultsMeasurementVar <- cbind(format(resultsMeasurementVar$Variable, digits=2),
-#                                           format(resultsMeasurementVar$Measurement, digits=2),
-#                                           format(resultsMeasurementVar$beta, digits=2),
-#                                           paste(format(resultsMeasurementVar$betaCILower, digits=2),
-#                                                 "to",
-#                                                 format(resultsMeasurementVar$betaCIUpper, digits=2)),
-#                                           format(resultsMeasurementVar$betaPValue, digits=2))
-#   colnames(printableResultsMeasurementVar) <- c("Variable","Measurement" ,"Beta",
-#                                                 "95% conf. interval", "P Value" )
-#   # for timesinceinclusion
-#   printableResultsDaysSinceInclusion <- cbind(format(resultsDaysSinceInclusion$Variable, digits=2),
-#                                               format(resultsDaysSinceInclusion$beta, digits=2),
-#                                               paste(format(resultsDaysSinceInclusion$betaCILower, digits=2),
-#                                                     "to",
-#                                                     format(resultsDaysSinceInclusion$betaCIUpper, digits=2)),
-#                                               format(resultsDaysSinceInclusion$betaPValue, digits=2))
-#   colnames(printableResultsDaysSinceInclusion) <- c("Variable","Beta", "95% conf. interval", "P Value" )
-#   
-#   
-#   }
- # browser()
-
-
-#### Construct printable results tables ####
-# printable results for the intercepts ####
-if ("OR" %in% colnames(resultsIntercept) ) { # OR scenario ####
-  printableResultsIntercept <- 
-    data.frame("Variable"=resultsIntercept$Variable,
-               "Odds (intercept)"=format(resultsIntercept$OR, digits=2),
-               "95% conf. interval"= paste(format(resultsIntercept$ORCILower, digits=2),
-                                           "to",
-                                           format(resultsIntercept$ORCIUpper, digits=2)),
-               "P Value"=format(resultsIntercept$ORPValue, digits=2), check.names=FALSE)
-}
-
-if ("beta" %in% colnames(resultsIntercept) ) { # beta scenario ####
- printableResultsIntercept <- 
-   data.frame("Variable"=resultsIntercept$Variable,
-              "Intercept"=format(resultsIntercept$beta, digits=2),
-              "95% conf. interval"= paste(format(resultsIntercept$betaCILower, digits=2),
-                                          "to",
-                                          format(resultsIntercept$betaCIUpper, digits=2)),
-              "P Value"=format(resultsIntercept$betaPValue, digits=2), check.names=FALSE)                                                  
-}
-
-
-# printable results for coVariate1st ####
-if ("OR" %in% colnames(resultscoVariate1st) ) { # OR scenario ####
-if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
-    printableResultsCoVariate1st <-
-      data.frame("Variable"=resultscoVariate1st$Variable,
-                 "Levels"= resultscoVariate1st$CovariateLevel,
-                 "OR"=format(resultscoVariate1st$OR, digits=2),
-                 "95% conf. interval"= paste(format(resultscoVariate1st$ORCILower, digits=2),
+  #### Construct printable results tables ####
+  # printable results for the intercepts ####
+  if ("OR" %in% colnames(resultsIntercept) ) { # OR scenario ####
+    printableResultsIntercept <- 
+      data.frame("Variable"=resultsIntercept$Variable,
+                 "Odds (intercept)"=format(resultsIntercept$OR, digits=2),
+                 "95% conf. interval"= paste(format(resultsIntercept$ORCILower, digits=2),
                                              "to",
-                                             format(resultscoVariate1st$ORCIUpper, digits=2)),
-                 "P Value"=format(resultscoVariate1st$ORPValue, digits=2), check.names=FALSE)    
-    
-    # resort the results of printableResultsCoVariate1st
-    printableResultsCoVariate1st <- resortbyVariables(printableResultsCoVariate1st, selectedSymptoms)
-   
-} else { # non multilevel factor
-  printableResultsCoVariate1st <-
-    data.frame("Variable"=resultscoVariate1st$Variable,
-               "OR"=format(resultscoVariate1st$OR, digits=2),
-               "95% conf. interval"= paste(format(resultscoVariate1st$ORCILower, digits=2),
-                                           "to",
-                                           format(resultscoVariate1st$ORCIUpper, digits=2)),
-               "P Value"=format(resultscoVariate1st$ORPValue, digits=2), check.names=FALSE)
-}}
-if ("beta" %in% colnames(resultscoVariate1st) ) { # beta scenario ####
-  if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
-    printableResultsCoVariate1st <-
-      data.frame("Variable"=resultscoVariate1st$Variable,
-                 "Levels"= resultscoVariate1st$CovariateLevel,
-                 "Beta"=format(resultscoVariate1st$beta, digits=2),
-                 "95% conf. interval"= paste(format(resultscoVariate1st$betaCILower, digits=2),
+                                             format(resultsIntercept$ORCIUpper, digits=2)),
+                 "P Value"=format(resultsIntercept$ORPValue, digits=2), check.names=FALSE)
+  }
+  
+  if ("beta" %in% colnames(resultsIntercept) ) { # beta scenario ####
+    printableResultsIntercept <- 
+      data.frame("Variable"=resultsIntercept$Variable,
+                 "Intercept"=format(resultsIntercept$beta, digits=2),
+                 "95% conf. interval"= paste(format(resultsIntercept$betaCILower, digits=2),
                                              "to",
-                                             format(resultscoVariate1st$betaCIUpper, digits=2)),
-                 "P Value"=format(resultscoVariate1st$betaPValue, digits=2), check.names=FALSE)  
-    
-    # resort the results of printableResultsCoVariate1st
-    printableResultsCoVariate1st <- resortbyVariables(printableResultsCoVariate1st, selectedSymptoms)
-    
-  } else { # non multilevel factor
-    printableResultsCoVariate1st <-
-      data.frame("Variable"=resultscoVariate1st$Variable,
-                 "Beta"=format(resultscoVariate1st$beta, digits=2),
-                 "95% conf. interval"= paste(format(resultscoVariate1st$betaCILower, digits=2),
-                                             "to",
-                                             format(resultscoVariate1st$betaCIUpper, digits=2)),
-                 "P Value"=format(resultscoVariate1st$betaPValue, digits=2), check.names=FALSE)
-  }}
-
-printableResultsMeasurementVar <- data.frame()
-printableResultsDaysSinceInclusion <- data.frame()
-
-# printable results for MeasurementVar ####
-if ("OR" %in% colnames(resultsMeasurementVar) ) { # OR scenario ####
-        printableResultsMeasurementVar <-
-          data.frame("Variable"=resultsMeasurementVar$Variable,
-                     "Levels"= resultsMeasurementVar$Measurement,
-                     "OR"=format(resultsMeasurementVar$OR, digits=2),
-                     "95% conf. interval"= paste(format(resultsMeasurementVar$ORCILower, digits=2),
-                                                 "to",
-                                                 format(resultsMeasurementVar$ORCIUpper, digits=2)),
-                     "P Value"=format(resultsMeasurementVar$ORPValue, digits=2), check.names=FALSE)
-        
-        # resort the results of printableResultsMeasurementVar, to keep Variables together
-        printableResultsMeasurementVar <-
-          resortbyVariables(printableResultsMeasurementVar, selectedSymptoms)
-}
-
-if ("beta" %in% colnames(resultsMeasurementVar) ) { # beta scenario ####
-         printableResultsMeasurementVar <- 
-           data.frame("Variable"=resultsMeasurementVar$Variable,
-                      "Levels"= resultsMeasurementVar$Measurement,
-                      "Beta"=format(resultsMeasurementVar$beta, digits=2),
-                      "95% conf. interval"= paste(format(resultsMeasurementVar$betaCILower, digits=2),
-                                                  "to",
-                                                  format(resultsMeasurementVar$betaCIUpper, digits=2)),
-                      "P Value"=format(resultsMeasurementVar$betaPValue, digits=2), check.names=FALSE)
-         
-         # resort the results of printableResultsMeasurementVar, to keep Variables together
-         printableResultsMeasurementVar <-
-           resortbyVariables(printableResultsMeasurementVar, selectedSymptoms)
-}
-
-
-# printable results for daysSinceInclusion ####
-if ("OR" %in% colnames(resultsDaysSinceInclusion) ) { # OR scenario ####
-      printableResultsDaysSinceInclusion <-
-        data.frame("Variable"=resultsDaysSinceInclusion$Variable,
-                   "OR"=format(resultsDaysSinceInclusion$OR, digits=2),
-                   "95% conf. interval"= paste(format(resultsDaysSinceInclusion$ORCILower, digits=2),
+                                             format(resultsIntercept$betaCIUpper, digits=2)),
+                 "P Value"=format(resultsIntercept$betaPValue, digits=2), check.names=FALSE)                                                  
+  }
+  
+  
+  # printable results for coVariate1st ####
+  if ("OR" %in% colnames(resultscoVariate1st) ) { # OR scenario ####
+    if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
+      printableResultsCoVariate1st <-
+        data.frame("Variable"=resultscoVariate1st$Variable,
+                   "Levels"= resultscoVariate1st$CovariateLevel,
+                   "OR"=format(resultscoVariate1st$OR, digits=2),
+                   "95% conf. interval"= paste(format(resultscoVariate1st$ORCILower, digits=2),
                                                "to",
-                                               format(resultsDaysSinceInclusion$ORCIUpper, digits=2)),
-                   "P Value"=format(resultsDaysSinceInclusion$ORPValue, digits=2), check.names=FALSE)
-}
-
-if ("beta" %in% colnames(resultsDaysSinceInclusion) ) { # beta scenario ####
-  printableResultsDaysSinceInclusion <- 
-    data.frame("Variable"=resultsDaysSinceInclusion$Variable,
-               "Beta"=format(resultsDaysSinceInclusion$beta, digits=2),
-               "95% conf. interval"= paste(format(resultsDaysSinceInclusion$betaCILower, digits=2),
-                                           "to",
-                                           format(resultsDaysSinceInclusion$betaCIUpper, digits=2)),
-               "P Value"=format(resultsDaysSinceInclusion$betaPValue, digits=2), check.names=FALSE)
-}
-
+                                               format(resultscoVariate1st$ORCIUpper, digits=2)),
+                   "P Value"=format(resultscoVariate1st$ORPValue, digits=2), check.names=FALSE)    
+      
+      # resort the results of printableResultsCoVariate1st
+      printableResultsCoVariate1st <- resortbyVariables(printableResultsCoVariate1st, selectedSymptoms)
+      
+    } else { # non multilevel factor
+      printableResultsCoVariate1st <-
+        data.frame("Variable"=resultscoVariate1st$Variable,
+                   "OR"=format(resultscoVariate1st$OR, digits=2),
+                   "95% conf. interval"= paste(format(resultscoVariate1st$ORCILower, digits=2),
+                                               "to",
+                                               format(resultscoVariate1st$ORCIUpper, digits=2)),
+                   "P Value"=format(resultscoVariate1st$ORPValue, digits=2), check.names=FALSE)
+    }}
+  if ("beta" %in% colnames(resultscoVariate1st) ) { # beta scenario ####
+    if ("CovariateLevel" %in% colnames(resultscoVariate1st)) { # multilevel factor
+      printableResultsCoVariate1st <-
+        data.frame("Variable"=resultscoVariate1st$Variable,
+                   "Levels"= resultscoVariate1st$CovariateLevel,
+                   "Beta"=format(resultscoVariate1st$beta, digits=2),
+                   "95% conf. interval"= paste(format(resultscoVariate1st$betaCILower, digits=2),
+                                               "to",
+                                               format(resultscoVariate1st$betaCIUpper, digits=2)),
+                   "P Value"=format(resultscoVariate1st$betaPValue, digits=2), check.names=FALSE)  
+      
+      # resort the results of printableResultsCoVariate1st
+      printableResultsCoVariate1st <- resortbyVariables(printableResultsCoVariate1st, selectedSymptoms)
+      
+    } else { # non multilevel factor
+      printableResultsCoVariate1st <-
+        data.frame("Variable"=resultscoVariate1st$Variable,
+                   "Beta"=format(resultscoVariate1st$beta, digits=2),
+                   "95% conf. interval"= paste(format(resultscoVariate1st$betaCILower, digits=2),
+                                               "to",
+                                               format(resultscoVariate1st$betaCIUpper, digits=2)),
+                   "P Value"=format(resultscoVariate1st$betaPValue, digits=2), check.names=FALSE)
+    }}
+  
+  printableResultsMeasurementVar <- data.frame()
+  printableResultsDaysSinceInclusion <- data.frame()
+  
+  # printable results for MeasurementVar ####
+  if ("OR" %in% colnames(resultsMeasurementVar) ) { # OR scenario ####
+    printableResultsMeasurementVar <-
+      data.frame("Variable"=resultsMeasurementVar$Variable,
+                 "Levels"= resultsMeasurementVar$Measurement,
+                 "OR"=format(resultsMeasurementVar$OR, digits=2),
+                 "95% conf. interval"= paste(format(resultsMeasurementVar$ORCILower, digits=2),
+                                             "to",
+                                             format(resultsMeasurementVar$ORCIUpper, digits=2)),
+                 "P Value"=format(resultsMeasurementVar$ORPValue, digits=2), check.names=FALSE)
+    
+    # resort the results of printableResultsMeasurementVar, to keep Variables together
+    printableResultsMeasurementVar <-
+      resortbyVariables(printableResultsMeasurementVar, selectedSymptoms)
+  }
+  
+  if ("beta" %in% colnames(resultsMeasurementVar) ) { # beta scenario ####
+    printableResultsMeasurementVar <- 
+      data.frame("Variable"=resultsMeasurementVar$Variable,
+                 "Levels"= resultsMeasurementVar$Measurement,
+                 "Beta"=format(resultsMeasurementVar$beta, digits=2),
+                 "95% conf. interval"= paste(format(resultsMeasurementVar$betaCILower, digits=2),
+                                             "to",
+                                             format(resultsMeasurementVar$betaCIUpper, digits=2)),
+                 "P Value"=format(resultsMeasurementVar$betaPValue, digits=2), check.names=FALSE)
+    
+    # resort the results of printableResultsMeasurementVar, to keep Variables together
+    printableResultsMeasurementVar <-
+      resortbyVariables(printableResultsMeasurementVar, selectedSymptoms)
+  }
+  
+  # printable results for daysSinceInclusion ####
+  if ("OR" %in% colnames(resultsDaysSinceInclusion) ) { # OR scenario ####
+    printableResultsDaysSinceInclusion <-
+      data.frame("Variable"=resultsDaysSinceInclusion$Variable,
+                 "OR"=format(resultsDaysSinceInclusion$OR, digits=2),
+                 "95% conf. interval"= paste(format(resultsDaysSinceInclusion$ORCILower, digits=2),
+                                             "to",
+                                             format(resultsDaysSinceInclusion$ORCIUpper, digits=2)),
+                 "P Value"=format(resultsDaysSinceInclusion$ORPValue, digits=2), check.names=FALSE)
+  }
+  
+  if ("beta" %in% colnames(resultsDaysSinceInclusion) ) { # beta scenario ####
+    printableResultsDaysSinceInclusion <- 
+      data.frame("Variable"=resultsDaysSinceInclusion$Variable,
+                 "Beta"=format(resultsDaysSinceInclusion$beta, digits=2),
+                 "95% conf. interval"= paste(format(resultsDaysSinceInclusion$betaCILower, digits=2),
+                                             "to",
+                                             format(resultsDaysSinceInclusion$betaCIUpper, digits=2)),
+                 "P Value"=format(resultsDaysSinceInclusion$betaPValue, digits=2), check.names=FALSE)
+  }
+  
   return(list( intercept=resultsIntercept,
                printableIntercept=printableResultsIntercept,
                coVariate1st=resultscoVariate1st,
@@ -512,6 +490,17 @@ if ("beta" %in% colnames(resultsDaysSinceInclusion) ) { # beta scenario ####
                printabledaysSinceInclusion=printableResultsDaysSinceInclusion))
 }
 
+
+#' @title Helper function for calculating the number of days from first date
+#' 
+#' @description Calculates and returns the number of days since minimum date of a certain subject. 
+#' Adds the number of days since min date as column to the data frame it returns. 
+#' 
+#' @param data The data.
+#' @param subjectIDVar Which variable identifies the subject.
+#' @param dateVar Whic variable contains the date.
+#' 
+#' @export
 calculateDaysSinceInclusion <- function (data,
                                          subjectIDVar,
                                          dateVar) {
@@ -533,6 +522,15 @@ calculateDaysSinceInclusion <- function (data,
   return(data)
 }
 
+#' @title Plot the fixed effects for mixed models (helper function)
+#' 
+#' @param calculatedStatistics The results of modeling.
+#' @param coVariate1st Which variable represents the covariate.
+#' @param coVariate1stReferenceValue What is the reference level of the covariate.
+#' @param treatasBinary Should outcomes be treated as binary.
+#' @param variableOrder What should be the variable order on graph.
+#' 
+#' @export
 plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
                                             coVariate1st,
                                             coVariate1stReferenceValue,
@@ -566,12 +564,19 @@ plotFixedEffectsofcoVariate1st <- function (calculatedStatistics,
   }
   
   plot <- plot + myTheme() + labs(title=graphTitle,
-                                   x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
-    
+                                  x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
+  
   return(plot)  
 }
 
-
+#' @title Plot the fixed effects for mixed models (helper function)
+#' 
+#' @param calculatedStatistics The results of modeling.
+#' @param measurementVar Which variable represents the measurement occasion.
+#' @param treatasBinary Should outcomes be treated as binary.
+#' @param variableOrder What should be the variable order on graph.
+#' 
+#' @export
 plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
                                               measurementVar,
                                               treatasBinary, 
@@ -606,11 +611,17 @@ plotFixedEffectsofMeasurementVar <- function (calculatedStatistics,
   }
   
   plot <- plot + myTheme() + labs(title=graphTitle,
-                                   x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
+                                  x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
   return(plot)  
 }
 
-
+#' @title Plot the fixed effects for mixed models (helper function)
+#' 
+#' @param calculatedStatistics The results of modeling.
+#' @param treatasBinary Should outcomes be treated as binary.
+#' @param variableOrder What should be the variable order on graph.
+#' 
+#' @export
 plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
                                                   treatasBinary, 
                                                   variableOrder) {
@@ -642,11 +653,19 @@ plotFixedEffectsofDaysSinceInclusion <- function (calculatedStatistics,
   }
   
   plot <- plot + myTheme() + labs(title=graphTitle,
-                                   x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
+                                  x= xlabLabel) + scale_y_discrete(limits=rev(variableOrder))
   return(plot)  
 }
 
-# helper function to resort printable data frames to keep Variable levels together
+#' @title Helper function to resort printable data frames to keep Variable levels together
+#' 
+#' @description Resorts the variables according the order the outcomes were selected on the GUI.
+#' Returns the resorted dataframe.
+#' 
+#' @param dataframe The data.
+#' @param selectedSymptoms Which outcome variables were selected.
+#' 
+#' @export
 resortbyVariables <- function(dataframe, selectedSymptoms) {
   variableOrder <- match(dataframe[,"Variable"], selectedSymptoms)
   evaluationOrder <- dataframe[,"Levels"]
