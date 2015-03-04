@@ -6,31 +6,23 @@
 #' @param data Data fram to be passed to the function.
 #' @param variableName The column name of the variable used for filtering.
 #' @param variableValues The value of the filtering variable used to filter.
+#' 
+#' @export
 plotDendrogram <- function (data,
-                                   variableName,
-                                   variableValue,
-                                   selectedSymptoms,
-                                   treatasBinary=FALSE) {
-
+                            variableName,
+                            variableValue,
+                            selectedSymptoms,
+                            treatasBinary=FALSE) {
+  
   dataSubset=data[data[,variableName]==variableValue, selectedSymptoms]
   #distance: 1-Spearman's correlation, agglomeration method='complete',
   if (treatasBinary==FALSE) { # for numerical outcomes
-  plot(hclust(as.dist(1-cor(dataSubset, use="c", method="s"))), ann=FALSE)
+    plot(hclust(as.dist(1-cor(dataSubset, use="c", method="s"))), ann=FALSE)
   } else { # for binary outcomes
-  plot(hclust(dist(t(dataSubset))), ann=FALSE)
+    plot(hclust(dist(t(dataSubset))), ann=FALSE)
   }
   
 }
-
-
-# output$plotClusterDendrogram=renderPlot({
-#   print("plot the hierarchical clustering")
-#   #my.data.for.cluster=symptomsData()[symptomsData()[,3]==input$measurementSelected,-c(1:3)]
-#   my.data.for.cluster=symptomsData()[symptomsData()[,3]=="T0",-c(1:3)]
-#   plot(hclust(as.dist(cor(my.data.for.cluster, use="c", method="s"))))
-#   
-#   
-
 
 
 #' @title Plot clustered heatmaps.
@@ -40,6 +32,11 @@ plotDendrogram <- function (data,
 #' @param data Data fram to be passed to the function.
 #' @param variableName The column name of the variable used for filtering.
 #' @param variableValues The value of the filtering variable used to filter.
+#' @param selectedSymptoms The outcome variables selected.
+#' @param treatasBinary Dichotomize?
+#' @param annotationVars Which variables to use for annotation?
+#' 
+#' @export
 plotClusterHeatmap <- function (data,
                                 variableName,
                                 variableValue,
@@ -51,11 +48,11 @@ plotClusterHeatmap <- function (data,
   #browser()
   annotation <- data.frame(data[, annotationVars])
   if (treatasBinary==FALSE) {
-  pheatmap(dataSubset, annotation=annotation,
-           show_colnames=FALSE
- 
-           #main=FALSE) #"Outcomes and subjects heatmap"
-           )
+    pheatmap(dataSubset, annotation=annotation,
+             show_colnames=FALSE
+             
+             #main=FALSE) #"Outcomes and subjects heatmap"
+    )
   } else {
     pheatmap(dataSubset,
              legend_breaks=c(0,1),
@@ -65,19 +62,29 @@ plotClusterHeatmap <- function (data,
              annotation=annotation,
              show_colnames=FALSE
              #main=FALSE #"Outcomes and subjects heatmap"
-             )
+    )
   }
 }
 
-########
+#' @title Plot heatmap of correlations.
+#' 
+#' @description Plots a heatmap for correlation of symptoms.
+#' 
+#' @param data Data fram to be passed to the function.
+#' @param variableName The column name of the variable used for filtering.
+#' @param variableValues The value of the filtering variable used to filter.
+#' @param selectedSymptoms The outcome variables selected.
+#' @param treatasBinary Dichotomize?
+#' 
+#' @export
 plotCorrelations <- function (data,
-                                     variableName,
-                                     variableValue,
-                                     selectedSymptoms,
-                                     treatasBinary=FALSE) {
-
-dataSubset=data[data[,variableName]==variableValue, selectedSymptoms]  
-pheatmap(cor(dataSubset,method="s", use="c" ), display_numbers=TRUE#,
-         #main="Outcome correlations heatmap"
-         )
+                              variableName,
+                              variableValue,
+                              selectedSymptoms,
+                              treatasBinary=FALSE) {
+  
+  dataSubset=data[data[,variableName]==variableValue, selectedSymptoms]  
+  pheatmap(cor(dataSubset,method="s", use="c" ), display_numbers=TRUE#,
+           #main="Outcome correlations heatmap"
+  )
 }
