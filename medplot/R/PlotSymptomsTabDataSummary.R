@@ -1,8 +1,14 @@
 #' @title Tables summarizing data
 #' 
-#' @description TODO
+#' @description Outputs a summary of the data.
 #' 
-#' @param TODO
+#' @param data The data.
+#' @param personIDVar Which variable identifies the person.
+#' @param measurementVar Which variable identifies the evaluation occasion.
+#' @param selectedSymptoms Which outcome variables were selected.
+#' @param groupingVar Which variable is used for grouping.
+#' 
+#' @export
 summarizeData <- function(data,
                           personIDVar,
                           measurementVar,
@@ -43,7 +49,8 @@ summarizeData <- function(data,
   
   cat("\nNumber of subjects with missing values (by evaluation occasion, for the evaluated subjects) \n")
   #gets a table with the number of missing values for each variable, at each occasion
-  num.missing.values.occ=addmargins((t(apply(data[,selectedSymptoms], 2, function(symptom) {tapply(symptom, INDEX=data[,measurementVar], FUN=function(x) sum(is.na(x)))}))))
+  num.missing.values.occ=addmargins((t(apply(data[,selectedSymptoms], 2,
+            function(symptom) {tapply(symptom, INDEX=data[,measurementVar], FUN=function(x) sum(is.na(x)))}))))
   
   print(num.missing.values.occ)
   
@@ -60,8 +67,8 @@ summarizeData <- function(data,
   summary.grouping.variable.occ=tapply(data[,groupingVar], INDEX=data[,measurementVar], FUN=function(x) table(x))
   summary.grouping.variable.occ2=tapply(data[,groupingVar], INDEX=data[,measurementVar], FUN=function(x) 
   {my.res=numeric(num.levels.grouping)
-   for(i in 1:num.levels.grouping) my.res[i]=sum(x==levels.grouping[i], na.rm=T)
-   return(my.res)
+  for(i in 1:num.levels.grouping) my.res[i]=sum(x==levels.grouping[i], na.rm=T)
+  return(my.res)
   })
   
   summary.grouping.variable.occ2= matrix(unlist(summary.grouping.variable.occ2), ncol=num.levels.grouping, byrow=TRUE)

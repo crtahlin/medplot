@@ -7,9 +7,17 @@
 summarizeData(data, personIDVar, measurementVar, selectedSymptoms, groupingVar)
 }
 \arguments{
-\item{TODO}{}
+\item{data}{The data.}
+
+\item{personIDVar}{Which variable identifies the person.}
+
+\item{measurementVar}{Which variable identifies the evaluation occasion.}
+
+\item{selectedSymptoms}{Which outcome variables were selected.}
+
+\item{groupingVar}{Which variable is used for grouping.}
 }
 \description{
-TODO
+Outputs a summary of the data.
 }
 
