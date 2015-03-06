@@ -2,7 +2,7 @@
 #' 
 #' @description Function call loads the shiny app in located the default installation folder.
 #' 
-#' @import Cairo XML boot ggplot2 logistf lubridate lme4 permute
+#' @import Cairo XML boot ggplot2 logistf lme4 permute
 #' @import plyr scales shiny xtable 
 #' 
 #' @export
