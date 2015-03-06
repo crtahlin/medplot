@@ -2,14 +2,20 @@
 % Please edit documentation in R/PlotSymptomsTabDistribution_GroupingVariable.R
 \name{plotPropPositiveCI}
 \alias{plotPropPositiveCI}
-\title{Plot of confidence intervals for proportions for groups an measurements.}
+\title{Plot of confidence intervals}
 \usage{
 plotPropPositiveCI(data, groupingVar, measurementVar, selectedSymptoms)
 }
 \arguments{
-\item{TODO}{}
+\item{data}{The data.}
+
+\item{groupingVar}{The grouping variable.}
+
+\item{measurementVar}{Which is the measurement variable.}
+
+\item{selectedSymptoms}{For which outcomes.}
 }
 \description{
-TODO
+Plot of confidence intervals for proportions for groups and measurements.
 }
 

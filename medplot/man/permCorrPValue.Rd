@@ -8,9 +8,23 @@ permCorrPValue(data, nPermutations = 999, selectedSymptoms, groupingVar,
   measurementVar, measurementOccasion, FUN, thresholdValue = 0)
 }
 \arguments{
-\item{TODO}{}
+\item{data}{The data.}
+
+\item{nPermutations}{Number of permutations.}
+
+\item{selectedSymptoms}{Which outcomes were selected.}
+
+\item{groupingVar}{The grouping variable.}
+
+\item{measurementVar}{The evaluation occasion variable.}
+
+\item{measurementOccasion}{For which evaluation occasion.}
+
+\item{thresholdValue}{Dichotomizing threshold.}
+
+\item{Which}{function to use for returning a P value.}
 }
 \description{
-TODO
+Multivariate P values correction.
 }
 

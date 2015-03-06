@@ -8,9 +8,22 @@ tableMeGroups(data, groupingVar = "Sex", measurementVar, forMeasurement,
   symptomsNames, thresholdValue = 0, doPValueAdjustments)
 }
 \arguments{
-\item{TODO}{}
+\item{data}{The data.}
+
+\item{groupingVar}{Which is the grouping variable.}
+
+\item{measurementVar}{Which is the measurement variable.}
+
+\item{forMeasurement}{For which measuremet occasion?}
+
+\item{symptomsNames}{For which outcome variables?}
+
+\item{thresholdValue}{Dichotomizing threshold.}
+
+\item{doPValueAdjustments}{Should P value adjustments be done?}
 }
 \description{
-TODO Ignores threshold value.
+Table with median values for certain outcomes.
+Ignores threshold value.
 }
 
