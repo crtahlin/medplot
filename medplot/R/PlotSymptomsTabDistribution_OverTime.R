@@ -25,7 +25,7 @@ plotTimelineProfiles <- function (data,
   # one plot per variable - all data
   if (plotType=="oneGraph") {
     # prepare data
-    dataMelted <- melt(data=data,
+    dataMelted <- reshape2::melt(data=data,
                        id.vars=c(personIDVar, measurementVar),
                        measure.vars=selectedSymptoms )
     
@@ -124,7 +124,7 @@ plotTimelineBoxplots <- function(data,
                                  selectedSymptoms,
                                  faceting) {
   # prepare data
-  dataMelted <- melt(data=data,
+  dataMelted <- reshape2::melt(data=data,
                      id.vars=c(personIDVar, measurementVar),
                      measure.vars=selectedSymptoms )
   

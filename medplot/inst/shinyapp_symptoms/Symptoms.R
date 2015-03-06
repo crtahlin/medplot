@@ -8,7 +8,7 @@ library(reshape2)
 mySymptomsData["Date"] <- as.Date(mySymptomsData[,"Date"], "%d.%m.%Y")
 
 # transform data into ggplot compliant format
-symptomsData <- melt(mySymptomsData, id.vars = c("Patient", "Date"))
+symptomsData <- reshape2::melt(mySymptomsData, id.vars = c("Patient", "Date"))
 
 # save data to file to share with the R session that will run shiny
 save.image(file="data.Rdata")

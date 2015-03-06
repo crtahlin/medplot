@@ -43,7 +43,7 @@ plotTimeline <- function (data,
   if (displayFormat == "timeFromInclusion") { # in case of ploting days since inclusion on horizontal axis
     
     data <- data[ , c("daysSinceInclusion", personID, measurement, symptoms)]
-    data <- melt(data=data, id.vars = c(personID, "daysSinceInclusion", measurement))
+    data <- reshape2::melt(data=data, id.vars = c(personID, "daysSinceInclusion", measurement))
     #horizontalAxisVariable <- "daysSinceInclusion" 
     colnames(data)[which(colnames(data)=="daysSinceInclusion")] <- "horizontalAxisVariable"
     
@@ -53,7 +53,7 @@ plotTimeline <- function (data,
   # in case dates are used on the horizontal axis
   if (displayFormat == "dates") { # in case of ploting with dates on horzontal axis
     data <- data[ , c(date, personID, measurement, symptoms)]
-    data <- melt(data=data, id.vars = c(personID, date, measurement))
+    data <- reshape2::melt(data=data, id.vars = c(personID, date, measurement))
     
     #horizontalAxisVariable <- "Date"
     colnames(data)[which(colnames(data)==date)] <- "horizontalAxisVariable"
@@ -76,7 +76,7 @@ plotTimeline <- function (data,
     yCoord <- 0.65
     
     # melt the data
-    data <- melt(data=data, id.vars = c(personID, date, measurement))
+    data <- reshape2::melt(data=data, id.vars = c(personID, date, measurement))
     #horizontalAxisVariable <- "Measurement"
     colnames(data)[which(colnames(data)==measurement)] <- "horizontalAxisVariable"
     
