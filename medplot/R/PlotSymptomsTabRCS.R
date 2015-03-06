@@ -34,7 +34,7 @@ plotRCS <- function (data.all,
     if (binaryVar==TRUE) {my.data <- my.data.symptoms.yn[,i] } else {
       my.data <- my.data.symptoms[,i]}
     
-    my.mod=glm(my.data~rcs(my.var),
+    my.mod=glm(my.data~rms::rcs(my.var),
                family=ifelse(binaryVar, "binomial", "gaussian"), x=T, y=T)
     plotRCSmod(my.mod,
                my.mod$x[,2],
