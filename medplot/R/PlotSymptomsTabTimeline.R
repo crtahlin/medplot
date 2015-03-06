@@ -7,15 +7,19 @@
 #' @param personID Name of variable containing person ID.
 #' @param measurement Name of variable containing measuring occasion info.
 #' @param symptoms Vector of variable names representing measured symptoms. 
+#' @param displayFormat What should be on the horizontal axis (dates, timeFromInclusion).
+#' @param treatasBinary Dichotomize?
 #' 
 #' for ggplot() (see melt()). Returns a ggplot object that has to be plotted via print().
+#' 
+#' @export
 plotTimeline <- function (data,
-                                  date,
-                                  personID,
-                                  measurement,
-                                  symptoms, 
-                                  displayFormat = "dates",
-                                  treatasBinary=FALSE) {
+                          date,
+                          personID,
+                          measurement,
+                          symptoms, 
+                          displayFormat = "dates",
+                          treatasBinary=FALSE) {
   
   
   # Scenario - timeFromInclusion
@@ -34,7 +38,7 @@ plotTimeline <- function (data,
     data$minDate <- as.Date(data$minDate, format="%Y-%m-%d")
     data$daysSinceInclusion <- as.numeric(data[,date] - data$minDate) # save as numeric for melt()to work
   }
-    
+  
   # keep only relevant data and melt() it into ggplot format
   if (displayFormat == "timeFromInclusion") { # in case of ploting days since inclusion on horizontal axis
     
@@ -81,12 +85,12 @@ plotTimeline <- function (data,
   # rename column names to make sure ggplot recognizes them and that the code below works
   colnames(data)[which(colnames(data)==personID)] <- "PersonID"
   #colnames(data)[which(colnames(data)==measurement)] <- "Measurement"
- 
+  
   # Ploting function ####
   if (treatasBinary==FALSE) {
     plot <-  ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value, colour = variable)) +
-    geom_point(shape = 1) + myTheme() + 
-    geom_point(subset=.(value == 0), shape=2, size=1) + 
+      geom_point(shape = 1) + myTheme() + 
+      geom_point(subset=.(value == 0), shape=2, size=1) + 
       scale_size_area(breaks=c(1:10),minor_breaks=c(1:10),
                       guide="legend",
                       limits=c(1,10),
@@ -97,7 +101,7 @@ plotTimeline <- function (data,
     plot <- ggplot(data, aes(x = horizontalAxisVariable, y = PersonID, size = value,
                              colour = variable)) +
       geom_point(shape=1) + myTheme() + scale_size_manual(values=c(1,5))
-      
+    
   }
   
   # if plotting dates on horizontal axis
@@ -118,8 +122,8 @@ plotTimeline <- function (data,
   if (displayFormat == "measurementOccasions") { 
     plot <- plot + xlab("Measurement occasions") 
     plot <- plot + annotate(geom="text", x=as.factor(peopleMeasured$horizontalAxisVariable),
-                 y=yCoord,
-                 label=paste("Measured:",peopleMeasured$Number))
+                            y=yCoord,
+                            label=paste("Measured:",peopleMeasured$Number))
   }
   
   return(plot)

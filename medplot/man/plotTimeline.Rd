@@ -16,7 +16,11 @@ plotTimeline(data, date, personID, measurement, symptoms,
 
 \item{measurement}{Name of variable containing measuring occasion info.}
 
-\item{symptoms}{Vector of variable names representing measured symptoms.
+\item{symptoms}{Vector of variable names representing measured symptoms.}
+
+\item{displayFormat}{What should be on the horizontal axis (dates, timeFromInclusion).}
+
+\item{treatasBinary}{Dichotomize?
 
 for ggplot() (see melt()). Returns a ggplot object that has to be plotted via print().}
 }
