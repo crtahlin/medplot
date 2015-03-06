@@ -2,24 +2,25 @@
 % Please edit documentation in R/PlotSymptomsTabLogistf.R
 \name{tableLogistf}
 \alias{tableLogistf}
-\title{OBSOLETE Plot logistf
-#
-#}
+\title{Logistf data in tabular format}
 \usage{
 tableLogistf(data, measurementVar, selectedMeasurement, covariate,
   selectedSymptoms, thresholdValue)
 }
 \arguments{
-\item{TODO}{TODO write instructions}
+\item{data}{The data.}
 
-\item{TODO}{}
+\item{measurementVar}{Which variable represents the evaluatuon occasions.}
+
+\item{selectedMeasurement}{For which evaluation occasion.}
+
+\item{covariate}{Which var is the covariate.}
+
+\item{selectedSymptoms}{For which outcomes.}
+
+\item{thresholdValue}{For which threshold value.}
 }
 \description{
-TODO write description
-#
-#
-}
-\details{
-#
+TODO
 }
 
