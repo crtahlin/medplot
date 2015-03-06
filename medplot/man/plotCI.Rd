@@ -7,7 +7,13 @@
 plotCI(data.yn, measurements, selectedSymptoms, selectedProportion)
 }
 \arguments{
-\item{ddd}{dddd}
+\item{data.yn}{Data with threshold applied.}
+
+\item{measurements}{Vector of measurement values.}
+
+\item{selectedSymptoms}{Column names of symptoms in data frame.}
+
+\item{selectedProportion}{User selected measurement time.}
 }
 \description{
 Ploting confidence intervals

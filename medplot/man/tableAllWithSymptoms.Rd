@@ -2,15 +2,23 @@
 % Please edit documentation in R/PlotSymptomsTabDistribution_MeasurementOccasion.R
 \name{tableAllWithSymptoms}
 \alias{tableAllWithSymptoms}
-\title{Table for both groups}
+\title{Table with descritpive statistics for both groups}
 \usage{
 tableAllWithSymptoms(data, measurementVar, forMeasurement, symptomsNames,
   thresholdValue = 0)
 }
 \arguments{
-\item{TODO}{}
+\item{data}{The data}
+
+\item{measurementVar}{The mesurement variable.}
+
+\item{forMeasurement}{For which measurement occasion.}
+
+\item{symptomsNames}{For which outcomes.}
+
+\item{thresholdValue}{Threshold for dichotomizing.}
 }
 \description{
-TODO Thresholds take into account for proportions, not for medians.
+Thresholds taken into account for proportions, not for medians.
 }
 

@@ -8,6 +8,12 @@ plotDistribution(data, selectedSymptoms, selectedProportion, measurements)
 }
 \arguments{
 \item{data}{Data frame for ploting.}
+
+\item{selectedSymptoms}{Column names of symptoms in data frame.}
+
+\item{selectedProportion}{User selected measurement time.}
+
+\item{measurements}{Vector of measurement values.}
 }
 \description{
 Plots of distribution of the symptoms
