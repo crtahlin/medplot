@@ -8,9 +8,22 @@ plotTimelineProfiles(data, plotType = "oneGraph", personIDVar, measurementVar,
   selectedSymptoms, sizeofRandomSample = 10, sizeofGroup = 25)
 }
 \arguments{
-\item{TODO}{}
+\item{data}{The data.}
+
+\item{plotType}{What type of plot (oneGraph, randomSample, multipleGraphs).}
+
+\item{personIDVar}{Which variable identifies the person.}
+
+\item{measurementVar}{Which var identifies the evaluation occasion.}
+
+\item{selectedSymptoms}{Which outcomes were selected.}
+
+\item{sizeofRandomSample}{Size of random sample (in case of oneGraph variant).}
+
+\item{sizeofGroup}{Size of group (in case of multipleGraphs).}
 }
 \description{
-TODO
+Plots different kind of profile (spaghetti) plots
+for the outcome values over time.
 }
 

@@ -8,9 +8,17 @@ plotTimelineBoxplots(data, personIDVar, measurementVar, selectedSymptoms,
   faceting)
 }
 \arguments{
-\item{TODO}{}
+\item{data}{The data.}
+
+\item{personIDVar}{Which var identifies the person.}
+
+\item{measurementVar}{Which var identifies the evaluation occasions.}
+
+\item{selectedSymptoms}{Which outcome variables wre selected.}
+
+\item{faceting}{Should faceting be used.}
 }
 \description{
-TODO
+Plots boxplots for each evaluation occasion.
 }
 

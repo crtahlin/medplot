@@ -1,8 +1,17 @@
 #' @title Plot profiles for variables.
 #' 
-#' @description TODO
+#' @description Plots different kind of profile (spaghetti) plots
+#' for the outcome values over time.
 #' 
-#' @param TODO
+#' @param data The data.
+#' @param plotType What type of plot (oneGraph, randomSample, multipleGraphs).
+#' @param personIDVar Which variable identifies the person.
+#' @param measurementVar Which var identifies the evaluation occasion.
+#' @param selectedSymptoms Which outcomes were selected.
+#' @param sizeofRandomSample Size of random sample (in case of oneGraph variant).
+#' @param sizeofGroup Size of group (in case of multipleGraphs).
+#' 
+#' @export
 plotTimelineProfiles <- function (data,
                                   plotType="oneGraph",
                                   personIDVar,
@@ -10,8 +19,8 @@ plotTimelineProfiles <- function (data,
                                   selectedSymptoms,
                                   sizeofRandomSample=10,
                                   sizeofGroup=25) {
-
-
+  
+  
   # prepare data for different type of plots
   # one plot per variable - all data
   if (plotType=="oneGraph") {
@@ -19,7 +28,7 @@ plotTimelineProfiles <- function (data,
     dataMelted <- melt(data=data,
                        id.vars=c(personIDVar, measurementVar),
                        measure.vars=selectedSymptoms )
-  
+    
     # rename column names to make sure ggplot recognizes them
     colnames(dataMelted)[which(colnames(dataMelted)==personIDVar)] <- "PersonID"
     colnames(dataMelted)[which(colnames(dataMelted)==measurementVar)] <- "Measurement"
@@ -94,23 +103,26 @@ plotTimelineProfiles <- function (data,
     # add summary statistics at each point
     stat_summary(aes(group=1), geom="point", fun.y=median, shape=16, size=5, colour="red") 
   return(p)
-
+  
 }
 
 
 #' @title Plot timeline boxplots
 #' 
-#' @description TODO
+#' @description Plots boxplots for each evaluation occasion.
 #' 
-#' @param TODO
+#' @param data The data.
+#' @param personIDVar Which var identifies the person.
+#' @param measurementVar Which var identifies the evaluation occasions.
+#' @param selectedSymptoms Which outcome variables wre selected.
+#' @param faceting Should faceting be used.
 #' 
+#' @export
 plotTimelineBoxplots <- function(data,
                                  personIDVar,
                                  measurementVar,
                                  selectedSymptoms,
                                  faceting) {
-  # TODO remove next line
-  dev.list()
   # prepare data
   dataMelted <- melt(data=data,
                      id.vars=c(personIDVar, measurementVar),
@@ -123,39 +135,44 @@ plotTimelineBoxplots <- function(data,
   # set some variables as factors
   dataMelted[,"PersonID"] <- as.factor(dataMelted[,"PersonID"])
   dataMelted[,"Measurement"] <- as.factor(dataMelted[,"Measurement"])
-
-# code to draw graph
-#   # define x, y axis, groups, coloring
-if (faceting=="variablesOnYaxis") {
-p <- ggplot(data=dataMelted, aes(x=Measurement, y=value)) +
-  # draw points, jitter points, draw boxplots, facet by variable, use black & white theme
-  geom_boxplot(width=0.5) +
-  geom_jitter(alpha=I(1/5)) +
-  facet_grid(variable ~.) +
-  myTheme() +
-  ylab("Value") + xlab("Evaluation occasion")
-}
-
-if (faceting=="variablesOnXaxis") {
-  p <- ggplot(data=dataMelted, aes(x=variable, y=value)) +
-    # draw points, jitter points, draw boxplots, facet by variable, use black & white theme
-    geom_boxplot(width=0.5) +
-    geom_jitter(alpha=I(1/5)) +   
-    facet_grid(Measurement ~.) +
-    myTheme() +
-    theme(axis.text.x=element_text(angle=90, hjust=1)) +
-    ylab("Value") + xlab("Variable")
-}
-
-# return ggplot
-return(p)
+  
+  # code to draw graph
+  #   # define x, y axis, groups, coloring
+  if (faceting=="variablesOnYaxis") {
+    p <- ggplot(data=dataMelted, aes(x=Measurement, y=value)) +
+      # draw points, jitter points, draw boxplots, facet by variable, use black & white theme
+      geom_boxplot(width=0.5) +
+      geom_jitter(alpha=I(1/5)) +
+      facet_grid(variable ~.) +
+      myTheme() +
+      ylab("Value") + xlab("Evaluation occasion")
+  }
+  
+  if (faceting=="variablesOnXaxis") {
+    p <- ggplot(data=dataMelted, aes(x=variable, y=value)) +
+      # draw points, jitter points, draw boxplots, facet by variable, use black & white theme
+      geom_boxplot(width=0.5) +
+      geom_jitter(alpha=I(1/5)) +   
+      facet_grid(Measurement ~.) +
+      myTheme() +
+      theme(axis.text.x=element_text(angle=90, hjust=1)) +
+      ylab("Value") + xlab("Variable")
+  }
+  
+  # return ggplot
+  return(p)
 }
 
 #' @title Boxplots data in form of a table
 #' 
-#' @description TODO
+#' @description The data that is also plotted, presented in a table.
 #' 
-#' @param TODO
+#' @param data The data.
+#' @param measurements Vector of measurements?
+#' @param measurementVar Which var identifies the evaluation occasions.
+#' @param selectedSymptoms Which outcome variables were selected.
+#' 
+#' @export
 tabelizeBoxplots <- function(measurements,
                              measurementVar,
                              data,
@@ -164,9 +181,9 @@ tabelizeBoxplots <- function(measurements,
   tables <- list()
   for (measurement in measurements) {
     table <- tableMedians(measurement=measurement,
-                                             measurementVar=measurementVar,
-                                             data=data,
-                                             selectedSymptoms=selectedSymptoms)
+                          measurementVar=measurementVar,
+                          data=data,
+                          selectedSymptoms=selectedSymptoms)
     tables[[as.character(measurement)]] <- 
       print(xtable(table, caption=paste("Evaluation occasion:", measurement)),
             type="html",
@@ -176,11 +193,18 @@ tabelizeBoxplots <- function(measurements,
   return(lapply(tables, paste))
 }
 
-# helper function for tabelizeBoxplots
+#' @title Helper function for tabelizeBoxplots
+#' 
+#' @param data The data.
+#' @param measurement Selected evaluation occasion.
+#' @param measurementVar Which var identifies the evaluation occasions.
+#' @param selectedSymptoms Which outcome variables were selected.
+#' 
+#' @export
 tableMedians <- function(measurement,
-                                            measurementVar,
-                                            data,
-                                            selectedSymptoms) {
+                         measurementVar,
+                         data,
+                         selectedSymptoms) {
   
   result <- data.frame("Variables"=selectedSymptoms, "Median"=NA)
   result2 <- data.frame("Variables"=selectedSymptoms)
@@ -216,11 +240,18 @@ tableMedians <- function(measurement,
   return(list(printableTable=result, rawTable=result2))  
 }
 
-# construct a table of proportions
+#' @title Construct a table of proportions
+#' 
+#' @param data The data.
+#' @param measurement Selected evaluation occasion.
+#' @param measurementVar Which var identifies the evaluation occasions.
+#' @param selectedSymptoms Which outcome variables were selected.
+#' 
+#' @export
 tableProportions <- function(measurement,
-                                            measurementVar,
-                                            data,
-                                            selectedSymptoms) {
+                             measurementVar,
+                             data,
+                             selectedSymptoms) {
   
   result <- data.frame("Variables"=selectedSymptoms, "Positive"=NA)
   data <- data[data[,measurementVar]==measurement, ]
@@ -228,8 +259,7 @@ tableProportions <- function(measurement,
   for (symptom in selectedSymptoms) {
     positive <- sum(na.omit(data[ ,symptom]))
     all <- length(data[ ,symptom])
-
-    #res <- prop.test(x=positive, n=all, conf.level=0.95)
+    
     res <- binom.test(x=positive, n=all, conf.level=0.95)
     
     result[result[,"Variables"]==symptom,"Positive"] <- positive
