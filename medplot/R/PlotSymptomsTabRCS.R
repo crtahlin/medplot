@@ -1,8 +1,16 @@
 #' @title Plot RCS
 #' 
-#' @description Plot RCS.
+#' @description Plot restricted cubic splines.
 #' 
-#' @param data Data for ploting.
+#' @param data.all Data for ploting.
+#' @param data.yn ???
+#' @param measurement ???
+#' @param selectedSymptoms ???
+#' @param measurementSelectedrcs ???
+#' @param rcsIDVar ???
+#' @param binaryVar ???
+#' 
+#' @export
 plotRCS <- function (data.all,
                      data.yn=NULL,
                      measurement,
@@ -10,7 +18,7 @@ plotRCS <- function (data.all,
                      measurementSelectedrcs,
                      rcsIDVar,
                      binaryVar=TRUE) {
-
+  
   num.symptoms=length(selectedSymptoms)
   # only if binary data is passed to function
   if(binaryVar==TRUE & is.null(data.yn)) {return()}
@@ -24,15 +32,15 @@ plotRCS <- function (data.all,
   
   for(i in c(1:num.symptoms)){
     if (binaryVar==TRUE) {my.data <- my.data.symptoms.yn[,i] } else {
-    my.data <- my.data.symptoms[,i]}
+      my.data <- my.data.symptoms[,i]}
     
     my.mod=glm(my.data~rcs(my.var),
-    				 family=ifelse(binaryVar, "binomial", "gaussian"), x=T, y=T)
+               family=ifelse(binaryVar, "binomial", "gaussian"), x=T, y=T)
     plotRCSmod(my.mod,
-                 my.mod$x[,2],
-                 my.ylab=ifelse(binaryVar, "Probability of positive variable", "Estimated value"),
-                 my.xlab=rcsIDVar,
-                 my.title=selectedSymptoms[i])
+               my.mod$x[,2],
+               my.ylab=ifelse(binaryVar, "Probability of positive variable", "Estimated value"),
+               my.xlab=rcsIDVar,
+               my.title=selectedSymptoms[i])
     my.p=ifelse(anova(my.mod, test="Chi")[2,5]<0.001,
                 "P<0.001", 
                 paste("P=", round(anova(my.mod, test="Chi")[2,5],4)))
@@ -40,23 +48,38 @@ plotRCS <- function (data.all,
   }
 }
 
-#' @title Plot RCS MOD ??? TODO : help contents
+#' @title Helper function for plotRCS()
 #' 
 #' @param My.mod ???
+#' @param my.var
+#' @param my.ylab
+#' @param my.xlab
+#' @param my.xlim
+#' @param my.ylim
+#' @param my.knots
+#' @param my.title
+#' @param vlines
+#' @param hlines
+#' @param my.cex.lab
+#' @param my.axes
+#' @param my.cex.main
+#' @param my.cex.axis
+#' 
+#' @export 
 plotRCSmod <- function(My.mod,
-                         my.var,
-                         my.ylab="Response",
-                         my.xlab="Covariate",
-                         my.xlim=NULL,
-                         my.ylim=NULL,
-                         my.knots=NULL,
-                         my.title=NULL,
-                         vlines=NULL,
-                         hlines=NULL,
-                         my.cex.lab=NULL,
-                         my.axes=TRUE,
-                         my.cex.main=NULL,
-                         my.cex.axis=NULL ){
+                       my.var,
+                       my.ylab="Response",
+                       my.xlab="Covariate",
+                       my.xlim=NULL,
+                       my.ylim=NULL,
+                       my.knots=NULL,
+                       my.title=NULL,
+                       vlines=NULL,
+                       hlines=NULL,
+                       my.cex.lab=NULL,
+                       my.axes=TRUE,
+                       my.cex.main=NULL,
+                       my.cex.axis=NULL ){
   
   my.intervals<-c(0.0001, 0.001, .01, .1, 1, 10, 100, 1000, 10000, 100000)
   my.range<- diff(range(my.var, na.rm=T))
@@ -92,21 +115,27 @@ plotRCSmod <- function(My.mod,
 
 #' @title Restricted cubic spline P values in tabular form
 #' 
-#' @description TODO
+#' @param data.all ???
+#' @param data.yn
+#' @param measurement
+#' @param selectedSymptoms
+#' @param measurementSelectedrcs
+#' @param rcsIDVar
+#' @param binaryVar
 #' 
-#' @param TODO
+#' @export
 tableRCS <- function(data.all,
-                        data.yn,
-                        measurement,
-                        selectedSymptoms,
-                        measurementSelectedrcs,
-                        rcsIDVar, 
-						binaryVar=TRUE) {
+                     data.yn,
+                     measurement,
+                     selectedSymptoms,
+                     measurementSelectedrcs,
+                     rcsIDVar, 
+                     binaryVar=TRUE) {
   
   if(binaryVar==TRUE) {
-  data <- data.yn[measurement==measurementSelectedrcs,]
+    data <- data.yn[measurement==measurementSelectedrcs,]
   } else {
-  data <- data.all[measurement==measurementSelectedrcs, selectedSymptoms]
+    data <- data.all[measurement==measurementSelectedrcs, selectedSymptoms]
   }
   variable <- data.all[measurement==measurementSelectedrcs,rcsIDVar]  
   

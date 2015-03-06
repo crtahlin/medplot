@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlotSymptomsTabRCS.R
 \name{plotRCSmod}
 \alias{plotRCSmod}
-\title{Plot RCS MOD ??? TODO : help contents}
+\title{Helper function for plotRCS()}
 \usage{
 plotRCSmod(My.mod, my.var, my.ylab = "Response", my.xlab = "Covariate",
   my.xlim = NULL, my.ylim = NULL, my.knots = NULL, my.title = NULL,
@@ -11,8 +11,34 @@ plotRCSmod(My.mod, my.var, my.ylab = "Response", my.xlab = "Covariate",
 }
 \arguments{
 \item{My.mod}{???}
+
+\item{my.var}{}
+
+\item{my.ylab}{}
+
+\item{my.xlab}{}
+
+\item{my.xlim}{}
+
+\item{my.ylim}{}
+
+\item{my.knots}{}
+
+\item{my.title}{}
+
+\item{vlines}{}
+
+\item{hlines}{}
+
+\item{my.cex.lab}{}
+
+\item{my.axes}{}
+
+\item{my.cex.main}{}
+
+\item{my.cex.axis}{}
 }
 \description{
-Plot RCS MOD ??? TODO : help contents
+Helper function for plotRCS()
 }
 

@@ -8,9 +8,21 @@ plotRCS(data.all, data.yn = NULL, measurement, selectedSymptoms,
   measurementSelectedrcs, rcsIDVar, binaryVar = TRUE)
 }
 \arguments{
-\item{data}{Data for ploting.}
+\item{data.all}{Data for ploting.}
+
+\item{data.yn}{???}
+
+\item{measurement}{???}
+
+\item{selectedSymptoms}{???}
+
+\item{measurementSelectedrcs}{???}
+
+\item{rcsIDVar}{???}
+
+\item{binaryVar}{???}
 }
 \description{
-Plot RCS.
+Plot restricted cubic splines.
 }
 

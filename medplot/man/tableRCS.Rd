@@ -8,9 +8,21 @@ tableRCS(data.all, data.yn, measurement, selectedSymptoms,
   measurementSelectedrcs, rcsIDVar, binaryVar = TRUE)
 }
 \arguments{
-\item{TODO}{}
+\item{data.all}{???}
+
+\item{data.yn}{}
+
+\item{measurement}{}
+
+\item{selectedSymptoms}{}
+
+\item{measurementSelectedrcs}{}
+
+\item{rcsIDVar}{}
+
+\item{binaryVar}{}
 }
 \description{
-TODO
+Restricted cubic spline P values in tabular form
 }
 
