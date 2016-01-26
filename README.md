@@ -10,7 +10,23 @@ And the Tab Separated Values template file in the folder:
 
 [/inst/extdata/PlotSymptoms_TemplateTSV.txt](/inst/extdata/PlotSymptoms_TemplateTSV.txt)
 
-# Installation instructions for the medplot package
+# Docker installation
+
+Medplot package is contained in a docker image located at:
+   https://hub.docker.com/r/crtahlin/medplot/
+
+Make sure you have docker installed. Instructions for various platforms can be found on: 
+   https://docs.docker.com/engine/installation/
+
+Run the docker container (it is automatically downloaded) by running the following in a shell:
+
+   ```sudo docker run -d -p 3838:3838 crtahlin/medplot```
+
+Open your browser and connect to: [http://localhost:3838/shinyapp_symptoms2/](http://localhost:3838/shinyapp_symptoms2/)
+
+Medplot app should open in your browser.
+
+# General installation instructions for the medplot package
 
 After installing the [R programming language](http://cran.r-project.org/), use the console in R to install the devtools package:
 
